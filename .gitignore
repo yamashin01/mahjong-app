@@ -34,3 +34,8 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Docs
+docs/implementation-plan.md
+docs/mvp-workflow.md
+docs/technical-architecture.md
