@@ -39,3 +39,6 @@ next-env.d.ts
 docs/implementation-plan.md
 docs/mvp-workflow.md
 docs/technical-architecture.md
+
+# Supabase
+supabase/.temp
