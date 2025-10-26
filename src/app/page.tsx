@@ -22,7 +22,21 @@ export default async function Home() {
         </div>
         <div className="space-y-4">
           <p className="text-sm text-gray-500">ログイン中: {user.email}</p>
-          <SignOutButton />
+          <div className="flex flex-col gap-3">
+            <a
+              href="/groups"
+              className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
+            >
+              グループ一覧
+            </a>
+            <a
+              href="/profile"
+              className="rounded-lg bg-gray-600 px-6 py-3 text-white hover:bg-gray-700 transition-colors"
+            >
+              プロファイルを確認
+            </a>
+            <SignOutButton />
+          </div>
         </div>
       </div>
     </main>

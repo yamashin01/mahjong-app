@@ -18,9 +18,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-md space-y-8 p-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold">麻雀アプリ</h1>
-          <p className="mt-2 text-gray-600">
-            Googleアカウントでログインしてください
-          </p>
+          <p className="mt-2 text-gray-600">Googleアカウントでログインしてください</p>
         </div>
 
         <GoogleSignInButton />
