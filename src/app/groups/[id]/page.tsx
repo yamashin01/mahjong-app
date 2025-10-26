@@ -90,7 +90,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     .eq("group_id", groupId)
     .order("played_at", { ascending: false })
     .limit(5);
-  console.log(recentGames);
+
   if (gameError) {
     console.error("Supabase Recent Games Fetch Error:", gameError);
   }
