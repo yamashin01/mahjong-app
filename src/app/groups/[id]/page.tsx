@@ -83,6 +83,18 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     .eq("group_id", groupId)
     .single();
 
+  // 最近の対局を取得（最新5件）
+  const { data: recentGames, error: gameError } = await supabase
+    .from("games")
+    .select("*, game_results(rank, profiles(display_name))")
+    .eq("group_id", groupId)
+    .order("played_at", { ascending: false })
+    .limit(5);
+  console.log(recentGames);
+  if (gameError) {
+    console.error("Supabase Recent Games Fetch Error:", gameError);
+  }
+
   const isAdmin = membership.role === "admin";
 
   return (
@@ -159,6 +171,61 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               </div>
             ))}
           </div>
+        </div>
+
+        {/* 対局記録 */}
+        <div className="rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">対局記録</h2>
+            <Link
+              href={`/groups/${groupId}/games/new`}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition-colors"
+            >
+              対局を記録
+            </Link>
+          </div>
+
+          {recentGames && recentGames.length > 0 ? (
+            <div className="space-y-3">
+              {recentGames.map((game: any) => {
+                // 1位のプレイヤーを取得
+                const winner = game.game_results?.find((r: any) => r.rank === 1);
+                return (
+                  <Link
+                    key={game.id}
+                    href={`/groups/${groupId}/games/${game.id}`}
+                    className="block rounded-lg bg-gray-50 p-4 hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">
+                          {game.game_type === "tonpuu" ? "東風戦" : "東南戦"} 第{game.game_number}回戦
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(game.played_at).toLocaleDateString("ja-JP", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          })}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm text-gray-600">1位</p>
+                        <p className="font-medium">
+                          {winner?.profiles?.display_name || "名前未設定"}
+                        </p>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <p>まだ対局記録がありません</p>
+              <p className="text-sm mt-2">「対局を記録」ボタンから対局を記録してください</p>
+            </div>
+          )}
         </div>
 
         {/* グループルール */}
