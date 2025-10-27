@@ -73,6 +73,13 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
     .eq("group_id", groupId)
     .order("joined_at", { ascending: true });
 
+  // ゲストプレイヤー一覧を取得
+  const { data: guestPlayers } = await supabase
+    .from("guest_players")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("created_at", { ascending: true });
+
   // デフォルトの対局日時（現在時刻）
   const now = new Date();
   const defaultDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -180,11 +187,22 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
               >
                 <option value="">なし</option>
-                {members?.map((member) => (
-                  <option key={member.user_id} value={member.user_id}>
-                    {(member.profiles as any)?.display_name || "名前未設定"}
-                  </option>
-                ))}
+                <optgroup label="メンバー">
+                  {members?.map((member) => (
+                    <option key={member.user_id} value={member.user_id}>
+                      {(member.profiles as any)?.display_name || "名前未設定"}
+                    </option>
+                  ))}
+                </optgroup>
+                {guestPlayers && guestPlayers.length > 0 && (
+                  <optgroup label="ゲストプレイヤー">
+                    {guestPlayers.map((guest) => (
+                      <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
+                        {guest.name} (ゲスト)
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
               </select>
             </div>
           </div>
@@ -209,11 +227,22 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                   >
                     <option value="">選択してください</option>
-                    {members?.map((member) => (
-                      <option key={member.user_id} value={member.user_id}>
-                        {(member.profiles as any)?.display_name || "名前未設定"}
-                      </option>
-                    ))}
+                    <optgroup label="メンバー">
+                      {members?.map((member) => (
+                        <option key={member.user_id} value={member.user_id}>
+                          {(member.profiles as any)?.display_name || "名前未設定"}
+                        </option>
+                      ))}
+                    </optgroup>
+                    {guestPlayers && guestPlayers.length > 0 && (
+                      <optgroup label="ゲストプレイヤー">
+                        {guestPlayers.map((guest) => (
+                          <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
+                            {guest.name} (ゲスト)
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
                   </select>
                 </div>
 

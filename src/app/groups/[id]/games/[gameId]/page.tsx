@@ -60,6 +60,9 @@ export default async function GameDetailPage({
       profiles (
         display_name,
         avatar_url
+      ),
+      guest_players (
+        name
       )
     `,
     )
@@ -74,14 +77,21 @@ export default async function GameDetailPage({
   }
 
   // トビしたプレイヤー情報を取得
-  let tobiPlayer = null;
+  let tobiPlayerName = null;
   if (game.tobi_player_id) {
     const { data } = await supabase
       .from("profiles")
       .select("display_name")
       .eq("id", game.tobi_player_id)
       .single();
-    tobiPlayer = data;
+    tobiPlayerName = data?.display_name;
+  } else if (game.tobi_guest_player_id) {
+    const { data } = await supabase
+      .from("guest_players")
+      .select("name")
+      .eq("id", game.tobi_guest_player_id)
+      .single();
+    tobiPlayerName = data?.name;
   }
 
   const seatNames = {
@@ -127,10 +137,10 @@ export default async function GameDetailPage({
               <dt className="text-sm text-gray-600">役満回数</dt>
               <dd className="font-medium">{game.yakuman_count}回</dd>
             </div>
-            {tobiPlayer && (
+            {tobiPlayerName && (
               <div className="col-span-2">
                 <dt className="text-sm text-gray-600">トビ</dt>
-                <dd className="font-medium">{tobiPlayer.display_name || "名前未設定"}</dd>
+                <dd className="font-medium">{tobiPlayerName || "名前未設定"}</dd>
               </div>
             )}
           </dl>
@@ -172,7 +182,9 @@ export default async function GameDetailPage({
                       </span>
                     </td>
                     <td className="py-3 px-4 font-medium">
-                      {(result.profiles as any)?.display_name || "名前未設定"}
+                      {(result.profiles as any)?.display_name ||
+                       (result.guest_players as any)?.name ||
+                       "名前未設定"}
                     </td>
                     <td className="py-3 px-4">{seatNames[result.seat as keyof typeof seatNames]}</td>
                     <td className="py-3 px-4 text-right font-mono">

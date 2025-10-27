@@ -54,10 +54,24 @@ export async function createGame(formData: FormData) {
     playerRanks.set(p.playerId, index + 1);
   });
 
+  // トビプレイヤーの処理
+  let actualTobiPlayerId: string | null = null;
+  let actualTobiGuestPlayerId: string | null = null;
+  if (tobiPlayerId && tobiPlayerId.startsWith("guest-")) {
+    actualTobiGuestPlayerId = tobiPlayerId.replace("guest-", "");
+  } else if (tobiPlayerId) {
+    actualTobiPlayerId = tobiPlayerId;
+  }
+
   // 各プレイヤーのスコアを計算
   const results = players.map((player) => {
     const rank = playerRanks.get(player.playerId) || 1;
     const rawScore = player.finalPoints - rules.return_points;
+
+    // ゲストプレイヤーかどうかをチェック
+    const isGuest = player.playerId.startsWith("guest-");
+    const actualPlayerId = isGuest ? null : player.playerId;
+    const guestPlayerId = isGuest ? player.playerId.replace("guest-", "") : null;
 
     // ウマの取得
     let uma = 0;
@@ -83,7 +97,8 @@ export async function createGame(formData: FormData) {
     const pointAmount = totalScore * rules.rate;
 
     return {
-      player_id: player.playerId,
+      player_id: actualPlayerId,
+      guest_player_id: guestPlayerId,
       seat: player.seat,
       final_points: player.finalPoints,
       raw_score: rawScore,
@@ -103,7 +118,8 @@ export async function createGame(formData: FormData) {
       game_number: gameNumber,
       played_at: playedAt,
       recorded_by: user.id,
-      tobi_player_id: tobiPlayerId || null,
+      tobi_player_id: actualTobiPlayerId,
+      tobi_guest_player_id: actualTobiGuestPlayerId,
       yakuman_count: yakumanCount,
     })
     .select()

@@ -38,8 +38,9 @@ export type Database = {
           created_at: string;
           final_points: number;
           game_id: string;
+          guest_player_id: string | null;
           id: string;
-          player_id: string;
+          player_id: string | null;
           point_amount: number;
           rank: number;
           raw_score: number;
@@ -51,8 +52,9 @@ export type Database = {
           created_at?: string;
           final_points: number;
           game_id: string;
+          guest_player_id?: string | null;
           id?: string;
-          player_id: string;
+          player_id?: string | null;
           point_amount: number;
           rank: number;
           raw_score: number;
@@ -64,8 +66,9 @@ export type Database = {
           created_at?: string;
           final_points?: number;
           game_id?: string;
+          guest_player_id?: string | null;
           id?: string;
-          player_id?: string;
+          player_id?: string | null;
           point_amount?: number;
           rank?: number;
           raw_score?: number;
@@ -81,6 +84,20 @@ export type Database = {
             referencedRelation: "games";
             referencedColumns: ["id"];
           },
+          {
+            foreignKeyName: "game_results_guest_player_id_fkey";
+            columns: ["guest_player_id"];
+            isOneToOne: false;
+            referencedRelation: "guest_players";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "game_results_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
         ];
       };
       games: {
@@ -93,6 +110,7 @@ export type Database = {
           played_at: string;
           recorded_by: string;
           tobi_player_id: string | null;
+          tobi_guest_player_id: string | null;
           updated_at: string;
           yakuman_count: number | null;
         };
@@ -105,6 +123,7 @@ export type Database = {
           played_at?: string;
           recorded_by: string;
           tobi_player_id?: string | null;
+          tobi_guest_player_id?: string | null;
           updated_at?: string;
           yakuman_count?: number | null;
         };
@@ -117,6 +136,7 @@ export type Database = {
           played_at?: string;
           recorded_by?: string;
           tobi_player_id?: string | null;
+          tobi_guest_player_id?: string | null;
           updated_at?: string;
           yakuman_count?: number | null;
         };
@@ -222,6 +242,38 @@ export type Database = {
             foreignKeyName: "group_rules_group_id_fkey";
             columns: ["group_id"];
             isOneToOne: true;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      guest_players: {
+        Row: {
+          created_at: string;
+          group_id: string;
+          id: string;
+          name: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          group_id: string;
+          id?: string;
+          name: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          group_id?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guest_players_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
             referencedRelation: "groups";
             referencedColumns: ["id"];
           },
