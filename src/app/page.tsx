@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "./sign-out-button";
+import { MobileMenu } from "./mobile-menu";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -51,7 +52,9 @@ export default async function Home() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">麻雀スコア管理</h1>
-            <div className="flex items-center gap-3">
+
+            {/* デスクトップメニュー */}
+            <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/profile"
                 className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
@@ -60,6 +63,9 @@ export default async function Home() {
               </Link>
               <SignOutButton />
             </div>
+
+            {/* モバイルメニュー */}
+            <MobileMenu />
           </div>
         </div>
       </header>
@@ -72,16 +78,13 @@ export default async function Home() {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               ようこそ、{user.email}さん
             </h2>
-            <p className="text-gray-600">
-              友人同士の麻雀サークルのスコア記録・管理システムです
-            </p>
           </div>
 
           {/* 参加グループ一覧 */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">参加しているグループ</h2>
-              <div className="flex gap-3">
+            <div className="md:flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">参加しているグループ</h2>
+              <div className="flex gap-3 mb-2">
                 <Link
                   href="/groups/new"
                   className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
