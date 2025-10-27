@@ -67,18 +67,13 @@
 - ビルド成果物を7日間保持
 - ビルドエラーがあればPRブロック（必須チェック）
 
-### 4. PR Validation Workflow (`pr-validation.yml`)
-**目的**: PRの品質とセキュリティの検証
+### 4. Code Quality Validation Workflow (`quality-check.yml`)
+**目的**: コード変更の品質とセキュリティの検証
 
 **トリガー**:
 - `pull_request`: opened, synchronize, reopened
 
 **実行ジョブ**:
-
-#### validate-pr
-- PRタイトル形式の検証
-- PR説明の充実度チェック
-- 関連issue参照の確認
 
 #### check-files
 - 大容量ファイル検出（>1MB）
@@ -103,8 +98,7 @@ PR作成
   ├─→ Lint (並列実行) ⚠️  警告のみ
   ├─→ Type Check (並列実行) ✅ 必須
   ├─→ Build (並列実行) ✅ 必須
-  └─→ PR Validation (並列実行) ✅ 必須
-       ├─→ validate-pr
+  └─→ Code Quality Validation (並列実行) ✅ 必須
        ├─→ check-files
        └─→ security-check
 ```
@@ -125,9 +119,8 @@ Push
 **必須ステータスチェック**:
 - `Type Check / TypeScript Type Validation` ✅ 必須
 - `Build / Next.js Production Build` ✅ 必須
-- `PR Validation / Validate PR` ✅ 必須
-- `PR Validation / Check Modified Files` ✅ 必須
-- `PR Validation / Security Check` ✅ 必須
+- `Code Quality Validation / Check Modified Files` ✅ 必須
+- `Code Quality Validation / Security Check` ✅ 必須
 
 **オプション**:
 - `Lint / Code Quality Check` ⚠️ 警告のみ
@@ -212,11 +205,11 @@ pnpm test
 - ビルドエラーを修正してからpush
 - 環境変数（Supabase）を確認
 
-#### PR Validation失敗
+#### Code Quality Validation失敗
 - **PRマージがブロックされる**
-- PRタイトル形式を確認: `[Feature] タイトル`
-- PR説明を50文字以上記載
 - 大容量ファイル（>1MB）を確認
+- デバッグコード（console.log等）を削除
+- シークレット情報が含まれていないか確認
 
 ## 🚀 今後の拡張
 

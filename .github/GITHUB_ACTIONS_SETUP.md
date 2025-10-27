@@ -69,9 +69,9 @@ pnpm build       # ビルド検証
    - Build artifactsの保存
    - 必須チェック（失敗時PRブロック）
 
-4. **`.github/workflows/pr-validation.yml`** - PR品質検証
-   - PRタイトル・説明の検証
+4. **`.github/workflows/pr-validation.yml`** - コード品質検証
    - ファイルサイズチェック
+   - デバッグコード検出
    - セキュリティチェック
    - 必須チェック（失敗時PRブロック）
 
@@ -122,12 +122,11 @@ mainブランチに以下の保護ルールを設定することを推奨:
    - ✅ Require status checks to pass before merging
      - **必須**: `Type Check / TypeScript Type Validation`
      - **必須**: `Build / Next.js Production Build`
-     - **必須**: `PR Validation / Validate PR`
-     - **必須**: `PR Validation / Check Modified Files`
-     - **必須**: `PR Validation / Security Check`
+     - **必須**: `Code Quality Validation / Check Modified Files`
+     - **必須**: `Code Quality Validation / Security Check`
      - **オプション**: `Lint / Code Quality Check` (警告のみ)
    - ✅ Require branches to be up to date before merging
    - ✅ Require linear history (推奨)
 
-これにより、型チェック、ビルド、PR品質がパスしない限りmainブランチへのマージができなくなります。
+これにより、型チェック、ビルド、コード品質がパスしない限りmainブランチへのマージができなくなります。
 Lintは警告のみなので、失敗してもマージは可能です。

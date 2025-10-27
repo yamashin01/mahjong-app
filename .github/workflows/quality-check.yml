@@ -1,48 +1,11 @@
-name: PR Validation
+name: Code Quality Validation
 
-# PRの品質を検証: タイトル形式、説明の充実度、ファイルサイズ、セキュリティチェック
+# コード変更の品質を検証: ファイルサイズ、デバッグコード、セキュリティチェック
 on:
   pull_request:
     types: [opened, synchronize, reopened]
 
 jobs:
-  validate-pr:
-    name: Validate PR
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check PR title format
-        run: |
-          PR_TITLE="${{ github.event.pull_request.title }}"
-          if [[ ! "$PR_TITLE" =~ ^(\[Feature\]|\[Bug\]|\[Performance\]|\[Refactor\]|\[Docs\]) ]]; then
-            echo "❌ PR title must start with [Feature], [Bug], [Performance], [Refactor], or [Docs]"
-            echo "Current title: $PR_TITLE"
-            exit 1
-          fi
-          echo "✅ PR title format is valid"
-
-      - name: Check PR description
-        run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
-          if [ -z "$PR_BODY" ] || [ ${#PR_BODY} -lt 50 ]; then
-            echo "❌ PR description is too short (minimum 50 characters)"
-            echo "Please provide a meaningful description using the PR template"
-            exit 1
-          fi
-          echo "✅ PR description length is adequate"
-
-      - name: Check for related issue
-        run: |
-          PR_BODY="${{ github.event.pull_request.body }}"
-          if [[ ! "$PR_BODY" =~ (Closes|Fixes|Resolves)[[:space:]]+#[0-9]+ ]] && [[ ! "$PR_BODY" =~ 関連issue ]]; then
-            echo "⚠️  Warning: No related issue found"
-            echo "Consider linking an issue with 'Closes #123' or '関連issue'"
-          else
-            echo "✅ Related issue is linked"
-          fi
-
   check-files:
     name: Check Modified Files
     runs-on: ubuntu-latest
