@@ -306,8 +306,8 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         )}
 
         <div className="text-center">
-          <Link href="/groups" className="text-blue-600 hover:text-blue-700 hover:underline">
-            グループ一覧に戻る
+          <Link href="/" className="text-blue-600 hover:text-blue-700 hover:underline">
+            トップページに戻る
           </Link>
         </div>
       </div>

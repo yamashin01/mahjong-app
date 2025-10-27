@@ -234,10 +234,10 @@ export default async function ProfilePage() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">参加グループ ({memberships?.length || 0})</h2>
             <Link
-              href="/groups"
+              href="/"
               className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
             >
-              グループ一覧
+              トップページ
             </Link>
           </div>
 
@@ -276,8 +276,8 @@ export default async function ProfilePage() {
             <div className="text-center py-8 text-gray-500">
               <p>まだグループに参加していません</p>
               <p className="text-sm mt-2">
-                <Link href="/groups" className="text-blue-600 hover:underline">
-                  グループ一覧
+                <Link href="/" className="text-blue-600 hover:underline">
+                  トップページ
                 </Link>
                 からグループを作成または参加してください
               </p>
