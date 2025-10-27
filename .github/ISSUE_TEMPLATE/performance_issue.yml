@@ -1,0 +1,148 @@
+name: パフォーマンス問題
+description: ページの読み込みが遅い、動作が重いなどの報告
+title: "[Performance] "
+labels: ["performance", "bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        パフォーマンス問題の報告にご協力いただきありがとうございます。
+        具体的な状況を教えてください。
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 問題の説明
+      description: どのようなパフォーマンス問題が発生しているか説明してください
+      placeholder: ページの読み込みが遅い、操作の反応が遅い、など
+    validations:
+      required: true
+
+  - type: dropdown
+    id: page
+    attributes:
+      label: 発生ページ
+      description: 問題が発生しているページを選択してください
+      multiple: true
+      options:
+        - トップページ
+        - グループ一覧
+        - グループ詳細
+        - 対局記録ページ
+        - 対局詳細ページ
+        - プロフィールページ
+        - ランキングページ
+        - 設定ページ
+        - その他
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: 問題の種類
+      description: パフォーマンス問題の種類を選択してください
+      multiple: true
+      options:
+        - ページ読み込みが遅い
+        - 操作の反応が遅い
+        - スクロールがカクカクする
+        - 画像の読み込みが遅い
+        - フォーム送信が遅い
+        - データ更新が遅い
+        - その他
+    validations:
+      required: true
+
+  - type: input
+    id: load-time
+    attributes:
+      label: 読み込み時間
+      description: おおよその読み込み時間を記載してください
+      placeholder: 例：5秒以上かかる
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 再現手順
+      description: パフォーマンス問題を再現するための手順
+      placeholder: |
+        1. '...'に移動
+        2. '...'を実行
+        3. 読み込みが遅い/動作が重い
+    validations:
+      required: true
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: デバイス
+      description: 使用しているデバイスを選択してください
+      options:
+        - デスクトップ (高性能)
+        - デスクトップ (標準)
+        - デスクトップ (低性能)
+        - モバイル (高性能)
+        - モバイル (標準)
+        - モバイル (低性能)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: connection
+    attributes:
+      label: ネットワーク環境
+      description: 使用しているネットワーク環境を選択してください
+      options:
+        - 高速回線 (光ファイバーなど)
+        - 標準回線 (ADSL、4Gなど)
+        - 低速回線 (3G、公共Wi-Fiなど)
+        - オフライン時の問題
+    validations:
+      required: true
+
+  - type: dropdown
+    id: browser
+    attributes:
+      label: ブラウザ
+      description: 使用しているブラウザを選択してください
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Edge
+        - その他
+
+  - type: textarea
+    id: browser-tools
+    attributes:
+      label: ブラウザ開発者ツールの情報
+      description: 開発者ツールのパフォーマンスタブやネットワークタブのスクリーンショットがあれば添付してください
+      placeholder: スクリーンショットをここにドラッグ＆ドロップ
+
+  - type: textarea
+    id: console-errors
+    attributes:
+      label: コンソールエラー
+      description: ブラウザのコンソールにエラーが表示されている場合、その内容を記載してください
+      placeholder: エラーメッセージをコピー＆ペースト
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: 発生頻度
+      description: この問題はどのくらいの頻度で発生しますか？
+      options:
+        - 常に発生する
+        - 頻繁に発生する
+        - たまに発生する
+        - 一度だけ発生した
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 追加情報
+      description: その他、参考になる情報があれば記載してください
+      placeholder: メモリ使用量、CPU使用率、その他気づいた点など
