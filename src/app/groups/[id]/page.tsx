@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireGroupMembership } from "@/lib/auth/group-access";
+import { getPlayerDisplayName, hasPlayerAvatar, getPlayerAvatarUrl } from "@/lib/utils/player";
 import { CopyButton } from "./copy-button";
 import { MemberActions } from "./member-actions";
 import { RankingSection } from "./ranking-section";
@@ -32,30 +34,8 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // メンバーシップ確認
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-red-600">アクセス権限がありません</h1>
-          <p className="text-gray-600">このグループのメンバーではありません</p>
-          <Link
-            href="/groups"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
-          >
-            グループ一覧に戻る
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  // メンバーシップ確認（404を返す）
+  const membership = await requireGroupMembership(groupId, user.id);
 
   // メンバー一覧を取得
   const { data: members, error: membersError } = await supabase
@@ -151,9 +131,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             {members?.map((member) => (
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
-                  {(member.profiles as any)?.avatar_url ? (
+                  {hasPlayerAvatar(member as any) ? (
                     <img
-                      src={(member.profiles as any).avatar_url}
+                      src={getPlayerAvatarUrl(member as any)!}
                       alt=""
                       className="h-10 w-10 rounded-full"
                     />
@@ -162,7 +142,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                   )}
                   <div>
                     <p className="font-medium">
-                      {(member.profiles as any)?.display_name || "名前未設定"}
+                      {getPlayerDisplayName(member as any)}
                     </p>
                     <p className="text-sm text-gray-500">
                       参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
@@ -246,9 +226,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
           {recentGames && recentGames.length > 0 ? (
             <div className="space-y-3">
-              {recentGames.map((game: any) => {
+              {recentGames.map((game) => {
                 // 1位のプレイヤーを取得
-                const winner = game.game_results?.find((r: any) => r.rank === 1);
+                const winner = game.game_results?.find((r) => r.rank === 1);
                 return (
                   <Link
                     key={game.id}
@@ -271,9 +251,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                       <div className="text-right">
                         <p className="text-sm text-gray-600">1位</p>
                         <p className="font-medium">
-                          {winner?.profiles?.display_name ||
-                           winner?.guest_players?.name ||
-                           "名前未設定"}
+                          {getPlayerDisplayName(winner)}
                         </p>
                       </div>
                     </div>

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminRole } from "@/lib/auth/group-access";
 
 export async function createGroup(formData: FormData) {
   const supabase = await createClient();
@@ -115,14 +116,9 @@ export async function removeMember(formData: FormData) {
   const userId = formData.get("userId") as string;
 
   // 管理者権限チェック
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership || membership.role !== "admin") {
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
     return { error: "管理者権限がありません" };
   }
 
@@ -163,14 +159,9 @@ export async function updateMemberRole(formData: FormData) {
   const newRole = formData.get("role") as "admin" | "member";
 
   // 管理者権限チェック
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership || membership.role !== "admin") {
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
     return { error: "管理者権限がありません" };
   }
 
@@ -209,14 +200,9 @@ export async function updateGroupRules(formData: FormData) {
   const groupId = formData.get("groupId") as string;
 
   // 管理者権限チェック
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership || membership.role !== "admin") {
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
     return { error: "管理者権限がありません" };
   }
 
