@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { CopyButton } from "./copy-button";
 import { MemberActions } from "./member-actions";
+import { RankingSection } from "./ranking-section";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> } ) {
 
@@ -94,6 +95,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   if (gameError) {
     console.error("Supabase Recent Games Fetch Error:", gameError);
   }
+
+  // 今日のランキングデータを取得
+  const today = new Date().toISOString().split("T")[0];
+  const { data: rankings } = await supabase
+    .from("daily_rankings")
+    .select("*")
+    .eq("group_id", groupId)
+    .eq("game_date", today);
 
   const isAdmin = membership.role === "admin";
 
@@ -226,6 +235,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               <p className="text-sm mt-2">「対局を記録」ボタンから対局を記録してください</p>
             </div>
           )}
+        </div>
+
+        {/* 今日のランキング */}
+        <div className="rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">今日のランキング</h2>
+          <RankingSection rankings={rankings || []} />
         </div>
 
         {/* グループルール */}
