@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireGroupMembership } from "@/lib/auth/group-access";
+import { getPlayerDisplayName } from "@/lib/utils/player";
 
 export default async function GameDetailPage({
   params,
@@ -19,43 +21,14 @@ export default async function GameDetailPage({
     redirect("/login");
   }
 
-  // メンバーシップ確認
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-red-600">アクセス権限がありません</h1>
-          <p className="text-gray-600">このグループのメンバーではありません</p>
-          <Link
-            href="/groups"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
-          >
-            グループ一覧に戻る
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  // 対局情報を取得
-  const { data: game } = await supabase.from("games").select("*").eq("id", gameId).single();
-
-  if (!game) {
-    notFound();
-  }
-
-  // 対局結果を取得
-  const { data: results } = await supabase
-    .from("game_results")
-    .select(
-      `
+  // メンバーシップ確認とデータを並列取得（パフォーマンス最適化）
+  const [membership, gameResult, resultsData, groupResult] = await Promise.all([
+    requireGroupMembership(groupId, user.id),
+    supabase.from("games").select("*").eq("id", gameId).single(),
+    supabase
+      .from("game_results")
+      .select(
+        `
       *,
       profiles (
         display_name,
@@ -65,12 +38,19 @@ export default async function GameDetailPage({
         name
       )
     `,
-    )
-    .eq("game_id", gameId)
-    .order("rank", { ascending: true });
+      )
+      .eq("game_id", gameId)
+      .order("rank", { ascending: true }),
+    supabase.from("groups").select("name").eq("id", groupId).single(),
+  ]);
 
-  // グループ情報を取得
-  const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
+  const { data: game } = gameResult;
+  const { data: results } = resultsData;
+  const { data: group } = groupResult;
+
+  if (!game) {
+    notFound();
+  }
 
   if (!group) {
     notFound();
@@ -182,9 +162,7 @@ export default async function GameDetailPage({
                       </span>
                     </td>
                     <td className="py-3 px-4 font-medium">
-                      {(result.profiles as any)?.display_name ||
-                       (result.guest_players as any)?.name ||
-                       "名前未設定"}
+                      {getPlayerDisplayName(result)}
                     </td>
                     <td className="py-3 px-4">{seatNames[result.seat as keyof typeof seatNames]}</td>
                     <td className="py-3 px-4 text-right font-mono">

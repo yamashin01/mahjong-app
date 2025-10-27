@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createGame } from "@/app/actions/games";
 import { createClient } from "@/lib/supabase/server";
+import { requireGroupMembership } from "@/lib/auth/group-access";
+import { getPlayerDisplayName } from "@/lib/utils/player";
 
 export default async function NewGamePage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -16,30 +18,8 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
     redirect("/login");
   }
 
-  // メンバーシップ確認
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-red-600">アクセス権限がありません</h1>
-          <p className="text-gray-600">このグループのメンバーではありません</p>
-          <Link
-            href="/groups"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
-          >
-            グループ一覧に戻る
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  // メンバーシップ確認（404を返す）
+  await requireGroupMembership(groupId, user.id);
 
   // グループ情報を取得
   const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
@@ -190,7 +170,7 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                 <optgroup label="メンバー">
                   {members?.map((member) => (
                     <option key={member.user_id} value={member.user_id}>
-                      {(member.profiles as any)?.display_name || "名前未設定"}
+                      {getPlayerDisplayName(member as any)}
                     </option>
                   ))}
                 </optgroup>
@@ -230,7 +210,7 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                     <optgroup label="メンバー">
                       {members?.map((member) => (
                         <option key={member.user_id} value={member.user_id}>
-                          {(member.profiles as any)?.display_name || "名前未設定"}
+                          {getPlayerDisplayName(member as any)}
                         </option>
                       ))}
                     </optgroup>

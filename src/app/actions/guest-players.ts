@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdminRole } from "@/lib/auth/group-access";
 
 export async function addGuestPlayer(formData: FormData) {
   const supabase = await createClient();
@@ -23,14 +24,9 @@ export async function addGuestPlayer(formData: FormData) {
   }
 
   // 管理者権限チェック
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership || membership.role !== "admin") {
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
     return { error: "管理者のみがゲストプレイヤーを追加できます" };
   }
 
@@ -61,14 +57,9 @@ export async function deleteGuestPlayer(guestPlayerId: string, groupId: string) 
   }
 
   // 管理者権限チェック
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
-
-  if (!membership || membership.role !== "admin") {
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
     return { error: "管理者のみがゲストプレイヤーを削除できます" };
   }
 

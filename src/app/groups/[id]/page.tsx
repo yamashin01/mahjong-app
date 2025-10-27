@@ -1,6 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { requireGroupMembership } from "@/lib/auth/group-access";
+import { getPlayerDisplayName, hasPlayerAvatar, getPlayerAvatarUrl } from "@/lib/utils/player";
 import { CopyButton } from "./copy-button";
 import { MemberActions } from "./member-actions";
 import { RankingSection } from "./ranking-section";
@@ -21,47 +24,27 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     redirect("/login");
   }
 
-  // グループ情報を取得
-  const { data: group, error: groupError } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("id", groupId)
-    .single();
+  // グループ情報取得とメンバーシップ確認を並列実行（パフォーマンス最適化）
+  const [groupResult, membership] = await Promise.all([
+    supabase.from("groups").select("*").eq("id", groupId).single(),
+    requireGroupMembership(groupId, user.id),
+  ]);
+
+  const { data: group, error: groupError } = groupResult;
 
   if (groupError || !group) {
     notFound();
   }
 
-  // メンバーシップ確認
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
+  // 残りの全データを並列取得（パフォーマンス最適化）
+  const today = new Date().toISOString().split("T")[0];
 
-  if (!membership) {
-    return (
-      <main className="min-h-screen flex items-center justify-center p-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-red-600">アクセス権限がありません</h1>
-          <p className="text-gray-600">このグループのメンバーではありません</p>
-          <Link
-            href="/groups"
-            className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
-          >
-            グループ一覧に戻る
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  // メンバー一覧を取得
-  const { data: members, error: membersError } = await supabase
-    .from("group_members")
-    .select(
-      `
+  const [membersResult, { data: rules }, gamesResult, { data: rankings }, { data: guestPlayers }] =
+    await Promise.all([
+      supabase
+        .from("group_members")
+        .select(
+          `
       user_id,
       role,
       joined_at,
@@ -70,48 +53,34 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         avatar_url
       )
     `,
-    )
-    .eq("group_id", groupId)
-    .order("joined_at", { ascending: true });
-  
+        )
+        .eq("group_id", groupId)
+        .order("joined_at", { ascending: true }),
+      supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+      supabase
+        .from("games")
+        .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+        .eq("group_id", groupId)
+        .order("played_at", { ascending: false })
+        .limit(5),
+      supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
+      supabase
+        .from("guest_players")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: true }),
+    ]);
+
+  const { data: members, error: membersError } = membersResult;
+  const { data: recentGames, error: gameError } = gamesResult;
+
   if (membersError) {
     console.error("Supabase Group Members Fetch Error:", membersError);
-    // error.message を確認することで、RLS違反（'permission denied'など）が確認できることが多いです。
   }
-
-  // グループルールを取得
-  const { data: rules } = await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
-
-  // 最近の対局を取得（最新5件）
-  const { data: recentGames, error: gameError } = await supabase
-    .from("games")
-    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-    .eq("group_id", groupId)
-    .order("played_at", { ascending: false })
-    .limit(5);
 
   if (gameError) {
     console.error("Supabase Recent Games Fetch Error:", gameError);
   }
-
-  // 今日のランキングデータを取得
-  const today = new Date().toISOString().split("T")[0];
-  const { data: rankings } = await supabase
-    .from("daily_rankings")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("game_date", today);
-
-  // ゲストプレイヤー一覧を取得
-  const { data: guestPlayers } = await supabase
-    .from("guest_players")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("created_at", { ascending: true });
 
   const isAdmin = membership.role === "admin";
 
@@ -151,18 +120,20 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             {members?.map((member) => (
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
-                  {(member.profiles as any)?.avatar_url ? (
-                    <img
-                      src={(member.profiles as any).avatar_url}
-                      alt=""
-                      className="h-10 w-10 rounded-full"
+                  {hasPlayerAvatar(member as any) ? (
+                    <Image
+                      src={getPlayerAvatarUrl(member as any)!}
+                      alt={getPlayerDisplayName(member as any)}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-gray-200" />
                   )}
                   <div>
                     <p className="font-medium">
-                      {(member.profiles as any)?.display_name || "名前未設定"}
+                      {getPlayerDisplayName(member as any)}
                     </p>
                     <p className="text-sm text-gray-500">
                       参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
@@ -246,9 +217,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
           {recentGames && recentGames.length > 0 ? (
             <div className="space-y-3">
-              {recentGames.map((game: any) => {
+              {recentGames.map((game) => {
                 // 1位のプレイヤーを取得
-                const winner = game.game_results?.find((r: any) => r.rank === 1);
+                const winner = game.game_results?.find((r) => r.rank === 1);
                 return (
                   <Link
                     key={game.id}
@@ -271,9 +242,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                       <div className="text-right">
                         <p className="text-sm text-gray-600">1位</p>
                         <p className="font-medium">
-                          {winner?.profiles?.display_name ||
-                           winner?.guest_players?.name ||
-                           "名前未設定"}
+                          {getPlayerDisplayName(winner)}
                         </p>
                       </div>
                     </div>

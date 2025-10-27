@@ -57,7 +57,7 @@ export async function createGame(formData: FormData) {
   // トビプレイヤーの処理
   let actualTobiPlayerId: string | null = null;
   let actualTobiGuestPlayerId: string | null = null;
-  if (tobiPlayerId && tobiPlayerId.startsWith("guest-")) {
+  if (tobiPlayerId?.startsWith("guest-")) {
     actualTobiGuestPlayerId = tobiPlayerId.replace("guest-", "");
   } else if (tobiPlayerId) {
     actualTobiPlayerId = tobiPlayerId;
