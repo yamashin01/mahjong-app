@@ -58,10 +58,19 @@ jobs:
 
       - name: Check for secrets
         run: |
-          if git diff origin/${{ github.base_ref }}...HEAD | grep -E "(api[_-]?key|secret|password|token)" | grep "^+" | grep -v "NEXT_PUBLIC"; then
-            echo "❌ Potential secret detected in changes"
-            echo "Review changes for accidentally committed secrets"
-            exit 1
+          # .mdファイルと.github/workflows/*.ymlを除外してシークレット検出
+          # （ドキュメントやワークフロー定義では"secret"等の単語が正常に使用されるため）
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -v -E "(\.md$|\.github/workflows/.*\.yml$)" || true)
+          if [ -n "$changed_files" ]; then
+            for file in $changed_files; do
+              if [ -f "$file" ]; then
+                if git diff origin/${{ github.base_ref }}...HEAD -- "$file" | grep "^+" | grep -E "(api[_-]?key|secret|password|token)" | grep -v "NEXT_PUBLIC"; then
+                  echo "❌ Potential secret detected in: $file"
+                  echo "Review changes for accidentally committed secrets"
+                  exit 1
+                fi
+              fi
+            done
           fi
           echo "✅ No obvious secrets detected"
 
