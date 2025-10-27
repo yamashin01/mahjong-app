@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireGroupMembership } from "@/lib/auth/group-access";
@@ -23,25 +24,27 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     redirect("/login");
   }
 
-  // グループ情報を取得
-  const { data: group, error: groupError } = await supabase
-    .from("groups")
-    .select("*")
-    .eq("id", groupId)
-    .single();
+  // グループ情報取得とメンバーシップ確認を並列実行（パフォーマンス最適化）
+  const [groupResult, membership] = await Promise.all([
+    supabase.from("groups").select("*").eq("id", groupId).single(),
+    requireGroupMembership(groupId, user.id),
+  ]);
+
+  const { data: group, error: groupError } = groupResult;
 
   if (groupError || !group) {
     notFound();
   }
 
-  // メンバーシップ確認（404を返す）
-  const membership = await requireGroupMembership(groupId, user.id);
+  // 残りの全データを並列取得（パフォーマンス最適化）
+  const today = new Date().toISOString().split("T")[0];
 
-  // メンバー一覧を取得
-  const { data: members, error: membersError } = await supabase
-    .from("group_members")
-    .select(
-      `
+  const [membersResult, { data: rules }, gamesResult, { data: rankings }, { data: guestPlayers }] =
+    await Promise.all([
+      supabase
+        .from("group_members")
+        .select(
+          `
       user_id,
       role,
       joined_at,
@@ -50,48 +53,34 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         avatar_url
       )
     `,
-    )
-    .eq("group_id", groupId)
-    .order("joined_at", { ascending: true });
-  
+        )
+        .eq("group_id", groupId)
+        .order("joined_at", { ascending: true }),
+      supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+      supabase
+        .from("games")
+        .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+        .eq("group_id", groupId)
+        .order("played_at", { ascending: false })
+        .limit(5),
+      supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
+      supabase
+        .from("guest_players")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: true }),
+    ]);
+
+  const { data: members, error: membersError } = membersResult;
+  const { data: recentGames, error: gameError } = gamesResult;
+
   if (membersError) {
     console.error("Supabase Group Members Fetch Error:", membersError);
-    // error.message を確認することで、RLS違反（'permission denied'など）が確認できることが多いです。
   }
-
-  // グループルールを取得
-  const { data: rules } = await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
-
-  // 最近の対局を取得（最新5件）
-  const { data: recentGames, error: gameError } = await supabase
-    .from("games")
-    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-    .eq("group_id", groupId)
-    .order("played_at", { ascending: false })
-    .limit(5);
 
   if (gameError) {
     console.error("Supabase Recent Games Fetch Error:", gameError);
   }
-
-  // 今日のランキングデータを取得
-  const today = new Date().toISOString().split("T")[0];
-  const { data: rankings } = await supabase
-    .from("daily_rankings")
-    .select("*")
-    .eq("group_id", groupId)
-    .eq("game_date", today);
-
-  // ゲストプレイヤー一覧を取得
-  const { data: guestPlayers } = await supabase
-    .from("guest_players")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("created_at", { ascending: true });
 
   const isAdmin = membership.role === "admin";
 
@@ -132,10 +121,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   {hasPlayerAvatar(member as any) ? (
-                    <img
+                    <Image
                       src={getPlayerAvatarUrl(member as any)!}
-                      alt=""
-                      className="h-10 w-10 rounded-full"
+                      alt={getPlayerDisplayName(member as any)}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
                     />
                   ) : (
                     <div className="h-10 w-10 rounded-full bg-gray-200" />

@@ -1,8 +1,10 @@
 /**
  * Group access control utilities
  * Centralizes authorization checks to eliminate code duplication
+ * Uses React cache() for request-level memoization to avoid duplicate queries
  */
 
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 
@@ -15,24 +17,24 @@ export type GroupMembership = {
 
 /**
  * Check if a user is a member of a group
+ * Cached at request level to avoid duplicate database queries
  * @param groupId Group ID to check
  * @param userId User ID to check
  * @returns Membership data or null if not a member
  */
-export async function checkGroupMembership(
-  groupId: string,
-  userId: string
-): Promise<GroupMembership | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("group_members")
-    .select("role, user_id, group_id, joined_at")
-    .eq("group_id", groupId)
-    .eq("user_id", userId)
-    .single();
+export const checkGroupMembership = cache(
+  async (groupId: string, userId: string): Promise<GroupMembership | null> => {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from("group_members")
+      .select("role, user_id, group_id, joined_at")
+      .eq("group_id", groupId)
+      .eq("user_id", userId)
+      .single();
 
-  return data as GroupMembership | null;
-}
+    return data as GroupMembership | null;
+  },
+);
 
 /**
  * Require group membership or throw 404

@@ -21,21 +21,14 @@ export default async function GameDetailPage({
     redirect("/login");
   }
 
-  // メンバーシップ確認（404を返す）
-  await requireGroupMembership(groupId, user.id);
-
-  // 対局情報を取得
-  const { data: game } = await supabase.from("games").select("*").eq("id", gameId).single();
-
-  if (!game) {
-    notFound();
-  }
-
-  // 対局結果を取得
-  const { data: results } = await supabase
-    .from("game_results")
-    .select(
-      `
+  // メンバーシップ確認とデータを並列取得（パフォーマンス最適化）
+  const [membership, gameResult, resultsData, groupResult] = await Promise.all([
+    requireGroupMembership(groupId, user.id),
+    supabase.from("games").select("*").eq("id", gameId).single(),
+    supabase
+      .from("game_results")
+      .select(
+        `
       *,
       profiles (
         display_name,
@@ -45,12 +38,19 @@ export default async function GameDetailPage({
         name
       )
     `,
-    )
-    .eq("game_id", gameId)
-    .order("rank", { ascending: true });
+      )
+      .eq("game_id", gameId)
+      .order("rank", { ascending: true }),
+    supabase.from("groups").select("name").eq("id", groupId).single(),
+  ]);
 
-  // グループ情報を取得
-  const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
+  const { data: game } = gameResult;
+  const { data: results } = resultsData;
+  const { data: group } = groupResult;
+
+  if (!game) {
+    notFound();
+  }
 
   if (!group) {
     notFound();
