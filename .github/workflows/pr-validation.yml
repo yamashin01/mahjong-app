@@ -1,0 +1,112 @@
+name: PR Validation
+
+# PRの品質を検証: タイトル形式、説明の充実度、ファイルサイズ、セキュリティチェック
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate-pr:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check PR title format
+        run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if [[ ! "$PR_TITLE" =~ ^(\[Feature\]|\[Bug\]|\[Performance\]|\[Refactor\]|\[Docs\]) ]]; then
+            echo "❌ PR title must start with [Feature], [Bug], [Performance], [Refactor], or [Docs]"
+            echo "Current title: $PR_TITLE"
+            exit 1
+          fi
+          echo "✅ PR title format is valid"
+
+      - name: Check PR description
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          if [ -z "$PR_BODY" ] || [ ${#PR_BODY} -lt 50 ]; then
+            echo "❌ PR description is too short (minimum 50 characters)"
+            echo "Please provide a meaningful description using the PR template"
+            exit 1
+          fi
+          echo "✅ PR description length is adequate"
+
+      - name: Check for related issue
+        run: |
+          PR_BODY="${{ github.event.pull_request.body }}"
+          if [[ ! "$PR_BODY" =~ (Closes|Fixes|Resolves)[[:space:]]+#[0-9]+ ]] && [[ ! "$PR_BODY" =~ 関連issue ]]; then
+            echo "⚠️  Warning: No related issue found"
+            echo "Consider linking an issue with 'Closes #123' or '関連issue'"
+          else
+            echo "✅ Related issue is linked"
+          fi
+
+  check-files:
+    name: Check Modified Files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for large files
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD | while read file; do
+            if [ -f "$file" ]; then
+              size=$(wc -c < "$file")
+              if [ $size -gt 1048576 ]; then
+                echo "❌ Large file detected: $file ($(numfmt --to=iec-i --suffix=B $size))"
+                echo "Files larger than 1MB should not be committed"
+                exit 1
+              fi
+            fi
+          done
+          echo "✅ No large files detected"
+
+      - name: Check for debug code
+        run: |
+          if git diff origin/${{ github.base_ref }}...HEAD | grep -E "console\.(log|debug|info|warn)" | grep "^+"; then
+            echo "⚠️  Warning: console statements found in changes"
+            echo "Consider removing debug console statements before merging"
+          else
+            echo "✅ No console statements in changes"
+          fi
+
+      - name: Check for TODOs
+        run: |
+          if git diff origin/${{ github.base_ref }}...HEAD | grep "^+" | grep -i "TODO"; then
+            echo "⚠️  Warning: TODO comments found in changes"
+            echo "Consider addressing TODOs or creating issues for them"
+          else
+            echo "✅ No TODO comments in changes"
+          fi
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for secrets
+        run: |
+          if git diff origin/${{ github.base_ref }}...HEAD | grep -E "(api[_-]?key|secret|password|token)" | grep "^+" | grep -v "NEXT_PUBLIC"; then
+            echo "❌ Potential secret detected in changes"
+            echo "Review changes for accidentally committed secrets"
+            exit 1
+          fi
+          echo "✅ No obvious secrets detected"
+
+      - name: Check for sensitive files
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -E "\.env$|\.env\.local$|credentials"; then
+            echo "❌ Sensitive file detected in changes"
+            echo "Do not commit .env files or credentials"
+            exit 1
+          fi
+          echo "✅ No sensitive files in changes"
