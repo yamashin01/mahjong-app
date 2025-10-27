@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { CopyButton } from "./copy-button";
 import { MemberActions } from "./member-actions";
 import { RankingSection } from "./ranking-section";
+import { GuestPlayerForm } from "./guest-player-form";
+import { GuestPlayerActions } from "./guest-player-actions";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> } ) {
 
@@ -87,7 +89,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   // 最近の対局を取得（最新5件）
   const { data: recentGames, error: gameError } = await supabase
     .from("games")
-    .select("*, game_results(rank, profiles(display_name))")
+    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
     .eq("group_id", groupId)
     .order("played_at", { ascending: false })
     .limit(5);
@@ -103,6 +105,13 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     .select("*")
     .eq("group_id", groupId)
     .eq("game_date", today);
+
+  // ゲストプレイヤー一覧を取得
+  const { data: guestPlayers } = await supabase
+    .from("guest_players")
+    .select("*")
+    .eq("group_id", groupId)
+    .order("created_at", { ascending: true });
 
   const isAdmin = membership.role === "admin";
 
@@ -182,6 +191,47 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           </div>
         </div>
 
+        {/* ゲストプレイヤー */}
+        <div className="rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">ゲストプレイヤー ({guestPlayers?.length || 0})</h2>
+            {isAdmin && <GuestPlayerForm groupId={groupId} />}
+          </div>
+          <div className="space-y-3">
+            {guestPlayers && guestPlayers.length > 0 ? (
+              guestPlayers.map((guest) => (
+                <div key={guest.id} className="flex items-center justify-between py-2">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                      <span className="text-green-700 font-semibold">G</span>
+                    </div>
+                    <div>
+                      <p className="font-medium">{guest.name}</p>
+                      <p className="text-sm text-gray-500">
+                        追加日: {new Date(guest.created_at).toLocaleDateString("ja-JP")}
+                      </p>
+                    </div>
+                  </div>
+                  {isAdmin && (
+                    <GuestPlayerActions
+                      groupId={groupId}
+                      guestPlayerId={guest.id}
+                      guestPlayerName={guest.name}
+                    />
+                  )}
+                </div>
+              ))
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <p>ゲストプレイヤーはいません</p>
+                {isAdmin && (
+                  <p className="text-sm mt-2">「ゲストプレイヤー追加」ボタンから追加できます</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* 対局記録 */}
         <div className="rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
@@ -221,7 +271,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                       <div className="text-right">
                         <p className="text-sm text-gray-600">1位</p>
                         <p className="font-medium">
-                          {winner?.profiles?.display_name || "名前未設定"}
+                          {winner?.profiles?.display_name ||
+                           winner?.guest_players?.name ||
+                           "名前未設定"}
                         </p>
                       </div>
                     </div>
