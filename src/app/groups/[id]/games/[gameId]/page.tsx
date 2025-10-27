@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
 export default async function GameDetailPage({
@@ -22,7 +22,7 @@ export default async function GameDetailPage({
   }
 
   // メンバーシップ確認とデータを並列取得（パフォーマンス最適化）
-  const [membership, gameResult, resultsData, groupResult] = await Promise.all([
+  const [_membership, gameResult, resultsData, groupResult] = await Promise.all([
     requireGroupMembership(groupId, user.id),
     supabase.from("games").select("*").eq("id", gameId).single(),
     supabase
@@ -134,13 +134,17 @@ export default async function GameDetailPage({
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">順位</th>
-                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">プレイヤー</th>
+                  <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">
+                    プレイヤー
+                  </th>
                   <th className="py-3 px-4 text-left text-sm font-medium text-gray-600">座席</th>
                   <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">最終点</th>
                   <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">素点</th>
                   <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">ウマ</th>
                   <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">スコア</th>
-                  <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">ポイント</th>
+                  <th className="py-3 px-4 text-right text-sm font-medium text-gray-600">
+                    ポイント
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -161,10 +165,10 @@ export default async function GameDetailPage({
                         {result.rank}
                       </span>
                     </td>
-                    <td className="py-3 px-4 font-medium">
-                      {getPlayerDisplayName(result)}
+                    <td className="py-3 px-4 font-medium">{getPlayerDisplayName(result)}</td>
+                    <td className="py-3 px-4">
+                      {seatNames[result.seat as keyof typeof seatNames]}
                     </td>
-                    <td className="py-3 px-4">{seatNames[result.seat as keyof typeof seatNames]}</td>
                     <td className="py-3 px-4 text-right font-mono">
                       {result.final_points.toLocaleString()}
                     </td>
@@ -208,7 +212,10 @@ export default async function GameDetailPage({
         </div>
 
         <div className="text-center">
-          <Link href={`/groups/${groupId}`} className="text-blue-600 hover:text-blue-700 hover:underline">
+          <Link
+            href={`/groups/${groupId}`}
+            className="text-blue-600 hover:text-blue-700 hover:underline"
+          >
             グループページに戻る
           </Link>
         </div>

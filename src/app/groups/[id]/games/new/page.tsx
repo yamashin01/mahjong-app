@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createGame } from "@/app/actions/games";
-import { createClient } from "@/lib/supabase/server";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
 export default async function NewGamePage({ params }: { params: Promise<{ id: string }> }) {
@@ -143,7 +143,10 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
 
             {/* 役満回数 */}
             <div>
-              <label htmlFor="yakumanCount" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="yakumanCount"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 役満回数
               </label>
               <input
@@ -158,7 +161,10 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
 
             {/* トビ */}
             <div>
-              <label htmlFor="tobiPlayerId" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="tobiPlayerId"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 トビしたプレイヤー（任意）
               </label>
               <select
@@ -197,7 +203,10 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
 
                 {/* プレイヤー選択 */}
                 <div>
-                  <label htmlFor={`player${i}Id`} className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor={`player${i}Id`}
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     プレイヤー <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -228,7 +237,10 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
 
                 {/* 座席 */}
                 <div>
-                  <label htmlFor={`player${i}Seat`} className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor={`player${i}Seat`}
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     座席 <span className="text-red-500">*</span>
                   </label>
                   <select

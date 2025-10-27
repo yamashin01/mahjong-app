@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { updateProfile } from "@/app/actions/profile";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -139,7 +139,8 @@ export default async function ProfilePage() {
             <div className="rounded-lg bg-green-50 p-4 text-center">
               <p className="text-sm text-gray-600">合計ポイント</p>
               <p className="text-2xl font-bold text-green-600">
-                {Number(stats.totalPoints) >= 0 ? "+" : ""}¥{Number(stats.totalPoints).toLocaleString()}
+                {Number(stats.totalPoints) >= 0 ? "+" : ""}¥
+                {Number(stats.totalPoints).toLocaleString()}
               </p>
             </div>
           </div>
@@ -151,12 +152,18 @@ export default async function ProfilePage() {
                 <div
                   className="h-full bg-yellow-500"
                   style={{
-                    width: stats.totalGames > 0 ? `${(stats.firstPlace / stats.totalGames) * 100}%` : "0%",
+                    width:
+                      stats.totalGames > 0
+                        ? `${(stats.firstPlace / stats.totalGames) * 100}%`
+                        : "0%",
                   }}
                 />
               </div>
               <p className="text-xs font-medium mt-1">
-                {stats.totalGames > 0 ? ((stats.firstPlace / stats.totalGames) * 100).toFixed(0) : 0}%
+                {stats.totalGames > 0
+                  ? ((stats.firstPlace / stats.totalGames) * 100).toFixed(0)
+                  : 0}
+                %
               </p>
             </div>
             <div className="text-center">
@@ -165,12 +172,18 @@ export default async function ProfilePage() {
                 <div
                   className="h-full bg-gray-400"
                   style={{
-                    width: stats.totalGames > 0 ? `${(stats.secondPlace / stats.totalGames) * 100}%` : "0%",
+                    width:
+                      stats.totalGames > 0
+                        ? `${(stats.secondPlace / stats.totalGames) * 100}%`
+                        : "0%",
                   }}
                 />
               </div>
               <p className="text-xs font-medium mt-1">
-                {stats.totalGames > 0 ? ((stats.secondPlace / stats.totalGames) * 100).toFixed(0) : 0}%
+                {stats.totalGames > 0
+                  ? ((stats.secondPlace / stats.totalGames) * 100).toFixed(0)
+                  : 0}
+                %
               </p>
             </div>
             <div className="text-center">
@@ -179,12 +192,18 @@ export default async function ProfilePage() {
                 <div
                   className="h-full bg-orange-400"
                   style={{
-                    width: stats.totalGames > 0 ? `${(stats.thirdPlace / stats.totalGames) * 100}%` : "0%",
+                    width:
+                      stats.totalGames > 0
+                        ? `${(stats.thirdPlace / stats.totalGames) * 100}%`
+                        : "0%",
                   }}
                 />
               </div>
               <p className="text-xs font-medium mt-1">
-                {stats.totalGames > 0 ? ((stats.thirdPlace / stats.totalGames) * 100).toFixed(0) : 0}%
+                {stats.totalGames > 0
+                  ? ((stats.thirdPlace / stats.totalGames) * 100).toFixed(0)
+                  : 0}
+                %
               </p>
             </div>
             <div className="text-center">
@@ -193,12 +212,18 @@ export default async function ProfilePage() {
                 <div
                   className="h-full bg-blue-400"
                   style={{
-                    width: stats.totalGames > 0 ? `${(stats.fourthPlace / stats.totalGames) * 100}%` : "0%",
+                    width:
+                      stats.totalGames > 0
+                        ? `${(stats.fourthPlace / stats.totalGames) * 100}%`
+                        : "0%",
                   }}
                 />
               </div>
               <p className="text-xs font-medium mt-1">
-                {stats.totalGames > 0 ? ((stats.fourthPlace / stats.totalGames) * 100).toFixed(0) : 0}%
+                {stats.totalGames > 0
+                  ? ((stats.fourthPlace / stats.totalGames) * 100).toFixed(0)
+                  : 0}
+                %
               </p>
             </div>
           </div>
@@ -228,7 +253,9 @@ export default async function ProfilePage() {
                     <div>
                       <p className="font-medium">{membership.groups.name}</p>
                       {membership.groups.description && (
-                        <p className="text-sm text-gray-600 mt-1">{membership.groups.description}</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {membership.groups.description}
+                        </p>
                       )}
                     </div>
                     <div className="text-right">
