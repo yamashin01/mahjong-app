@@ -75,9 +75,7 @@ export function MobileMenu() {
               </Link>
 
               <div className="pt-2 border-t border-gray-200">
-                <div onClick={() => setIsOpen(false)}>
                   <SignOutButton variant="mobile" />
-                </div>
               </div>
             </nav>
           </div>
