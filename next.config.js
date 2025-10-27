@@ -10,7 +10,7 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "hiyokoyarou.com",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
     formats: ["image/webp", "image/avif"],
