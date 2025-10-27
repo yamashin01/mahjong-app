@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 質問・相談
+    url: https://github.com/yamada/mahjong-app/discussions
+    about: 使い方の質問や相談はDiscussionsをご利用ください
+  - name: ドキュメント
+    url: https://github.com/yamada/mahjong-app/wiki
+    about: アプリの使い方やFAQはWikiをご確認ください

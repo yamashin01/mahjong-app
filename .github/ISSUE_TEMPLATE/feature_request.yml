@@ -1,0 +1,98 @@
+name: 機能リクエスト
+description: 新機能や機能改善の提案
+title: "[Feature] "
+labels: ["enhancement", "feature-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        機能リクエストにご協力いただきありがとうございます。
+        新機能や改善のアイデアをお聞かせください。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: 解決したい課題
+      description: この機能リクエストに関連する問題や課題を説明してください
+      placeholder: 現在、...という問題があります
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: 提案する解決策
+      description: どのような機能や改善があれば課題が解決できるか説明してください
+      placeholder: ...という機能があれば、...できるようになります
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 代替案
+      description: 検討した他の解決策や代替案があれば記載してください
+      placeholder: 他に...という方法も考えられます
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: 優先度
+      description: この機能の優先度を選択してください
+      options:
+        - 🔴 High - 重要で早急に必要
+        - 🟡 Medium - あると便利
+        - 🟢 Low - 将来的にあると良い
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: カテゴリ
+      description: この機能リクエストのカテゴリを選択してください
+      multiple: true
+      options:
+        - UI/UX改善
+        - 新機能
+        - パフォーマンス
+        - セキュリティ
+        - 対局記録
+        - ランキング
+        - グループ管理
+        - ユーザー管理
+        - その他
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: モックアップ・スケッチ
+      description: UIの変更を伴う場合、モックアップやスケッチを添付してください
+      placeholder: 画像をここにドラッグ＆ドロップ
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: ユースケース
+      description: この機能がどのように使われるか、具体的なシナリオを記載してください
+      placeholder: |
+        1. ユーザーが...する時
+        2. ...という機能を使って
+        3. ...できるようになる
+
+  - type: checkboxes
+    id: willing-to-contribute
+    attributes:
+      label: 貢献意向
+      description: この機能の実装に貢献する意向はありますか？
+      options:
+        - label: プルリクエストを作成する準備がある
+        - label: テストに協力できる
+        - label: ドキュメント作成に協力できる
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 追加情報
+      description: その他、参考になる情報があれば記載してください
+      placeholder: 参考リンク、類似機能の例など
