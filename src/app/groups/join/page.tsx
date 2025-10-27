@@ -59,7 +59,7 @@ export default async function JoinGroupPage() {
               グループに参加
             </button>
             <Link
-              href="/groups"
+              href="/"
               className="flex-1 rounded-lg bg-gray-200 px-6 py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors text-center"
             >
               キャンセル

@@ -41,7 +41,7 @@ export async function createGroup(formData: FormData) {
 
   // トリガーによってgroup_membersとgroup_rulesが自動作成される
 
-  revalidatePath("/groups");
+  revalidatePath("/");
   redirect(`/groups/${group.id}`);
 }
 
@@ -97,7 +97,7 @@ export async function joinGroup(formData: FormData) {
     return { error: "グループへの参加に失敗しました" };
   }
 
-  revalidatePath("/groups");
+  revalidatePath("/");
   redirect(`/groups/${group.id}`);
 }
 
