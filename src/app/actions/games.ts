@@ -136,9 +136,7 @@ export async function createGame(formData: FormData) {
     ...result,
   }));
 
-  const { error: resultsError } = await supabase
-    .from("game_results")
-    .insert(gameResults);
+  const { error: resultsError } = await supabase.from("game_results").insert(gameResults);
 
   if (resultsError) {
     console.error("Error creating game results:", resultsError);

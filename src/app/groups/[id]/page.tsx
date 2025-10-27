@@ -1,17 +1,16 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { requireGroupMembership } from "@/lib/auth/group-access";
-import { getPlayerDisplayName, hasPlayerAvatar, getPlayerAvatarUrl } from "@/lib/utils/player";
+import { createClient } from "@/lib/supabase/server";
+import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./copy-button";
+import { GuestPlayerActions } from "./guest-player-actions";
+import { GuestPlayerForm } from "./guest-player-form";
 import { MemberActions } from "./member-actions";
 import { RankingSection } from "./ranking-section";
-import { GuestPlayerForm } from "./guest-player-form";
-import { GuestPlayerActions } from "./guest-player-actions";
 
-export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> } ) {
-
+export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
 
   const supabase = await createClient();
@@ -132,9 +131,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div className="h-10 w-10 rounded-full bg-gray-200" />
                   )}
                   <div>
-                    <p className="font-medium">
-                      {getPlayerDisplayName(member as any)}
-                    </p>
+                    <p className="font-medium">{getPlayerDisplayName(member as any)}</p>
                     <p className="text-sm text-gray-500">
                       参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
                     </p>
@@ -165,7 +162,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         {/* ゲストプレイヤー */}
         <div className="rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">ゲストプレイヤー ({guestPlayers?.length || 0})</h2>
+            <h2 className="text-lg font-semibold">
+              ゲストプレイヤー ({guestPlayers?.length || 0})
+            </h2>
             {isAdmin && <GuestPlayerForm groupId={groupId} />}
           </div>
           <div className="space-y-3">
@@ -229,7 +228,8 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="font-medium">
-                          {game.game_type === "tonpuu" ? "東風戦" : "東南戦"} 第{game.game_number}回戦
+                          {game.game_type === "tonpuu" ? "東風戦" : "東南戦"} 第{game.game_number}
+                          回戦
                         </p>
                         <p className="text-sm text-gray-600">
                           {new Date(game.played_at).toLocaleDateString("ja-JP", {
@@ -241,9 +241,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-600">1位</p>
-                        <p className="font-medium">
-                          {getPlayerDisplayName(winner)}
-                        </p>
+                        <p className="font-medium">{getPlayerDisplayName(winner)}</p>
                       </div>
                     </div>
                   </Link>

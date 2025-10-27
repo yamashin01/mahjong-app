@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { requireAdminRole } from "@/lib/auth/group-access";
+import { createClient } from "@/lib/supabase/server";
 
 export async function addGuestPlayer(formData: FormData) {
   const supabase = await createClient();

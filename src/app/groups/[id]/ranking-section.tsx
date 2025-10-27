@@ -23,7 +23,9 @@ export function RankingSection({ rankings }: { rankings: RankingData[] }) {
   }
 
   // ポイント順でソート
-  const sortedRankings = [...rankings].sort((a, b) => Number(b.total_points || 0) - Number(a.total_points || 0));
+  const sortedRankings = [...rankings].sort(
+    (a, b) => Number(b.total_points || 0) - Number(a.total_points || 0),
+  );
 
   return (
     <div className="overflow-x-auto">
@@ -67,7 +69,7 @@ export function RankingSection({ rankings }: { rankings: RankingData[] }) {
                 </span>
               </td>
               <td className="py-3 px-4 text-center font-mono text-sm">
-                {((player.first_place_count || 0) / (player.games_played || 1) * 100).toFixed(1)}%
+                {(((player.first_place_count || 0) / (player.games_played || 1)) * 100).toFixed(1)}%
               </td>
               <td className="py-3 px-4 text-center">
                 <span

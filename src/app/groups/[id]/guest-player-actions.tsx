@@ -30,6 +30,7 @@ export function GuestPlayerActions({
 
   return (
     <button
+      type="button"
       onClick={handleDelete}
       disabled={isDeleting}
       className="rounded-lg bg-red-100 px-3 py-1 text-sm text-red-700 hover:bg-red-200 transition-colors disabled:opacity-50"

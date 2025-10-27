@@ -4,9 +4,9 @@
  * Uses React cache() for request-level memoization to avoid duplicate queries
  */
 
+import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { notFound } from "next/navigation";
 
 export type GroupMembership = {
   role: "admin" | "member";
@@ -45,7 +45,7 @@ export const checkGroupMembership = cache(
  */
 export async function requireGroupMembership(
   groupId: string,
-  userId: string
+  userId: string,
 ): Promise<GroupMembership> {
   const membership = await checkGroupMembership(groupId, userId);
 
@@ -89,7 +89,7 @@ export async function requireAdminRole(groupId: string, userId: string): Promise
  */
 export async function getGroupRole(
   groupId: string,
-  userId: string
+  userId: string,
 ): Promise<"admin" | "member" | null> {
   const membership = await checkGroupMembership(groupId, userId);
   return membership?.role || null;
