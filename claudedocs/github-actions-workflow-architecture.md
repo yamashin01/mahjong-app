@@ -72,6 +72,7 @@
 
 **トリガー**:
 - `pull_request`: opened, synchronize, reopened
+- **実行条件**: `src/` ディレクトリ配下のファイルが変更された場合のみ
 
 **実行ジョブ**:
 
@@ -119,8 +120,8 @@ Push
 **必須ステータスチェック**:
 - `Type Check / TypeScript Type Validation` ✅ 必須
 - `Build / Next.js Production Build` ✅ 必須
-- `Code Quality Validation / Check Modified Files` ✅ 必須
-- `Code Quality Validation / Security Check` ✅ 必須
+- `Code Quality Validation / Check Modified Files` ✅ 必須 (src/変更時のみ実行)
+- `Code Quality Validation / Security Check` ✅ 必須 (src/変更時のみ実行)
 
 **オプション**:
 - `Lint / Code Quality Check` ⚠️ 警告のみ

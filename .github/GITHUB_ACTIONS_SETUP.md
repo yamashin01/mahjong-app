@@ -69,11 +69,12 @@ pnpm build       # ビルド検証
    - Build artifactsの保存
    - 必須チェック（失敗時PRブロック）
 
-4. **`.github/workflows/pr-validation.yml`** - コード品質検証
+4. **`.github/workflows/quality-check.yml`** - コード品質検証
    - ファイルサイズチェック
    - デバッグコード検出
    - セキュリティチェック
    - 必須チェック（失敗時PRブロック）
+   - **実行条件**: `src/` ディレクトリ配下のファイル変更時のみ
 
 ### 利点
 - **並列実行**: 各チェックが独立して実行されるため高速（~66%時間短縮）
@@ -122,8 +123,8 @@ mainブランチに以下の保護ルールを設定することを推奨:
    - ✅ Require status checks to pass before merging
      - **必須**: `Type Check / TypeScript Type Validation`
      - **必須**: `Build / Next.js Production Build`
-     - **必須**: `Code Quality Validation / Check Modified Files`
-     - **必須**: `Code Quality Validation / Security Check`
+     - **必須**: `Code Quality Validation / Check Modified Files` (src/変更時のみ)
+     - **必須**: `Code Quality Validation / Security Check` (src/変更時のみ)
      - **オプション**: `Lint / Code Quality Check` (警告のみ)
    - ✅ Require branches to be up to date before merging
    - ✅ Require linear history (推奨)

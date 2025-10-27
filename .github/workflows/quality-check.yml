@@ -1,9 +1,12 @@
 name: Code Quality Validation
 
 # コード変更の品質を検証: ファイルサイズ、デバッグコード、セキュリティチェック
+# src/配下のファイルが変更された場合のみ実行
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    paths:
+      - 'src/**'
 
 jobs:
   check-files:
