@@ -5,6 +5,7 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./copy-button";
+import { EventsSection } from "./events-section";
 import { GuestPlayerActions } from "./guest-player-actions";
 import { GuestPlayerForm } from "./guest-player-form";
 import { MemberActions } from "./member-actions";
@@ -38,12 +39,18 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   // 残りの全データを並列取得（パフォーマンス最適化）
   const today = new Date().toISOString().split("T")[0];
 
-  const [membersResult, { data: rules }, gamesResult, { data: rankings }, { data: guestPlayers }] =
-    await Promise.all([
-      supabase
-        .from("group_members")
-        .select(
-          `
+  const [
+    membersResult,
+    { data: rules },
+    gamesResult,
+    { data: rankings },
+    { data: guestPlayers },
+    eventsResult,
+  ] = await Promise.all([
+    supabase
+      .from("group_members")
+      .select(
+        `
       user_id,
       role,
       joined_at,
@@ -52,23 +59,30 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         avatar_url
       )
     `,
-        )
-        .eq("group_id", groupId)
-        .order("joined_at", { ascending: true }),
-      supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
-      supabase
-        .from("games")
-        .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-        .eq("group_id", groupId)
-        .order("played_at", { ascending: false })
-        .limit(5),
-      supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
-      supabase
-        .from("guest_players")
-        .select("*")
-        .eq("group_id", groupId)
-        .order("created_at", { ascending: true }),
-    ]);
+      )
+      .eq("group_id", groupId)
+      .order("joined_at", { ascending: true }),
+    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+    supabase
+      .from("games")
+      .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+      .eq("group_id", groupId)
+      .order("played_at", { ascending: false })
+      .limit(5),
+    supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
+    supabase
+      .from("guest_players")
+      .select("*")
+      .eq("group_id", groupId)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("events" as any)
+      .select("*")
+      .eq("group_id", groupId)
+      .order("event_date", { ascending: false }) as any,
+  ]);
+
+  const { data: events } = eventsResult;
 
   const { data: members, error: membersError } = membersResult;
   const { data: recentGames, error: gameError } = gamesResult;
@@ -200,6 +214,11 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               </div>
             )}
           </div>
+        </div>
+
+        {/* イベント */}
+        <div className="rounded-lg border border-gray-200 p-6">
+          <EventsSection groupId={groupId} events={events || []} isAdmin={isAdmin} />
         </div>
 
         {/* 対局記録 */}
