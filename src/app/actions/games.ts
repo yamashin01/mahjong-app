@@ -17,23 +17,30 @@ export async function createGame(formData: FormData) {
 
   const groupId = formData.get("groupId") as string;
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
-  const gameNumber = Number.parseInt(formData.get("gameNumber") as string, 10);
   const playedAt = formData.get("playedAt") as string;
-  const tobiPlayerId = formData.get("tobiPlayerId") as string | null;
-  const yakumanCount = Number.parseInt(formData.get("yakumanCount") as string, 10);
+
+  // 回戦数を自動採番（グループ内の最新の対局記録+1）
+  const { data: latestGame } = await supabase
+    .from("games")
+    .select("game_number")
+    .eq("group_id", groupId)
+    .order("game_number", { ascending: false })
+    .limit(1)
+    .single();
+
+  const gameNumber = latestGame ? latestGame.game_number + 1 : 1;
 
   // プレイヤーと点数のデータを取得
   const players = [];
   for (let i = 1; i <= 4; i++) {
     const playerId = formData.get(`player${i}Id`) as string;
-    const seat = formData.get(`player${i}Seat`) as string;
     const finalPoints = Number.parseInt(formData.get(`player${i}FinalPoints`) as string, 10);
 
-    if (!playerId || !seat || Number.isNaN(finalPoints)) {
+    if (!playerId || Number.isNaN(finalPoints)) {
       return { error: `プレイヤー${i}の情報が不足しています` };
     }
 
-    players.push({ playerId, seat, finalPoints });
+    players.push({ playerId, finalPoints });
   }
 
   // グループルールを取得
@@ -54,17 +61,11 @@ export async function createGame(formData: FormData) {
     playerRanks.set(p.playerId, index + 1);
   });
 
-  // トビプレイヤーの処理
-  let actualTobiPlayerId: string | null = null;
-  let actualTobiGuestPlayerId: string | null = null;
-  if (tobiPlayerId?.startsWith("guest-")) {
-    actualTobiGuestPlayerId = tobiPlayerId.replace("guest-", "");
-  } else if (tobiPlayerId) {
-    actualTobiPlayerId = tobiPlayerId;
-  }
+  // 座席を自動割り当て
+  const seats = ["east", "south", "west", "north"];
 
   // 各プレイヤーのスコアを計算
-  const results = players.map((player) => {
+  const results = players.map((player, index) => {
     const rank = playerRanks.get(player.playerId) || 1;
     const rawScore = player.finalPoints - rules.return_points;
 
@@ -99,7 +100,7 @@ export async function createGame(formData: FormData) {
     return {
       player_id: actualPlayerId,
       guest_player_id: guestPlayerId,
-      seat: player.seat,
+      seat: seats[index],
       final_points: player.finalPoints,
       raw_score: rawScore,
       uma,
@@ -118,9 +119,9 @@ export async function createGame(formData: FormData) {
       game_number: gameNumber,
       played_at: playedAt,
       recorded_by: user.id,
-      tobi_player_id: actualTobiPlayerId,
-      tobi_guest_player_id: actualTobiGuestPlayerId,
-      yakuman_count: yakumanCount,
+      tobi_player_id: null,
+      tobi_guest_player_id: null,
+      yakuman_count: 0,
     })
     .select()
     .single();

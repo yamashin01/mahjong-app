@@ -66,11 +66,37 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
     .toISOString()
     .slice(0, 16);
 
+  // 座席名のマッピング
+  const seatNames = ["東", "南", "西", "北"];
+
+  // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストプレイヤー）
+  const defaultPlayers: (string | null)[] = [];
+
+  // メンバーを最大4人まで追加
+  if (members) {
+    for (let i = 0; i < Math.min(4, members.length); i++) {
+      defaultPlayers.push(members[i].user_id);
+    }
+  }
+
+  // メンバーが4人未満の場合、ゲストプレイヤーで埋める
+  if (defaultPlayers.length < 4 && guestPlayers) {
+    const remainingSlots = 4 - defaultPlayers.length;
+    for (let i = 0; i < Math.min(remainingSlots, guestPlayers.length); i++) {
+      defaultPlayers.push(`guest-${guestPlayers[i].id}`);
+    }
+  }
+
+  // まだ4人未満の場合はnullで埋める
+  while (defaultPlayers.length < 4) {
+    defaultPlayers.push(null);
+  }
+
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">対局記録登録</h1>
+          <h1 className="text-3xl font-bold mb-2">対局記録</h1>
           <p className="text-gray-600">{group.name}</p>
         </div>
 
@@ -110,22 +136,6 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
               </div>
             </div>
 
-            {/* 回戦数 */}
-            <div>
-              <label htmlFor="gameNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                回戦数 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="gameNumber"
-                name="gameNumber"
-                required
-                min="1"
-                defaultValue="1"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-
             {/* 対局日時 */}
             <div>
               <label htmlFor="playedAt" className="block text-sm font-medium text-gray-700 mb-2">
@@ -141,65 +151,16 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
               />
             </div>
 
-            {/* 役満回数 */}
-            <div>
-              <label
-                htmlFor="yakumanCount"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                役満回数
-              </label>
-              <input
-                type="number"
-                id="yakumanCount"
-                name="yakumanCount"
-                min="0"
-                defaultValue="0"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-
-            {/* トビ */}
-            <div>
-              <label
-                htmlFor="tobiPlayerId"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                トビしたプレイヤー（任意）
-              </label>
-              <select
-                id="tobiPlayerId"
-                name="tobiPlayerId"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              >
-                <option value="">なし</option>
-                <optgroup label="メンバー">
-                  {members?.map((member) => (
-                    <option key={member.user_id} value={member.user_id}>
-                      {getPlayerDisplayName(member as any)}
-                    </option>
-                  ))}
-                </optgroup>
-                {guestPlayers && guestPlayers.length > 0 && (
-                  <optgroup label="ゲストプレイヤー">
-                    {guestPlayers.map((guest) => (
-                      <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
-                        {guest.name} (ゲスト)
-                      </option>
-                    ))}
-                  </optgroup>
-                )}
-              </select>
-            </div>
           </div>
 
           {/* プレイヤー情報 */}
-          <div className="rounded-lg border border-gray-200 p-6 space-y-6">
-            <h2 className="text-lg font-semibold">プレイヤー情報</h2>
+          <div className="rounded-lg border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold mb-6">プレイヤー情報</h2>
 
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="rounded-lg bg-gray-50 p-4 space-y-4">
-                <h3 className="font-medium">プレイヤー{i}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="rounded-lg bg-gray-50 p-4 space-y-4">
+                  <h3 className="font-medium">{seatNames[i - 1]}</h3>
 
                 {/* プレイヤー選択 */}
                 <div>
@@ -213,6 +174,7 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                     id={`player${i}Id`}
                     name={`player${i}Id`}
                     required
+                    defaultValue={defaultPlayers[i - 1] || ""}
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                   >
                     <option value="">選択してください</option>
@@ -235,28 +197,6 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                   </select>
                 </div>
 
-                {/* 座席 */}
-                <div>
-                  <label
-                    htmlFor={`player${i}Seat`}
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    座席 <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id={`player${i}Seat`}
-                    name={`player${i}Seat`}
-                    required
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                  >
-                    <option value="">選択してください</option>
-                    <option value="east">東</option>
-                    <option value="south">南</option>
-                    <option value="west">西</option>
-                    <option value="north">北</option>
-                  </select>
-                </div>
-
                 {/* 最終持ち点 */}
                 <div>
                   <label
@@ -270,7 +210,6 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                     id={`player${i}FinalPoints`}
                     name={`player${i}FinalPoints`}
                     required
-                    min="0"
                     step="100"
                     defaultValue={rules.start_points}
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
@@ -278,13 +217,13 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
                 </div>
               </div>
             ))}
+            </div>
           </div>
 
           <div className="rounded-lg bg-yellow-50 p-4">
             <h3 className="font-semibold text-yellow-900 mb-2">注意事項</h3>
             <ul className="text-sm text-yellow-800 space-y-1">
               <li>• 4人のプレイヤーをすべて選択してください</li>
-              <li>• 座席は重複しないように設定してください</li>
               <li>• スコアは自動的に計算されます</li>
             </ul>
           </div>
