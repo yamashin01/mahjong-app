@@ -18,6 +18,7 @@ export async function createGame(formData: FormData) {
   const groupId = formData.get("groupId") as string;
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
   const playedAt = formData.get("playedAt") as string;
+  const eventId = formData.get("eventId") as string | null;
 
   // 回戦数を自動採番（グループ内の最新の対局記録+1）
   const { data: latestGame } = await supabase
@@ -119,6 +120,7 @@ export async function createGame(formData: FormData) {
       game_number: gameNumber,
       played_at: playedAt,
       recorded_by: user.id,
+      event_id: eventId || null,
       tobi_player_id: null,
       tobi_guest_player_id: null,
       yakuman_count: 0,
@@ -147,5 +149,8 @@ export async function createGame(formData: FormData) {
   }
 
   revalidatePath(`/groups/${groupId}`);
+  if (eventId) {
+    revalidatePath(`/groups/${groupId}/events/${eventId}`);
+  }
   redirect(`/groups/${groupId}/games/${game.id}`);
 }

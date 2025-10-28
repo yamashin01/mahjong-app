@@ -5,8 +5,15 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
-export default async function NewGamePage({ params }: { params: Promise<{ id: string }> }) {
+export default async function NewGamePage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ eventId?: string }>;
+}) {
   const groupId: string = (await params).id;
+  const { eventId } = await searchParams;
 
   const supabase = await createClient();
 
@@ -21,44 +28,45 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
   // メンバーシップ確認（404を返す）
   await requireGroupMembership(groupId, user.id);
 
-  // グループ情報を取得
-  const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
+  // 全データを並列取得
+  const [groupResult, rulesResult, membersResult, guestPlayersResult, eventsResult] =
+    await Promise.all([
+      supabase.from("groups").select("name").eq("id", groupId).single(),
+      supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+      supabase
+        .from("group_members")
+        .select(
+          `
+        user_id,
+        profiles (
+          display_name
+        )
+      `,
+        )
+        .eq("group_id", groupId)
+        .order("joined_at", { ascending: true }),
+      supabase
+        .from("guest_players")
+        .select("*")
+        .eq("group_id", groupId)
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("events" as any)
+        .select("*")
+        .eq("group_id", groupId)
+        .eq("status", "active")
+        .order("event_date", { ascending: false }) as any,
+    ]);
 
-  if (!group) {
+  const { data: group } = groupResult;
+  const { data: rules } = rulesResult;
+  const { data: members } = membersResult;
+  const { data: guestPlayers } = guestPlayersResult;
+  const { data: events } = eventsResult;
+
+  if (!group || !rules) {
     notFound();
   }
-
-  // グループルールを取得
-  const { data: rules } = await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
-
-  if (!rules) {
-    notFound();
-  }
-
-  // グループメンバー一覧を取得
-  const { data: members } = await supabase
-    .from("group_members")
-    .select(
-      `
-      user_id,
-      profiles (
-        display_name
-      )
-    `,
-    )
-    .eq("group_id", groupId)
-    .order("joined_at", { ascending: true });
-
-  // ゲストプレイヤー一覧を取得
-  const { data: guestPlayers } = await supabase
-    .from("guest_players")
-    .select("*")
-    .eq("group_id", groupId)
-    .order("created_at", { ascending: true });
 
   // デフォルトの対局日時（現在時刻）
   const now = new Date();
@@ -106,6 +114,35 @@ export default async function NewGamePage({ params }: { params: Promise<{ id: st
           {/* 対局情報 */}
           <div className="rounded-lg border border-gray-200 p-6 space-y-6">
             <h2 className="text-lg font-semibold">対局情報</h2>
+
+            {/* イベント選択 */}
+            {eventId ? (
+              <input type="hidden" name="eventId" value={eventId} />
+            ) : (
+              events &&
+              events.length > 0 && (
+                <div>
+                  <label htmlFor="eventId" className="block text-sm font-medium text-gray-700 mb-2">
+                    イベント（任意）
+                  </label>
+                  <select
+                    id="eventId"
+                    name="eventId"
+                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                  >
+                    <option value="">イベントなし</option>
+                    {events.map((event: any) => (
+                      <option key={event.id} value={event.id}>
+                        {event.name} ({new Date(event.event_date).toLocaleDateString("ja-JP")})
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-sm text-gray-500 mt-1">
+                    イベントに紐付けると、イベント内の対局として記録されます
+                  </p>
+                </div>
+              )
+            )}
 
             {/* 対局種別 */}
             <div>
