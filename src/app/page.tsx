@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "./sign-out-button";
 import { MobileMenu } from "./mobile-menu";
+import Image from "next/image";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -72,15 +73,9 @@ export default async function Home() {
 
       {/* メインコンテンツ */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* ウェルカムメッセージ */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              ようこそ、{user.email}さん
-            </h2>
-          </div>
+        <Image src="/images/top-image.jpg" alt="Top Background" width={1478} height={1108} className="w-full h-[80px] md:h-[200px] object-cover object-[10%_30%] mb-8" />
 
-          {/* 参加グループ一覧 */}
+        <div className="space-y-8">
           <div className="space-y-4">
             <div className="md:flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900 mb-2">参加しているグループ</h2>
