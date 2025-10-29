@@ -46,9 +46,9 @@ export default async function Home() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       {/* ヘッダー - ナビゲーションメニュー */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-emerald-100 shadow-sm border-b border-gray-200">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <h1 className="text-xl font-bold text-gray-900">麻雀スコア管理</h1>
@@ -57,7 +57,7 @@ export default async function Home() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/profile"
-                className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
+                className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
               >
                 プロフィール編集
               </Link>
