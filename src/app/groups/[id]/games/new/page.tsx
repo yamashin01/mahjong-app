@@ -273,7 +273,7 @@ export default async function NewGamePage({
               対局を登録
             </button>
             <Link
-              href={`/groups/${groupId}`}
+              href={eventId ? `/groups/${groupId}/events/${eventId}` : `/groups/${groupId}`}
               className="flex-1 rounded-lg bg-gray-200 px-6 py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors text-center"
             >
               キャンセル

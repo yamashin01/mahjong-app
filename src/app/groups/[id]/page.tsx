@@ -10,6 +10,7 @@ import { GuestPlayerActions } from "./guest-player-actions";
 import { GuestPlayerForm } from "./guest-player-form";
 import { MemberActions } from "./member-actions";
 import { RankingSection } from "./ranking-section";
+import { GoPerson } from "react-icons/go";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -127,9 +128,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         {/* メンバー一覧 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">メンバー ({members?.length || 0})</h2>
+            <h2 className="text-lg font-semibold">メンバー ({members?.length || 0}人)</h2>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-3 mb-4">
             {members?.map((member) => (
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
@@ -171,23 +172,20 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               </div>
             ))}
           </div>
-        </div>
 
-        {/* ゲストプレイヤー */}
-        <div className="rounded-lg border border-gray-200 p-6 bg-white">
+          {/* ゲストメンバー */}
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">
-              ゲストプレイヤー ({guestPlayers?.length || 0})
+              ゲストメンバー ({guestPlayers?.length || 0}人)
             </h2>
-            {isAdmin && <GuestPlayerForm groupId={groupId} />}
           </div>
           <div className="space-y-3">
             {guestPlayers && guestPlayers.length > 0 ? (
               guestPlayers.map((guest) => (
                 <div key={guest.id} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
-                      <span className="text-green-700 font-semibold">G</span>
+                    <div className="h-16 w-16 rounded-full flex items-center justify-center">
+                      <GoPerson />
                     </div>
                     <div>
                       <p className="font-medium">{guest.name}</p>
@@ -213,6 +211,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                 )}
               </div>
             )}
+            {isAdmin && <GuestPlayerForm groupId={groupId} />}
           </div>
         </div>
 
@@ -225,11 +224,13 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
+          </div>
+          <div className="w-full my-4">
             <Link
               href={`/groups/${groupId}/games/new`}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition-colors"
+              className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-center text-gray-800 hover:bg-gray-200 transition-colors"
             >
-              対局を記録
+              新規対局を記録
             </Link>
           </div>
 
@@ -270,7 +271,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           ) : (
             <div className="text-center py-8 text-gray-500">
               <p>まだ対局記録がありません</p>
-              <p className="text-sm mt-2">「対局を記録」ボタンから対局を記録してください</p>
+              <p className="text-sm mt-2">「新規対局を記録」ボタンから対局を記録してください</p>
             </div>
           )}
         </div>

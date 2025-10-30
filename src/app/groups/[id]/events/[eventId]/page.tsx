@@ -89,12 +89,14 @@ export default async function EventDetailPage({
 
         {/* 対局記録 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <div className="flex items-center justify-between mb-4">
+          <div className="mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
+          </div>
+          <div className="items-center text-center mb-4">
             {event.status === "active" && (
               <Link
                 href={`/groups/${groupId}/games/new?eventId=${eventId}`}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition-colors"
+                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors"
               >
                 対局記録を追加
               </Link>
