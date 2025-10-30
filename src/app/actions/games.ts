@@ -70,7 +70,7 @@ export async function createGame(formData: FormData) {
     const rank = playerRanks.get(player.playerId) || 1;
     const rawScore = player.finalPoints - rules.return_points;
 
-    // ゲストプレイヤーかどうかをチェック
+    // ゲストメンバーかどうかをチェック
     const isGuest = player.playerId.startsWith("guest-");
     const actualPlayerId = isGuest ? null : player.playerId;
     const guestPlayerId = isGuest ? player.playerId.replace("guest-", "") : null;

@@ -205,9 +205,9 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               ))
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <p>ゲストプレイヤーはいません</p>
+                <p>ゲストメンバーーはいません</p>
                 {isAdmin && (
-                  <p className="text-sm mt-2">「ゲストプレイヤー追加」ボタンから追加できます</p>
+                  <p className="text-sm mt-2">「ゲストメンバー追加」ボタンから追加できます</p>
                 )}
               </div>
             )}

@@ -22,4 +22,4 @@ ALTER TABLE public.game_results
 CREATE INDEX idx_game_results_guest_player_id ON public.game_results(guest_player_id);
 
 -- コメント
-COMMENT ON COLUMN public.game_results.guest_player_id IS 'ゲストプレイヤーID（player_idまたはguest_player_idのどちらか一方のみ設定）';
+COMMENT ON COLUMN public.game_results.guest_player_id IS 'ゲストメンバーID（player_idまたはguest_player_idのどちらか一方のみ設定）';

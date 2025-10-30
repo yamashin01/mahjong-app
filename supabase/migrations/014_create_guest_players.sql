@@ -1,9 +1,9 @@
 -- ============================================================================
 -- 014_create_guest_players.sql
--- ゲストプレイヤー（Googleログインなしのプレイヤー）テーブル作成
+-- ゲストメンバー（Googleログインなしのプレイヤー）テーブル作成
 -- ============================================================================
 
--- ゲストプレイヤーテーブル
+-- ゲストメンバーテーブル
 CREATE TABLE IF NOT EXISTS public.guest_players (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   group_id UUID NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
@@ -19,7 +19,7 @@ CREATE INDEX idx_guest_players_group_id ON public.guest_players(group_id);
 -- RLSポリシー有効化
 ALTER TABLE public.guest_players ENABLE ROW LEVEL SECURITY;
 
--- ゲストプレイヤー閲覧: グループメンバーのみ
+-- ゲストメンバー閲覧: グループメンバーのみ
 CREATE POLICY "Group members can view guest players"
   ON public.guest_players
   FOR SELECT
@@ -31,7 +31,7 @@ CREATE POLICY "Group members can view guest players"
     )
   );
 
--- ゲストプレイヤー追加: グループ管理者のみ
+-- ゲストメンバー追加: グループ管理者のみ
 CREATE POLICY "Group admins can insert guest players"
   ON public.guest_players
   FOR INSERT
@@ -44,7 +44,7 @@ CREATE POLICY "Group admins can insert guest players"
     )
   );
 
--- ゲストプレイヤー更新: グループ管理者のみ
+-- ゲストメンバー更新: グループ管理者のみ
 CREATE POLICY "Group admins can update guest players"
   ON public.guest_players
   FOR UPDATE
@@ -57,7 +57,7 @@ CREATE POLICY "Group admins can update guest players"
     )
   );
 
--- ゲストプレイヤー削除: グループ管理者のみ
+-- ゲストメンバー削除: グループ管理者のみ
 CREATE POLICY "Group admins can delete guest players"
   ON public.guest_players
   FOR DELETE
@@ -71,9 +71,9 @@ CREATE POLICY "Group admins can delete guest players"
   );
 
 -- コメント
-COMMENT ON TABLE public.guest_players IS 'Googleログインなしで対局に参加できるゲストプレイヤー';
+COMMENT ON TABLE public.guest_players IS 'Googleログインなしで対局に参加できるゲストメンバー';
 COMMENT ON COLUMN public.guest_players.group_id IS '所属グループID';
-COMMENT ON COLUMN public.guest_players.name IS 'ゲストプレイヤー名';
+COMMENT ON COLUMN public.guest_players.name IS 'ゲストメンバー名';
 
 -- updated_at自動更新トリガー
 CREATE TRIGGER guest_players_updated_at

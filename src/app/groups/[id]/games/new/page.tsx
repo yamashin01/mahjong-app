@@ -77,7 +77,7 @@ export default async function NewGamePage({
   // 座席名のマッピング
   const seatNames = ["東", "南", "西", "北"];
 
-  // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストプレイヤー）
+  // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストメンバー）
   const defaultPlayers: (string | null)[] = [];
 
   // メンバーを最大4人まで追加
@@ -87,7 +87,7 @@ export default async function NewGamePage({
     }
   }
 
-  // メンバーが4人未満の場合、ゲストプレイヤーで埋める
+  // メンバーが4人未満の場合、ゲストメンバーで埋める
   if (defaultPlayers.length < 4 && guestPlayers) {
     const remainingSlots = 4 - defaultPlayers.length;
     for (let i = 0; i < Math.min(remainingSlots, guestPlayers.length); i++) {
@@ -223,7 +223,7 @@ export default async function NewGamePage({
                       ))}
                     </optgroup>
                     {guestPlayers && guestPlayers.length > 0 && (
-                      <optgroup label="ゲストプレイヤー">
+                      <optgroup label="ゲストメンバー">
                         {guestPlayers.map((guest) => (
                           <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
                             {guest.name} (ゲスト)
