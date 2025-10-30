@@ -4,6 +4,7 @@ import { createGame } from "@/app/actions/games";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function NewGamePage({
   params,
@@ -31,31 +32,11 @@ export default async function NewGamePage({
   // 全データを並列取得
   const [groupResult, rulesResult, membersResult, guestPlayersResult, eventsResult] =
     await Promise.all([
-      supabase.from("groups").select("name").eq("id", groupId).single(),
-      supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
-      supabase
-        .from("group_members")
-        .select(
-          `
-        user_id,
-        profiles (
-          display_name
-        )
-      `,
-        )
-        .eq("group_id", groupId)
-        .order("joined_at", { ascending: true }),
-      supabase
-        .from("guest_players")
-        .select("*")
-        .eq("group_id", groupId)
-        .order("created_at", { ascending: true }),
-      supabase
-        .from("events" as any)
-        .select("*")
-        .eq("group_id", groupId)
-        .eq("status", "active")
-        .order("event_date", { ascending: false }) as any,
+      groupsRepo.getGroupName(groupId),
+      groupsRepo.getGroupRules(groupId),
+      groupsRepo.getGroupMemberNames(groupId),
+      groupsRepo.getGroupGuestPlayers(groupId),
+      groupsRepo.getActiveGroupEvents(groupId),
     ]);
 
   const { data: group } = groupResult;

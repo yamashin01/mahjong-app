@@ -5,6 +5,7 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { EventRulesForm } from "@/app/components/event-rules-form";
 import type { EventRules } from "@/types/event-rules";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function EventSettingsPage({
   params,
@@ -31,9 +32,9 @@ export default async function EventSettingsPage({
 
   // イベント情報、グループ情報、グループルールを取得
   const [eventResult, groupResult, rulesResult] = await Promise.all([
-    supabase.from("events" as any).select("*").eq("id", eventId).single() as any,
-    supabase.from("groups").select("name").eq("id", groupId).single(),
-    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+    groupsRepo.getEventById(eventId),
+    groupsRepo.getGroupName(groupId),
+    groupsRepo.getGroupRules(groupId),
   ]);
 
   const { data: event } = eventResult;

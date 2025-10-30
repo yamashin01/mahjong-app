@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
 import { createClient } from "@/lib/supabase/server";
+import * as profileRepo from "@/lib/supabase/repositories";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -15,31 +16,13 @@ export default async function ProfilePage() {
   }
 
   // プロファイルデータを取得
-  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+  const { data: profile } = await profileRepo.getProfileById(user.id);
 
   // 参加グループ一覧を取得
-  const { data: memberships } = await supabase
-    .from("group_members")
-    .select(
-      `
-      group_id,
-      role,
-      joined_at,
-      groups (
-        id,
-        name,
-        description
-      )
-    `,
-    )
-    .eq("user_id", user.id)
-    .order("joined_at", { ascending: false });
+  const { data: memberships } = await profileRepo.getUserGroupMemberships(user.id);
 
   // 個人成績を集計
-  const { data: gameResults } = await supabase
-    .from("game_results")
-    .select("rank, total_score, point_amount")
-    .eq("player_id", user.id);
+  const { data: gameResults } = await profileRepo.getUserGameStats(user.id);
 
   // 成績統計を計算
   const stats = {

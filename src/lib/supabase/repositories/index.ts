@@ -10,3 +10,4 @@ export * from "./events";
 export * from "./games";
 export * from "./guest-players";
 export * from "./profile";
+export * from "./rankings";

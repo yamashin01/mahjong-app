@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { updateGroupRules } from "@/app/actions/groups";
 import { createClient } from "@/lib/supabase/server";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function GroupSettingsPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -17,45 +18,33 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
   }
 
   // メンバーシップと管理者権限確認
-  const { data: membership } = await supabase
-    .from("group_members")
-    .select("role")
-    .eq("group_id", groupId)
-    .eq("user_id", user.id)
-    .single();
+  const membershipResult = await groupsRepo.findGroupMember({ groupId, userId: user.id });
 
-  if (!membership || membership.role !== "admin") {
+  // メンバーでない、またはエラーの場合は権限チェックできないのでエラー
+  if (membershipResult.error || !membershipResult.data) {
     return (
       <main className="min-h-screen flex items-center justify-center p-8">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold text-red-600">管理者権限が必要です</h1>
-          <p className="text-gray-600">この設定を変更するには管理者である必要があります</p>
+          <h1 className="text-2xl font-bold text-red-600">アクセス権限がありません</h1>
+          <p className="text-gray-600">このグループのメンバーである必要があります</p>
           <Link
-            href={`/groups/${groupId}`}
+            href="/"
             className="inline-block rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors"
           >
-            グループページに戻る
+            トップページに戻る
           </Link>
         </div>
       </main>
     );
   }
 
-  // グループ情報を取得
-  const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
+  // 並列でグループ情報とルールを取得
+  const [{ data: group }, { data: rules }] = await Promise.all([
+    groupsRepo.getGroupName(groupId),
+    groupsRepo.getGroupRules(groupId),
+  ]);
 
-  if (!group) {
-    notFound();
-  }
-
-  // グループルールを取得
-  const { data: rules } = await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
-
-  if (!rules) {
+  if (!group || !rules) {
     notFound();
   }
 

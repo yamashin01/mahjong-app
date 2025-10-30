@@ -113,3 +113,28 @@ export async function getEventById(eventId: string) {
     .eq("id", eventId)
     .single()) as any;
 }
+
+/**
+ * グループのイベント一覧を取得する
+ */
+export async function getGroupEvents(groupId: string) {
+  const supabase = await createClient();
+  return (await supabase
+    .from("events" as any)
+    .select("*")
+    .eq("group_id", groupId)
+    .order("event_date", { ascending: false })) as any;
+}
+
+/**
+ * グループのアクティブなイベント一覧を取得する
+ */
+export async function getActiveGroupEvents(groupId: string) {
+  const supabase = await createClient();
+  return (await supabase
+    .from("events" as any)
+    .select("*")
+    .eq("group_id", groupId)
+    .eq("status", "active")
+    .order("event_date", { ascending: false })) as any;
+}

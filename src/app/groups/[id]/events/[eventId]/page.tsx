@@ -7,6 +7,7 @@ import { getPlayerDisplayName } from "@/lib/utils/player";
 import { DeleteEventButton } from "./components/delete-event-button";
 import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import type { EventRules } from "@/types/event-rules";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function EventDetailPage({
   params,
@@ -31,9 +32,9 @@ export default async function EventDetailPage({
 
   // イベント情報、グループ情報、グループルールを並列取得
   const [eventResult, groupResult, rulesResult] = await Promise.all([
-    supabase.from("events" as any).select("*").eq("id", eventId).single() as any,
-    supabase.from("groups").select("name").eq("id", groupId).single(),
-    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+    groupsRepo.getEventById(eventId),
+    groupsRepo.getGroupName(groupId),
+    groupsRepo.getGroupRules(groupId),
   ]);
 
   const { data: event, error: eventError } = eventResult;
@@ -61,11 +62,7 @@ export default async function EventDetailPage({
   };
 
   // イベントに紐づく対局一覧を取得
-  const { data: games } = await supabase
-    .from("games")
-    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-    .eq("event_id", eventId)
-    .order("played_at", { ascending: false });
+  const { data: games } = await groupsRepo.getEventGames(eventId);
 
   return (
     <main className="min-h-screen p-8">

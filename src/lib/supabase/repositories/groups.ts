@@ -136,3 +136,104 @@ export async function getGroupRules(groupId: string) {
     .eq("group_id", groupId)
     .single();
 }
+
+/**
+ * グループ情報を取得する
+ */
+export async function getGroupById(groupId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("groups")
+    .select("*")
+    .eq("id", groupId)
+    .single();
+}
+
+/**
+ * グループ名を取得する
+ */
+export async function getGroupName(groupId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("groups")
+    .select("name")
+    .eq("id", groupId)
+    .single();
+}
+
+/**
+ * グループメンバー一覧を取得する
+ */
+export async function getGroupMembers(groupId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("group_members")
+    .select(
+      `
+      user_id,
+      role,
+      joined_at,
+      profiles (
+        display_name,
+        avatar_url
+      )
+    `,
+    )
+    .eq("group_id", groupId)
+    .order("joined_at", { ascending: true });
+}
+
+/**
+ * ユーザーが参加しているグループ一覧を取得する
+ */
+export async function getUserGroups(userId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("group_members")
+    .select(
+      `
+      group_id,
+      role,
+      joined_at,
+      groups (
+        id,
+        name,
+        description,
+        invite_code,
+        created_at
+      )
+    `,
+    )
+    .eq("user_id", userId)
+    .order("joined_at", { ascending: false });
+}
+
+/**
+ * グループメンバー数を確認する
+ */
+export async function getGroupMemberCount(groupId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("group_members")
+    .select("user_id", { count: "exact", head: true })
+    .eq("group_id", groupId);
+}
+
+/**
+ * グループメンバーの表示名一覧を取得する（ゲーム記録用）
+ */
+export async function getGroupMemberNames(groupId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("group_members")
+    .select(
+      `
+      user_id,
+      profiles (
+        display_name
+      )
+    `,
+    )
+    .eq("group_id", groupId)
+    .order("joined_at", { ascending: true });
+}

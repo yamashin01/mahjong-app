@@ -58,3 +58,63 @@ export async function deleteGame(gameId: string) {
   const supabase = await createClient();
   return await supabase.from("games").delete().eq("id", gameId);
 }
+
+/**
+ * ゲーム詳細を取得する
+ */
+export async function getGameById(gameId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("games")
+    .select("*")
+    .eq("id", gameId)
+    .single();
+}
+
+/**
+ * ゲーム結果を取得する
+ */
+export async function getGameResults(gameId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("game_results")
+    .select(
+      `
+      *,
+      profiles (
+        display_name,
+        avatar_url
+      ),
+      guest_players (
+        name
+      )
+    `,
+    )
+    .eq("game_id", gameId)
+    .order("rank", { ascending: true });
+}
+
+/**
+ * グループの最近のゲーム一覧を取得する
+ */
+export async function getRecentGames(params: { groupId: string; limit?: number }) {
+  const supabase = await createClient();
+  return await supabase
+    .from("games")
+    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+    .eq("group_id", params.groupId)
+    .order("played_at", { ascending: false })
+    .limit(params.limit || 5);
+}
+
+/**
+ * イベントに紐づくゲーム一覧を取得する
+ */
+export async function getEventGames(eventId: string) {
+  const supabase = await createClient();
+  return await supabase
+    .from("games")
+    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+    .eq("event_id", eventId)
+    .order("played_at", { ascending: false });
+}

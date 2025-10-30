@@ -11,6 +11,7 @@ import { GuestPlayerForm } from "./components/guest-player-form";
 import { MemberActions } from "./components/member-actions";
 import { RankingSection } from "./components/ranking-section";
 import { GoPerson } from "react-icons/go";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -27,7 +28,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
   // グループ情報取得とメンバーシップ確認を並列実行（パフォーマンス最適化）
   const [groupResult, membership] = await Promise.all([
-    supabase.from("groups").select("*").eq("id", groupId).single(),
+    groupsRepo.getGroupById(groupId),
     requireGroupMembership(groupId, user.id),
   ]);
 
@@ -48,39 +49,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     { data: guestPlayers },
     eventsResult,
   ] = await Promise.all([
-    supabase
-      .from("group_members")
-      .select(
-        `
-      user_id,
-      role,
-      joined_at,
-      profiles (
-        display_name,
-        avatar_url
-      )
-    `,
-      )
-      .eq("group_id", groupId)
-      .order("joined_at", { ascending: true }),
-    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
-    supabase
-      .from("games")
-      .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-      .eq("group_id", groupId)
-      .order("played_at", { ascending: false })
-      .limit(5),
-    supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
-    supabase
-      .from("guest_players")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("events" as any)
-      .select("*")
-      .eq("group_id", groupId)
-      .order("event_date", { ascending: false }) as any,
+    groupsRepo.getGroupMembers(groupId),
+    groupsRepo.getGroupRules(groupId),
+    groupsRepo.getRecentGames({ groupId, limit: 5 }),
+    groupsRepo.getDailyRankings({ groupId, gameDate: today }),
+    groupsRepo.getGroupGuestPlayers(groupId),
+    groupsRepo.getGroupEvents(groupId),
   ]);
 
   const { data: events } = eventsResult;

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function GameDetailPage({
   params,
@@ -24,24 +25,9 @@ export default async function GameDetailPage({
   // メンバーシップ確認とデータを並列取得（パフォーマンス最適化）
   const [_membership, gameResult, resultsData, groupResult] = await Promise.all([
     requireGroupMembership(groupId, user.id),
-    supabase.from("games").select("*").eq("id", gameId).single(),
-    supabase
-      .from("game_results")
-      .select(
-        `
-      *,
-      profiles (
-        display_name,
-        avatar_url
-      ),
-      guest_players (
-        name
-      )
-    `,
-      )
-      .eq("game_id", gameId)
-      .order("rank", { ascending: true }),
-    supabase.from("groups").select("name").eq("id", groupId).single(),
+    groupsRepo.getGameById(gameId),
+    groupsRepo.getGameResults(gameId),
+    groupsRepo.getGroupName(groupId),
   ]);
 
   const { data: game } = gameResult;
@@ -59,18 +45,10 @@ export default async function GameDetailPage({
   // トビしたプレイヤー情報を取得
   let tobiPlayerName = null;
   if (game.tobi_player_id) {
-    const { data } = await supabase
-      .from("profiles")
-      .select("display_name")
-      .eq("id", game.tobi_player_id)
-      .single();
+    const { data } = await groupsRepo.getProfileDisplayName(game.tobi_player_id);
     tobiPlayerName = data?.display_name;
   } else if (game.tobi_guest_player_id) {
-    const { data } = await supabase
-      .from("guest_players")
-      .select("name")
-      .eq("id", game.tobi_guest_player_id)
-      .single();
+    const { data } = await groupsRepo.getGuestPlayerName(game.tobi_guest_player_id);
     tobiPlayerName = data?.name;
   }
 
