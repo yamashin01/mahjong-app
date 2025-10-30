@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SignOutButton } from "./sign-out-button";
 import { MobileMenu } from "./mobile-menu";
 import Image from "next/image";
+import { MobileAddGroupMenu } from "@/components/mobile-add-group-menu";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -77,22 +78,23 @@ export default async function Home() {
 
         <div className="space-y-8">
           <div className="space-y-4">
-            <div className="md:flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900 mb-2">参加しているグループ</h2>
-              <div className="flex gap-3 mb-2">
+              <div className="hidden md:flex gap-3 mb-2">
                 <Link
                   href="/groups/new"
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                  className="rounded-lg bg-lime-700 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 transition-colors"
                 >
                   新規作成
                 </Link>
                 <Link
                   href="/groups/join"
-                  className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+                  className="rounded-lg bg-lime-700 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 transition-colors"
                 >
                   招待コードで参加
                 </Link>
               </div>
+              <MobileAddGroupMenu />
             </div>
 
             {groups && groups.length > 0 ? (
