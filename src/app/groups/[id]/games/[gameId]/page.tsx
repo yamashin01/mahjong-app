@@ -212,12 +212,21 @@ export default async function GameDetailPage({
         </div>
 
         <div className="text-center">
-          <Link
-            href={`/groups/${groupId}`}
-            className="text-blue-600 hover:text-blue-700 hover:underline"
-          >
-            グループページに戻る
-          </Link>
+          {(game as any).event_id ? (
+            <Link
+              href={`/groups/${groupId}/events/${(game as any).event_id}`}
+              className="text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              イベントページに戻る
+            </Link>
+          ) : (
+            <Link
+              href={`/groups/${groupId}`}
+              className="text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              グループページに戻る
+            </Link>
+          )}
         </div>
       </div>
     </main>
