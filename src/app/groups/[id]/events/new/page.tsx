@@ -42,7 +42,7 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
         <form action={createEvent as any} className="space-y-8">
           <input type="hidden" name="groupId" value={groupId} />
 
-          <div className="rounded-lg border border-gray-200 p-6 space-y-6">
+          <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">
             <h2 className="text-lg font-semibold">イベント情報</h2>
 
             {/* イベント名 */}

@@ -112,7 +112,7 @@ export default async function NewGamePage({
           <input type="hidden" name="groupId" value={groupId} />
 
           {/* 対局情報 */}
-          <div className="rounded-lg border border-gray-200 p-6 space-y-6">
+          <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">
             <h2 className="text-lg font-semibold">対局情報</h2>
 
             {/* イベント選択 */}
@@ -191,7 +191,7 @@ export default async function NewGamePage({
           </div>
 
           {/* プレイヤー情報 */}
-          <div className="rounded-lg border border-gray-200 p-6">
+          <div className="rounded-lg border border-gray-200 p-6 bg-white">
             <h2 className="text-lg font-semibold mb-6">プレイヤー情報</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

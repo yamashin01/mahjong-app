@@ -64,7 +64,7 @@ export default async function EventDetailPage({
         </div>
 
         {/* イベント情報 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -88,7 +88,7 @@ export default async function EventDetailPage({
         </div>
 
         {/* 対局記録 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
             {event.status === "active" && (

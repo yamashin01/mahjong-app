@@ -113,7 +113,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* 招待コード */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <h2 className="text-lg font-semibold mb-3">招待コード</h2>
           <div className="flex items-center gap-3">
             <code className="flex-1 rounded-lg bg-gray-100 px-4 py-3 text-2xl font-mono font-bold text-center">
@@ -125,7 +125,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* メンバー一覧 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">メンバー ({members?.length || 0})</h2>
           </div>
@@ -174,7 +174,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* ゲストプレイヤー */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">
               ゲストプレイヤー ({guestPlayers?.length || 0})
@@ -217,12 +217,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* イベント */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <EventsSection groupId={groupId} events={events || []} isAdmin={isAdmin} />
         </div>
 
         {/* 対局記録 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
             <Link
@@ -276,14 +276,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
         </div>
 
         {/* 今日のランキング */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <h2 className="text-lg font-semibold mb-4">今日のランキング</h2>
           <RankingSection rankings={rankings || []} />
         </div>
 
         {/* グループルール */}
         {rules && (
-          <div className="rounded-lg border border-gray-200 p-6">
+          <div className="rounded-lg border border-gray-200 p-6 bg-white">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">グループルール</h2>
               {isAdmin && (

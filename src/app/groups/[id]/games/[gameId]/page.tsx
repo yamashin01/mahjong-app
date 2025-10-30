@@ -90,7 +90,7 @@ export default async function GameDetailPage({
         </div>
 
         {/* 対局情報 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <h2 className="text-lg font-semibold mb-4">対局情報</h2>
           <dl className="grid grid-cols-2 gap-4">
             <div>
@@ -127,7 +127,7 @@ export default async function GameDetailPage({
         </div>
 
         {/* 対局結果 */}
-        <div className="rounded-lg border border-gray-200 p-6">
+        <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <h2 className="text-lg font-semibold mb-4">対局結果</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
