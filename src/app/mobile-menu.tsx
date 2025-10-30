@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { SignOutButton } from "./sign-out-button";
+import { GiHamburgerMenu } from "react-icons/gi";
 
 export function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,28 +16,7 @@ export function MobileMenu() {
         className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         aria-label="メニュー"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          {isOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
-          ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
-          )}
-        </svg>
+        <GiHamburgerMenu className="w-6 h-6" />
       </button>
 
       {/* モバイルメニュー（オーバーレイ） */}

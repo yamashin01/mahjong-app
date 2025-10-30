@@ -27,10 +27,10 @@ export async function addGuestPlayer(formData: FormData) {
   try {
     await requireAdminRole(groupId, user.id);
   } catch {
-    return { error: "管理者のみがゲストプレイヤーを追加できます" };
+    return { error: "管理者のみがゲストメンバーを追加できます" };
   }
 
-  // ゲストプレイヤー追加
+  // ゲストメンバー追加
   const { error: insertError } = await supabase.from("guest_players").insert({
     group_id: groupId,
     name: name.trim(),
@@ -38,7 +38,7 @@ export async function addGuestPlayer(formData: FormData) {
 
   if (insertError) {
     console.error("Error adding guest player:", insertError);
-    return { error: "ゲストプレイヤーの追加に失敗しました" };
+    return { error: "ゲストメンバーの追加に失敗しました" };
   }
 
   revalidatePath(`/groups/${groupId}`);
@@ -60,10 +60,10 @@ export async function deleteGuestPlayer(guestPlayerId: string, groupId: string) 
   try {
     await requireAdminRole(groupId, user.id);
   } catch {
-    return { error: "管理者のみがゲストプレイヤーを削除できます" };
+    return { error: "管理者のみがゲストメンバーを削除できます" };
   }
 
-  // ゲストプレイヤー削除
+  // ゲストメンバー削除
   const { error: deleteError } = await supabase
     .from("guest_players")
     .delete()
@@ -72,7 +72,7 @@ export async function deleteGuestPlayer(guestPlayerId: string, groupId: string) 
 
   if (deleteError) {
     console.error("Error deleting guest player:", deleteError);
-    return { error: "ゲストプレイヤーの削除に失敗しました" };
+    return { error: "ゲストメンバーの削除に失敗しました" };
   }
 
   revalidatePath(`/groups/${groupId}`);

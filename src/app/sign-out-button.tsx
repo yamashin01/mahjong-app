@@ -37,7 +37,7 @@ export function SignOutButton({ variant = "default" }: SignOutButtonProps) {
     <form action={signOut}>
       <button
         type="submit"
-        className="rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700 transition-colors"
+        className="rounded-lg bg-emerald-500 px-4 py-2 text-white hover:bg-emerald-600 transition-colors"
       >
         ログアウト
       </button>

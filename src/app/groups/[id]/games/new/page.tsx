@@ -77,7 +77,7 @@ export default async function NewGamePage({
   // 座席名のマッピング
   const seatNames = ["東", "南", "西", "北"];
 
-  // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストプレイヤー）
+  // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストメンバー）
   const defaultPlayers: (string | null)[] = [];
 
   // メンバーを最大4人まで追加
@@ -87,7 +87,7 @@ export default async function NewGamePage({
     }
   }
 
-  // メンバーが4人未満の場合、ゲストプレイヤーで埋める
+  // メンバーが4人未満の場合、ゲストメンバーで埋める
   if (defaultPlayers.length < 4 && guestPlayers) {
     const remainingSlots = 4 - defaultPlayers.length;
     for (let i = 0; i < Math.min(remainingSlots, guestPlayers.length); i++) {
@@ -112,7 +112,7 @@ export default async function NewGamePage({
           <input type="hidden" name="groupId" value={groupId} />
 
           {/* 対局情報 */}
-          <div className="rounded-lg border border-gray-200 p-6 space-y-6">
+          <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">
             <h2 className="text-lg font-semibold">対局情報</h2>
 
             {/* イベント選択 */}
@@ -191,7 +191,7 @@ export default async function NewGamePage({
           </div>
 
           {/* プレイヤー情報 */}
-          <div className="rounded-lg border border-gray-200 p-6">
+          <div className="rounded-lg border border-gray-200 p-6 bg-white">
             <h2 className="text-lg font-semibold mb-6">プレイヤー情報</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -223,7 +223,7 @@ export default async function NewGamePage({
                       ))}
                     </optgroup>
                     {guestPlayers && guestPlayers.length > 0 && (
-                      <optgroup label="ゲストプレイヤー">
+                      <optgroup label="ゲストメンバー">
                         {guestPlayers.map((guest) => (
                           <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
                             {guest.name} (ゲスト)
@@ -273,7 +273,7 @@ export default async function NewGamePage({
               対局を登録
             </button>
             <Link
-              href={`/groups/${groupId}`}
+              href={eventId ? `/groups/${groupId}/events/${eventId}` : `/groups/${groupId}`}
               className="flex-1 rounded-lg bg-gray-200 px-6 py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors text-center"
             >
               キャンセル

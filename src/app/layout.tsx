@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Header } from "@/components/header";
 
 export const metadata: Metadata = {
   title: "麻雀スコア管理アプリ",
   description: "友人同士のカジュアルな麻雀および定期的な麻雀サークルにおけるスコア記録・管理アプリ",
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -13,7 +18,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body>{children}</body>
+      <body>
+        <div className="min-h-screen bg-slate-50">
+          <Header />
+          {children}
+        </div>
+      </body>
     </html>
   );
 }

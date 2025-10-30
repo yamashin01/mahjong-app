@@ -11,4 +11,4 @@ ALTER TABLE public.games
 CREATE INDEX idx_games_tobi_guest_player_id ON public.games(tobi_guest_player_id);
 
 -- コメント
-COMMENT ON COLUMN public.games.tobi_guest_player_id IS 'トビしたゲストプレイヤーID（tobi_player_idまたはtobi_guest_player_idのどちらか一方または両方nullも可能）';
+COMMENT ON COLUMN public.games.tobi_guest_player_id IS 'トビしたゲストメンバーID（tobi_player_idまたはtobi_guest_player_idのどちらか一方または両方nullも可能）';

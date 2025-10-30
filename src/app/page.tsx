@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SignOutButton } from "./sign-out-button";
-import { MobileMenu } from "./mobile-menu";
+import Image from "next/image";
+import { MobileAddGroupMenu } from "@/components/mobile-add-group-menu";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -46,58 +46,28 @@ export default async function Home() {
   }));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* ヘッダー - ナビゲーションメニュー */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">麻雀スコア管理</h1>
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <Image src="/images/top-image.jpg" alt="Top Background" width={1478} height={1108} className="w-full h-[80px] md:h-[200px] object-cover object-[10%_30%] mb-8" />
 
-            {/* デスクトップメニュー */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/profile"
-                className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 transition-colors"
-              >
-                プロフィール編集
-              </Link>
-              <SignOutButton />
-            </div>
-
-            {/* モバイルメニュー */}
-            <MobileMenu />
-          </div>
-        </div>
-      </header>
-
-      {/* メインコンテンツ */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* ウェルカムメッセージ */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              ようこそ、{user.email}さん
-            </h2>
-          </div>
-
-          {/* 参加グループ一覧 */}
           <div className="space-y-4">
-            <div className="md:flex items-center justify-between">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-gray-900 mb-2">参加しているグループ</h2>
-              <div className="flex gap-3 mb-2">
+              <div className="hidden md:flex gap-3 mb-2">
                 <Link
                   href="/groups/new"
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                  className="rounded-lg bg-lime-700 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 transition-colors"
                 >
                   新規作成
                 </Link>
                 <Link
                   href="/groups/join"
-                  className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors"
+                  className="rounded-lg bg-lime-700 px-4 py-2 text-sm font-medium text-white hover:bg-lime-600 transition-colors"
                 >
                   招待コードで参加
                 </Link>
               </div>
+              <MobileAddGroupMenu />
             </div>
 
             {groups && groups.length > 0 ? (
@@ -169,6 +139,5 @@ export default async function Home() {
 
         </div>
       </main>
-    </div>
   );
 }
