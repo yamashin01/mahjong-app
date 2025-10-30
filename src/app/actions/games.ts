@@ -45,14 +45,43 @@ export async function createGame(formData: FormData) {
   }
 
   // グループルールを取得
-  const { data: rules } = await supabase
+  const { data: groupRules } = await supabase
     .from("group_rules")
     .select("*")
     .eq("group_id", groupId)
     .single();
 
-  if (!rules) {
+  if (!groupRules) {
     return { error: "グループルールが見つかりません" };
+  }
+
+  // イベントIDが指定されている場合、イベントルールを取得
+  let rules = groupRules;
+  if (eventId) {
+    const { data: event } = (await supabase
+      .from("events" as any)
+      .select("*")
+      .eq("id", eventId)
+      .single()) as any;
+
+    if (event) {
+      // イベントにカスタムルールが設定されている場合は上書き
+      rules = {
+        ...groupRules,
+        ...(event.game_type !== null && { game_type: event.game_type }),
+        ...(event.start_points !== null && { start_points: event.start_points }),
+        ...(event.return_points !== null && { return_points: event.return_points }),
+        ...(event.uma_first !== null && { uma_first: event.uma_first }),
+        ...(event.uma_second !== null && { uma_second: event.uma_second }),
+        ...(event.uma_third !== null && { uma_third: event.uma_third }),
+        ...(event.uma_fourth !== null && { uma_fourth: event.uma_fourth }),
+        ...(event.oka_enabled !== null && { oka_enabled: event.oka_enabled }),
+        ...(event.rate !== null && { rate: event.rate }),
+        ...(event.tobi_prize !== null && { tobi_prize: event.tobi_prize }),
+        ...(event.yakuman_prize !== null && { yakuman_prize: event.yakuman_prize }),
+        ...(event.top_prize !== null && { top_prize: event.top_prize }),
+      };
+    }
   }
 
   // 順位を計算（点数の降順）

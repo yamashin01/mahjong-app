@@ -5,6 +5,8 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 import { DeleteEventButton } from "./delete-event-button";
+import { EventRulesDisplay } from "@/components/event-rules-display";
+import type { EventRules } from "@/types/event-rules";
 
 export default async function EventDetailPage({
   params,
@@ -27,18 +29,36 @@ export default async function EventDetailPage({
   const membership = await requireGroupMembership(groupId, user.id);
   const isAdmin = membership.role === "admin";
 
-  // イベント情報とグループ情報を並列取得
-  const [eventResult, groupResult] = await Promise.all([
+  // イベント情報、グループ情報、グループルールを並列取得
+  const [eventResult, groupResult, rulesResult] = await Promise.all([
     supabase.from("events" as any).select("*").eq("id", eventId).single() as any,
     supabase.from("groups").select("name").eq("id", groupId).single(),
+    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
   ]);
 
   const { data: event, error: eventError } = eventResult;
   const { data: group } = groupResult;
+  const { data: groupRules } = rulesResult;
 
-  if (eventError || !event || !group) {
+  if (eventError || !event || !group || !groupRules) {
     notFound();
   }
+
+  // イベントのカスタムルールを抽出
+  const eventRules: EventRules = {
+    game_type: event.game_type,
+    start_points: event.start_points,
+    return_points: event.return_points,
+    uma_first: event.uma_first,
+    uma_second: event.uma_second,
+    uma_third: event.uma_third,
+    uma_fourth: event.uma_fourth,
+    oka_enabled: event.oka_enabled,
+    rate: event.rate,
+    tobi_prize: event.tobi_prize,
+    yakuman_prize: event.yakuman_prize,
+    top_prize: event.top_prize,
+  };
 
   // イベントに紐づく対局一覧を取得
   const { data: games } = await supabase
@@ -141,15 +161,24 @@ export default async function EventDetailPage({
             <div className="text-center py-8 text-gray-500">
               <p>まだ対局記録がありません</p>
               {event.status === "active" && (
-                <p className="text-sm mt-2">「対局を記録」ボタンから対局を記録してください</p>
+                <p className="text-sm mt-2">「対局記録を追加」ボタンから対局を記録してください</p>
               )}
             </div>
           )}
         </div>
 
+        {/* ルール表示 */}
+        <EventRulesDisplay eventRules={eventRules} groupRules={groupRules} />
+
         {/* 管理者用操作 */}
         {isAdmin && (
           <div className="w-full flex flex-col gap-y-4">
+            <Link
+              href={`/groups/${groupId}/events/${eventId}/settings`}
+              className="rounded-lg w-full bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors text-center"
+            >
+              ルール設定
+            </Link>
             {event.status === "active" && (
               <form action={updateEventStatus as any}>
                 <input type="hidden" name="eventId" value={eventId} />

@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createEvent } from "@/app/actions/events";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
+import { EventRulesForm } from "@/components/event-rules-form";
 
 export default async function NewEventPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -20,10 +21,16 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
   // メンバーシップ確認
   await requireGroupMembership(groupId, user.id);
 
-  // グループ情報を取得
-  const { data: group } = await supabase.from("groups").select("name").eq("id", groupId).single();
+  // グループ情報とルール設定を取得
+  const [groupResult, rulesResult] = await Promise.all([
+    supabase.from("groups").select("name").eq("id", groupId).single(),
+    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+  ]);
 
-  if (!group) {
+  const { data: group } = groupResult;
+  const { data: groupRules } = rulesResult;
+
+  if (!group || !groupRules) {
     notFound();
   }
 
@@ -90,11 +97,18 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
+          {/* ルール設定 */}
+          <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">
+            <h2 className="text-lg font-semibold">ルール設定</h2>
+            <EventRulesForm groupRules={groupRules} mode="create" />
+          </div>
+
           <div className="rounded-lg bg-blue-50 p-4">
             <h3 className="font-semibold text-blue-900 mb-2">イベントについて</h3>
             <ul className="text-sm text-blue-800 space-y-1">
               <li>• イベント作成後、対局記録時にイベントに紐付けることができます</li>
-              <li>• イベント内の対局は個別にルール変更が可能です</li>
+              <li>• イベント専用のルールを設定できます（任意）</li>
+              <li>• カスタムルールを設定しない場合、グループのデフォルトルールが使用されます</li>
               <li>• イベントを「完了」にすると、成績が確定します</li>
             </ul>
           </div>
