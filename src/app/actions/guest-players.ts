@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminRole } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
+import * as guestPlayersRepo from "@/lib/supabase/repositories/guest-players";
 
 export async function addGuestPlayer(formData: FormData) {
   const supabase = await createClient();
@@ -31,8 +32,8 @@ export async function addGuestPlayer(formData: FormData) {
   }
 
   // ゲストメンバー追加
-  const { error: insertError } = await supabase.from("guest_players").insert({
-    group_id: groupId,
+  const { error: insertError } = await guestPlayersRepo.addGuestPlayer({
+    groupId,
     name: name.trim(),
   });
 
@@ -64,11 +65,10 @@ export async function deleteGuestPlayer(guestPlayerId: string, groupId: string) 
   }
 
   // ゲストメンバー削除
-  const { error: deleteError } = await supabase
-    .from("guest_players")
-    .delete()
-    .eq("id", guestPlayerId)
-    .eq("group_id", groupId);
+  const { error: deleteError } = await guestPlayersRepo.deleteGuestPlayer({
+    guestPlayerId,
+    groupId,
+  });
 
   if (deleteError) {
     console.error("Error deleting guest player:", deleteError);

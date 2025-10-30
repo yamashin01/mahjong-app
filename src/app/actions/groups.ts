@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminRole } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
+import * as groupsRepo from "@/lib/supabase/repositories/groups";
 
 export async function createGroup(formData: FormData) {
   const supabase = await createClient();
@@ -24,15 +25,11 @@ export async function createGroup(formData: FormData) {
   }
 
   // グループを作成
-  const { data: group, error: groupError } = await supabase
-    .from("groups")
-    .insert({
-      name: name.trim(),
-      description: description?.trim() || null,
-      created_by: user.id,
-    })
-    .select()
-    .single();
+  const { data: group, error: groupError } = await groupsRepo.createGroup({
+    name: name.trim(),
+    description: description?.trim() || null,
+    createdBy: user.id,
+  });
 
   if (groupError) {
     console.error("Error creating group:", groupError);
@@ -63,32 +60,27 @@ export async function joinGroup(formData: FormData) {
   }
 
   // 招待コードでグループを検索
-  const { data: group, error: groupError } = await supabase
-    .from("groups")
-    .select("id")
-    .eq("invite_code", inviteCode.trim().toUpperCase())
-    .single();
+  const { data: group, error: groupError } =
+    await groupsRepo.findGroupByInviteCode(inviteCode.trim().toUpperCase());
 
   if (groupError || !group) {
     return { error: "招待コードが無効です" };
   }
 
   // すでにメンバーかチェック
-  const { data: existingMember } = await supabase
-    .from("group_members")
-    .select("id")
-    .eq("group_id", group.id)
-    .eq("user_id", user.id)
-    .single();
+  const { data: existingMember } = await groupsRepo.findGroupMember({
+    groupId: group.id,
+    userId: user.id,
+  });
 
   if (existingMember) {
     return { error: "すでにこのグループに参加しています" };
   }
 
   // グループに参加
-  const { error: joinError } = await supabase.from("group_members").insert({
-    group_id: group.id,
-    user_id: user.id,
+  const { error: joinError } = await groupsRepo.addGroupMember({
+    groupId: group.id,
+    userId: user.id,
     role: "member",
   });
 
@@ -128,11 +120,10 @@ export async function removeMember(formData: FormData) {
   }
 
   // メンバーを削除
-  const { error: removeError } = await supabase
-    .from("group_members")
-    .delete()
-    .eq("group_id", groupId)
-    .eq("user_id", userId);
+  const { error: removeError } = await groupsRepo.removeGroupMember({
+    groupId,
+    userId,
+  });
 
   if (removeError) {
     console.error("Error removing member:", removeError);
@@ -171,11 +162,11 @@ export async function updateMemberRole(formData: FormData) {
   }
 
   // ロールを更新
-  const { error: updateError } = await supabase
-    .from("group_members")
-    .update({ role: newRole })
-    .eq("group_id", groupId)
-    .eq("user_id", userId);
+  const { error: updateError } = await groupsRepo.updateMemberRole({
+    groupId,
+    userId,
+    role: newRole,
+  });
 
   if (updateError) {
     console.error("Error updating role:", updateError);
@@ -222,19 +213,17 @@ export async function updateGroupRules(formData: FormData) {
   }
 
   // ルールを更新
-  const { error: updateError } = await supabase
-    .from("group_rules")
-    .update({
-      game_type: gameType,
-      start_points: startPoints,
-      return_points: returnPoints,
-      rate: rate,
-      uma_first: umaFirst,
-      uma_second: umaSecond,
-      uma_third: umaThird,
-      uma_fourth: umaFourth,
-    })
-    .eq("group_id", groupId);
+  const { error: updateError } = await groupsRepo.updateGroupRules({
+    groupId,
+    gameType,
+    startPoints,
+    returnPoints,
+    rate,
+    umaFirst,
+    umaSecond,
+    umaThird,
+    umaFourth,
+  });
 
   if (updateError) {
     console.error("Error updating rules:", updateError);
