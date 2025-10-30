@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut } from "./actions/auth";
+import { signOut } from "@/app/actions/auth";
 
 interface SignOutButtonProps {
   variant?: "default" | "mobile";

@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { SignOutButton } from "@/app/sign-out-button";
-import { MobileMenu } from "@/app/mobile-menu";
+import { SignOutButton } from "@/app/components/sign-out-button";
+import { MobileMenu } from "@/app/components/mobile-menu";
 
 export function Header() {
   return (

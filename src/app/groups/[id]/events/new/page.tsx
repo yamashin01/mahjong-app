@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createEvent } from "@/app/actions/events";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
-import { EventRulesForm } from "@/components/event-rules-form";
+import { EventRulesForm } from "@/app/components/event-rules-form";
 
 export default async function NewEventPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Header } from "@/components/header";
+import { Header } from "@/app/components/header";
 
 export const metadata: Metadata = {
   title: "麻雀スコア管理アプリ",

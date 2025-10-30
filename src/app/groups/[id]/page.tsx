@@ -4,12 +4,12 @@ import { notFound, redirect } from "next/navigation";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
-import { CopyButton } from "./copy-button";
-import { EventsSection } from "./events-section";
-import { GuestPlayerActions } from "./guest-player-actions";
-import { GuestPlayerForm } from "./guest-player-form";
-import { MemberActions } from "./member-actions";
-import { RankingSection } from "./ranking-section";
+import { CopyButton } from "./components/copy-button";
+import { EventsSection } from "./components/events-section";
+import { GuestPlayerActions } from "./components/guest-player-actions";
+import { GuestPlayerForm } from "./components/guest-player-form";
+import { MemberActions } from "./components/member-actions";
+import { RankingSection } from "./components/ranking-section";
 import { GoPerson } from "react-icons/go";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {

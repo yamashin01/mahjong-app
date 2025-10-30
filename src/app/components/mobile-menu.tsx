@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { SignOutButton } from "./sign-out-button";
+import { SignOutButton } from "@/app/components/sign-out-button";
 import { GiHamburgerMenu } from "react-icons/gi";
 
 export function MobileMenu() {

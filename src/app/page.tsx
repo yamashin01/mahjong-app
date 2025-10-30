@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { MobileAddGroupMenu } from "@/components/mobile-add-group-menu";
+import { MobileAddGroupMenu } from "@/app/components/mobile-add-group-menu";
 
 export default async function Home() {
   const supabase = await createClient();

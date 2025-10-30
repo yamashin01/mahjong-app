@@ -4,8 +4,8 @@ import { updateEventStatus } from "@/app/actions/events";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
-import { DeleteEventButton } from "./delete-event-button";
-import { EventRulesDisplay } from "@/components/event-rules-display";
+import { DeleteEventButton } from "./components/delete-event-button";
+import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import type { EventRules } from "@/types/event-rules";
 
 export default async function EventDetailPage({
