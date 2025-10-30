@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { SignOutButton } from "./sign-out-button";
-import { MobileMenu } from "./mobile-menu";
 import Image from "next/image";
 import { MobileAddGroupMenu } from "@/components/mobile-add-group-menu";
 
@@ -48,32 +46,7 @@ export default async function Home() {
   }));
 
   return (
-    <div>
-      {/* ヘッダー - ナビゲーションメニュー */}
-      <header className="bg-emerald-100 shadow-sm border-b border-gray-200">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">麻雀スコア管理</h1>
-
-            {/* デスクトップメニュー */}
-            <div className="hidden md:flex items-center gap-3">
-              <Link
-                href="/profile"
-                className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
-              >
-                プロフィール編集
-              </Link>
-              <SignOutButton />
-            </div>
-
-            {/* モバイルメニュー */}
-            <MobileMenu />
-          </div>
-        </div>
-      </header>
-
-      {/* メインコンテンツ */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+    <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <Image src="/images/top-image.jpg" alt="Top Background" width={1478} height={1108} className="w-full h-[80px] md:h-[200px] object-cover object-[10%_30%] mb-8" />
 
         <div className="space-y-8">
@@ -166,6 +139,5 @@ export default async function Home() {
 
         </div>
       </main>
-    </div>
   );
 }

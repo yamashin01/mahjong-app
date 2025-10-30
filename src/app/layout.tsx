@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Header } from "@/components/header";
 
 export const metadata: Metadata = {
   title: "麻雀スコア管理アプリ",
@@ -19,6 +20,7 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <div className="min-h-screen bg-slate-50">
+          <Header />
           {children}
         </div>
       </body>
