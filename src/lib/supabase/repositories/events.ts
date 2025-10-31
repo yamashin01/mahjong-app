@@ -1,29 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
+import type { EventInsert } from "@/types";
 
 /**
  * イベントを作成する
  */
-export async function createEvent(eventData: {
-    group_id: string;
-    name: string;
-    description: string;
-    event_date: string;
-    created_by: string;
-    status: "active" | "completed";
-    // カスタムルール（オプショナル）
-    game_type?: "tonpuu" | "tonnan";
-    start_points?: number;
-    return_points?: number;
-    uma_first?: number;
-    uma_second?: number;
-    uma_third?: number;
-    uma_fourth?: number;
-    oka_enabled?: boolean;
-    rate?: number;
-    tobi_prize?: number;
-    yakuman_prize?: number;
-    top_prize?: number;
-  }) {
+export async function createEvent(eventData: EventInsert) {
   const supabase = await createClient();
   return (await supabase
     .from("events" as any)
@@ -55,20 +36,20 @@ export async function updateEventStatus(params: {
  * イベントルールを更新する
  */
 export async function updateEventRules(params: {
-    eventId: string;
-    gameType: string | null;
-    startPoints: number | null;
-    returnPoints: number | null;
-    umaFirst: number | null;
-    umaSecond: number | null;
-    umaThird: number | null;
-    umaFourth: number | null;
-    okaEnabled: boolean | null;
-    rate: number | null;
-    tobiPrize: number | null;
-    yakumanPrize: number | null;
-    topPrize: number | null;
-  }) {
+  eventId: string;
+  gameType: string | null;
+  startPoints: number | null;
+  returnPoints: number | null;
+  umaFirst: number | null;
+  umaSecond: number | null;
+  umaThird: number | null;
+  umaFourth: number | null;
+  okaEnabled: boolean | null;
+  rate: number | null;
+  tobiPrize: number | null;
+  yakumanPrize: number | null;
+  topPrize: number | null;
+}) {
   const supabase = await createClient();
   const updateData = {
     game_type: params.gameType,
@@ -99,7 +80,10 @@ export async function updateEventRules(params: {
  */
 export async function deleteEvent(eventId: string) {
   const supabase = await createClient();
-  return await supabase.from("events" as any).delete().eq("id", eventId);
+  return await supabase
+    .from("events" as any)
+    .delete()
+    .eq("id", eventId);
 }
 
 /**

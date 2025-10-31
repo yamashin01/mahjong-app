@@ -164,7 +164,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div>
                       <p className="font-medium">{guest.name}</p>
                       <p className="text-sm text-gray-500">
-                        追加日: {new Date(guest.created_at).toLocaleDateString("ja-JP")}
+                        追加日: {new Date(guest.created_at!).toLocaleDateString("ja-JP")}
                       </p>
                     </div>
                   </div>

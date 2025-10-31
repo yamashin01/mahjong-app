@@ -127,9 +127,9 @@ export default async function NewGamePage({
 
             {/* 対局種別 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <text className="block text-sm font-medium text-gray-700 mb-2">
                 対局種別 <span className="text-red-500">*</span>
-              </label>
+              </text>
               <div className="flex gap-4">
                 <label className="flex items-center">
                   <input
@@ -168,7 +168,6 @@ export default async function NewGamePage({
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
               />
             </div>
-
           </div>
 
           {/* プレイヤー情報 */}
@@ -180,61 +179,61 @@ export default async function NewGamePage({
                 <div key={i} className="rounded-lg bg-gray-50 p-4 space-y-4">
                   <h3 className="font-medium">{seatNames[i - 1]}</h3>
 
-                {/* プレイヤー選択 */}
-                <div>
-                  <label
-                    htmlFor={`player${i}Id`}
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    プレイヤー <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    id={`player${i}Id`}
-                    name={`player${i}Id`}
-                    required
-                    defaultValue={defaultPlayers[i - 1] || ""}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                  >
-                    <option value="">選択してください</option>
-                    <optgroup label="メンバー">
-                      {members?.map((member) => (
-                        <option key={member.user_id} value={member.user_id}>
-                          {getPlayerDisplayName(member as any)}
-                        </option>
-                      ))}
-                    </optgroup>
-                    {guestPlayers && guestPlayers.length > 0 && (
-                      <optgroup label="ゲストメンバー">
-                        {guestPlayers.map((guest) => (
-                          <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
-                            {guest.name} (ゲスト)
+                  {/* プレイヤー選択 */}
+                  <div>
+                    <label
+                      htmlFor={`player${i}Id`}
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      プレイヤー <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id={`player${i}Id`}
+                      name={`player${i}Id`}
+                      required
+                      defaultValue={defaultPlayers[i - 1] || ""}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                    >
+                      <option value="">選択してください</option>
+                      <optgroup label="メンバー">
+                        {members?.map((member) => (
+                          <option key={member.user_id} value={member.user_id}>
+                            {getPlayerDisplayName(member as any)}
                           </option>
                         ))}
                       </optgroup>
-                    )}
-                  </select>
-                </div>
+                      {guestPlayers && guestPlayers.length > 0 && (
+                        <optgroup label="ゲストメンバー">
+                          {guestPlayers.map((guest) => (
+                            <option key={`guest-${guest.id}`} value={`guest-${guest.id}`}>
+                              {guest.name} (ゲスト)
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
+                    </select>
+                  </div>
 
-                {/* 最終持ち点 */}
-                <div>
-                  <label
-                    htmlFor={`player${i}FinalPoints`}
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    最終持ち点 <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    id={`player${i}FinalPoints`}
-                    name={`player${i}FinalPoints`}
-                    required
-                    step="100"
-                    defaultValue={rules.start_points}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                  />
+                  {/* 最終持ち点 */}
+                  <div>
+                    <label
+                      htmlFor={`player${i}FinalPoints`}
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      最終持ち点 <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id={`player${i}FinalPoints`}
+                      name={`player${i}FinalPoints`}
+                      required
+                      step="100"
+                      defaultValue={rules.start_points}
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
             </div>
           </div>
 

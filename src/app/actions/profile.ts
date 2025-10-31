@@ -24,10 +24,9 @@ export async function updateProfile(formData: FormData) {
   }
 
   // プロフィールを更新
-  const { error: updateError } = await profileRepo.updateProfile({
-    userId: user.id,
-    displayName: displayName.trim(),
-    avatarUrl: avatarUrl?.trim() || null,
+  const { error: updateError } = await profileRepo.updateProfile(user.id, {
+    display_name: displayName.trim(),
+    avatar_url: avatarUrl?.trim() || null,
   });
 
   if (updateError) {

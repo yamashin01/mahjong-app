@@ -25,20 +25,13 @@ export async function createGroup(params: {
  */
 export async function findGroupByInviteCode(inviteCode: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("groups")
-    .select("id")
-    .eq("invite_code", inviteCode)
-    .single();
+  return await supabase.from("groups").select("id").eq("invite_code", inviteCode).single();
 }
 
 /**
  * グループメンバーシップを確認する
  */
-export async function findGroupMember(params: {
-  groupId: string;
-  userId: string;
-}) {
+export async function findGroupMember(params: { groupId: string; userId: string }) {
   const supabase = await createClient();
   return await supabase
     .from("group_members")
@@ -67,10 +60,7 @@ export async function addGroupMember(params: {
 /**
  * グループメンバーを削除する
  */
-export async function removeGroupMember(params: {
-  groupId: string;
-  userId: string;
-}) {
+export async function removeGroupMember(params: { groupId: string; userId: string }) {
   const supabase = await createClient();
   return await supabase
     .from("group_members")
@@ -130,11 +120,7 @@ export async function updateGroupRules(params: {
  */
 export async function getGroupRules(groupId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
+  return await supabase.from("group_rules").select("*").eq("group_id", groupId).single();
 }
 
 /**
@@ -142,11 +128,7 @@ export async function getGroupRules(groupId: string) {
  */
 export async function getGroupById(groupId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("groups")
-    .select("*")
-    .eq("id", groupId)
-    .single();
+  return await supabase.from("groups").select("*").eq("id", groupId).single();
 }
 
 /**
@@ -154,11 +136,7 @@ export async function getGroupById(groupId: string) {
  */
 export async function getGroupName(groupId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("groups")
-    .select("name")
-    .eq("id", groupId)
-    .single();
+  return await supabase.from("groups").select("name").eq("id", groupId).single();
 }
 
 /**

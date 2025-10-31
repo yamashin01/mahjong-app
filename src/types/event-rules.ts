@@ -1,48 +1,30 @@
+import type { EventRow } from './index';
+
 /**
  * イベントルール設定の型定義
+ * EventRowから必要なルールフィールドのみを抽出
  */
-export interface EventRules {
-  game_type?: "tonpuu" | "tonnan";
-  start_points?: number;
-  return_points?: number;
-  uma_first?: number;
-  uma_second?: number;
-  uma_third?: number;
-  uma_fourth?: number;
-  oka_enabled?: boolean;
-  rate?: number;
-  tobi_prize?: number;
-  yakuman_prize?: number;
-  top_prize?: number;
-}
+export type EventRules = Pick<
+  EventRow,
+  | 'game_type'
+  | 'start_points'
+  | 'return_points'
+  | 'uma_first'
+  | 'uma_second'
+  | 'uma_third'
+  | 'uma_fourth'
+  | 'oka_enabled'
+  | 'rate'
+  | 'tobi_prize'
+  | 'yakuman_prize'
+  | 'top_prize'
+>;
 
 /**
  * イベント詳細（ルール含む）
+ * database.types.tsのEventRowをベースに、完全な型安全性を確保
  */
-export interface EventWithRules {
-  id: string;
-  group_id: string;
-  name: string;
-  description: string | null;
-  event_date: string;
-  status: "active" | "completed";
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-  // ルール設定
-  game_type?: "tonpuu" | "tonnan" | null;
-  start_points?: number | null;
-  return_points?: number | null;
-  uma_first?: number | null;
-  uma_second?: number | null;
-  uma_third?: number | null;
-  uma_fourth?: number | null;
-  oka_enabled?: boolean | null;
-  rate?: number | null;
-  tobi_prize?: number | null;
-  yakuman_prize?: number | null;
-  top_prize?: number | null;
-}
+export type EventWithRules = EventRow;
 
 /**
  * イベント作成時のフォームデータ

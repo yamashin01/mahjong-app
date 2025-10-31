@@ -1,17 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
+import type { GuestPlayerInsert } from "@/types";
 
 /**
  * ゲストプレイヤーを追加する
  */
-export async function addGuestPlayer(params: {
-  groupId: string;
-  name: string;
-}) {
+export async function addGuestPlayer(guestPlayer: Omit<GuestPlayerInsert, 'id' | 'created_at'>) {
   const supabase = await createClient();
-  return await supabase.from("guest_players").insert({
-    group_id: params.groupId,
-    name: params.name,
-  });
+  return await supabase.from("guest_players").insert(guestPlayer);
 }
 
 /**

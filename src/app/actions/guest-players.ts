@@ -33,7 +33,7 @@ export async function addGuestPlayer(formData: FormData) {
 
   // ゲストメンバー追加
   const { error: insertError } = await guestPlayersRepo.addGuestPlayer({
-    groupId,
+    group_id: groupId,
     name: name.trim(),
   });
 
