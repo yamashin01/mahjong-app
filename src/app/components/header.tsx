@@ -1,8 +1,24 @@
 import Link from "next/link";
-import { SignOutButton } from "@/app/components/sign-out-button";
 import { MobileMenu } from "@/app/components/mobile-menu";
+import { UserMenu } from "@/app/components/user-menu";
+import { createClient } from "@/lib/supabase/server";
+import * as profileRepo from "@/lib/supabase/repositories";
 
-export function Header() {
+export async function Header() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // ユーザーが未認証の場合はヘッダーを表示しない
+  if (!user) {
+    return null;
+  }
+
+  // プロフィール情報取得
+  const { data: profile } = await profileRepo.getProfileById(user.id);
+
   return (
     <header className="bg-emerald-100 shadow-sm border-b border-gray-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -13,17 +29,19 @@ export function Header() {
 
           {/* デスクトップメニュー */}
           <div className="hidden md:flex items-center gap-3">
-            <Link
-              href="/profile"
-              className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-600 transition-colors"
-            >
-              プロフィール編集
-            </Link>
-            <SignOutButton />
+            <UserMenu
+              userEmail={user.email}
+              avatarUrl={profile?.avatar_url}
+              displayName={profile?.display_name}
+            />
           </div>
 
           {/* モバイルメニュー */}
-          <MobileMenu />
+          <MobileMenu
+            userEmail={user.email}
+            avatarUrl={profile?.avatar_url}
+            displayName={profile?.display_name}
+          />
         </div>
       </div>
     </header>

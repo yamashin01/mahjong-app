@@ -15,6 +15,12 @@ const nextConfig = {
     ],
     formats: ["image/webp", "image/avif"],
   },
+  experimental: {
+    // Server Actionsのボディサイズ制限を3MBに設定
+    serverActions: {
+      bodySizeLimit: "3mb",
+    },
+  },
 };
 
 export default nextConfig;

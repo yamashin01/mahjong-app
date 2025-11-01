@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
 import { createClient } from "@/lib/supabase/server";
 import * as profileRepo from "@/lib/supabase/repositories";
+import AvatarUpload from "@/app/components/AvatarUpload";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -49,6 +50,12 @@ export default async function ProfilePage() {
           <p className="text-gray-600">{user.email}</p>
         </div>
 
+        {/* プロフィール画像アップロード */}
+        <div className="rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">プロフィール画像</h2>
+          <AvatarUpload currentAvatar={profile?.avatar_url} />
+        </div>
+
         {/* プロフィール編集 */}
         <div className="rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold mb-4">プロフィール編集</h2>
@@ -68,32 +75,6 @@ export default async function ProfilePage() {
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
               />
             </div>
-
-            <div>
-              <label htmlFor="avatarUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                アバター画像URL（任意）
-              </label>
-              <input
-                type="url"
-                id="avatarUrl"
-                name="avatarUrl"
-                defaultValue={profile?.avatar_url || ""}
-                placeholder="https://example.com/avatar.jpg"
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-              <p className="text-sm text-gray-500 mt-1">画像のURLを入力してください</p>
-            </div>
-
-            {profile?.avatar_url && (
-              <div>
-                <p className="text-sm text-gray-700 mb-2">現在のアバター:</p>
-                <img
-                  src={profile.avatar_url}
-                  alt="アバター"
-                  className="h-20 w-20 rounded-full border-2 border-gray-200"
-                />
-              </div>
-            )}
 
             <button
               type="submit"
