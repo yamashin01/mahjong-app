@@ -4,13 +4,14 @@ import { notFound, redirect } from "next/navigation";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
-import { CopyButton } from "./copy-button";
-import { EventsSection } from "./events-section";
-import { GuestPlayerActions } from "./guest-player-actions";
-import { GuestPlayerForm } from "./guest-player-form";
-import { MemberActions } from "./member-actions";
-import { RankingSection } from "./ranking-section";
+import { CopyButton } from "./components/copy-button";
+import { EventsSection } from "./components/events-section";
+import { GuestPlayerActions } from "./components/guest-player-actions";
+import { GuestPlayerForm } from "./components/guest-player-form";
+import { MemberActions } from "./components/member-actions";
+import { RankingSection } from "./components/ranking-section";
 import { GoPerson } from "react-icons/go";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -27,7 +28,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
   // グループ情報取得とメンバーシップ確認を並列実行（パフォーマンス最適化）
   const [groupResult, membership] = await Promise.all([
-    supabase.from("groups").select("*").eq("id", groupId).single(),
+    groupsRepo.getGroupById(groupId),
     requireGroupMembership(groupId, user.id),
   ]);
 
@@ -48,39 +49,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     { data: guestPlayers },
     eventsResult,
   ] = await Promise.all([
-    supabase
-      .from("group_members")
-      .select(
-        `
-      user_id,
-      role,
-      joined_at,
-      profiles (
-        display_name,
-        avatar_url
-      )
-    `,
-      )
-      .eq("group_id", groupId)
-      .order("joined_at", { ascending: true }),
-    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
-    supabase
-      .from("games")
-      .select("*, game_results(rank, profiles(display_name), guest_players(name))")
-      .eq("group_id", groupId)
-      .order("played_at", { ascending: false })
-      .limit(5),
-    supabase.from("daily_rankings").select("*").eq("group_id", groupId).eq("game_date", today),
-    supabase
-      .from("guest_players")
-      .select("*")
-      .eq("group_id", groupId)
-      .order("created_at", { ascending: true }),
-    supabase
-      .from("events" as any)
-      .select("*")
-      .eq("group_id", groupId)
-      .order("event_date", { ascending: false }) as any,
+    groupsRepo.getGroupMembers(groupId),
+    groupsRepo.getGroupRules(groupId),
+    groupsRepo.getRecentGames({ groupId, limit: 5 }),
+    groupsRepo.getDailyRankings({ groupId, gameDate: today }),
+    groupsRepo.getGroupGuestPlayers(groupId),
+    groupsRepo.getGroupEvents(groupId),
   ]);
 
   const { data: events } = eventsResult;
@@ -134,10 +108,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             {members?.map((member) => (
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
-                  {hasPlayerAvatar(member as any) ? (
+                  {hasPlayerAvatar(member) ? (
                     <Image
-                      src={getPlayerAvatarUrl(member as any)!}
-                      alt={getPlayerDisplayName(member as any)}
+                      src={getPlayerAvatarUrl(member)!}
+                      alt={getPlayerDisplayName(member)}
                       width={40}
                       height={40}
                       className="rounded-full"
@@ -146,7 +120,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div className="h-10 w-10 rounded-full bg-gray-200" />
                   )}
                   <div>
-                    <p className="font-medium">{getPlayerDisplayName(member as any)}</p>
+                    <p className="font-medium">{getPlayerDisplayName(member)}</p>
                     <p className="text-sm text-gray-500">
                       参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
                     </p>
@@ -190,7 +164,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div>
                       <p className="font-medium">{guest.name}</p>
                       <p className="text-sm text-gray-500">
-                        追加日: {new Date(guest.created_at).toLocaleDateString("ja-JP")}
+                        追加日: {new Date(guest.created_at!).toLocaleDateString("ja-JP")}
                       </p>
                     </div>
                   </div>

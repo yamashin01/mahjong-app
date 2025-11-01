@@ -24,7 +24,7 @@ interface EventRulesFormProps {
 
 export function EventRulesForm({ groupRules, initialRules, mode = "create" }: EventRulesFormProps) {
   const [useCustomRules, setUseCustomRules] = useState(
-    mode === "edit" ? initialRules?.game_type !== undefined : false
+    mode === "edit" ? initialRules?.game_type !== undefined : false,
   );
 
   return (
@@ -47,17 +47,15 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
 
       {!useCustomRules && (
         <div className="rounded-lg bg-gray-50 p-4">
-          <p className="text-sm text-gray-600">
-            グループのデフォルトルールが使用されます
-          </p>
+          <p className="text-sm text-gray-600">グループのデフォルトルールが使用されます</p>
           <div className="mt-2 text-xs text-gray-500 space-y-1">
             <p>• {groupRules.game_type === "tonpuu" ? "東風戦" : "東南戦"}</p>
             <p>
               • {groupRules.start_points}点持ち / {groupRules.return_points}点返し
             </p>
             <p>
-              • ウマ: {groupRules.uma_first}/{groupRules.uma_second}/
-              {groupRules.uma_third}/{groupRules.uma_fourth}
+              • ウマ: {groupRules.uma_first}/{groupRules.uma_second}/{groupRules.uma_third}/
+              {groupRules.uma_fourth}
             </p>
             <p>• レート: {groupRules.rate}</p>
           </div>
@@ -85,7 +83,10 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
           {/* 基本点数設定 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="start_points" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="start_points"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 開始持ち点
               </label>
               <input
@@ -117,9 +118,7 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
 
           {/* ウマ設定 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              ウマ（順位点）
-            </label>
+            <div className="block text-sm font-medium text-gray-700 mb-2">ウマ（順位点）</div>
             <div className="grid grid-cols-4 gap-2">
               <div>
                 <label htmlFor="uma_first" className="block text-xs text-gray-600 mb-1">
@@ -181,8 +180,8 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
               value="true"
               defaultChecked={
                 initialRules?.oka_enabled !== undefined
-                  ? initialRules.oka_enabled
-                  : groupRules.oka_enabled
+                  ? (initialRules.oka_enabled ?? false)
+                  : (groupRules.oka_enabled ?? false)
               }
               className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
@@ -208,9 +207,7 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
 
           {/* 各種賞金 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              各種賞金（任意）
-            </label>
+            <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">

@@ -2,13 +2,7 @@
  * Utility functions for player operations
  */
 
-import type { PlayerWithName } from "@/types/supabase-queries";
-
-// More flexible type for Supabase query results
-type FlexiblePlayerData = {
-  profiles?: { display_name?: string | null; avatar_url?: string | null } | null;
-  guest_players?: { name?: string } | null;
-};
+import type { FlexiblePlayerData } from "@/types";
 
 /**
  * Get display name from player data (handles both profiles and guest_players)

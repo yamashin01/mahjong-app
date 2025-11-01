@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import * as gamesRepo from "@/lib/supabase/repositories/games";
+import * as groupsRepo from "@/lib/supabase/repositories/groups";
+import * as eventsRepo from "@/lib/supabase/repositories/events";
 
 export async function createGame(formData: FormData) {
   const supabase = await createClient();
@@ -21,13 +24,7 @@ export async function createGame(formData: FormData) {
   const eventId = formData.get("eventId") as string | null;
 
   // 回戦数を自動採番（グループ内の最新の対局記録+1）
-  const { data: latestGame } = await supabase
-    .from("games")
-    .select("game_number")
-    .eq("group_id", groupId)
-    .order("game_number", { ascending: false })
-    .limit(1)
-    .single();
+  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId);
 
   const gameNumber = latestGame ? latestGame.game_number + 1 : 1;
 
@@ -45,11 +42,7 @@ export async function createGame(formData: FormData) {
   }
 
   // グループルールを取得
-  const { data: groupRules } = await supabase
-    .from("group_rules")
-    .select("*")
-    .eq("group_id", groupId)
-    .single();
+  const { data: groupRules } = await groupsRepo.getGroupRules(groupId);
 
   if (!groupRules) {
     return { error: "グループルールが見つかりません" };
@@ -58,11 +51,7 @@ export async function createGame(formData: FormData) {
   // イベントIDが指定されている場合、イベントルールを取得
   let rules = groupRules;
   if (eventId) {
-    const { data: event } = (await supabase
-      .from("events" as any)
-      .select("*")
-      .eq("id", eventId)
-      .single()) as any;
+    const { data: event } = await eventsRepo.getEventById(eventId);
 
     if (event) {
       // イベントにカスタムルールが設定されている場合は上書き
@@ -141,21 +130,17 @@ export async function createGame(formData: FormData) {
   });
 
   // 対局記録を作成
-  const { data: game, error: gameError } = await supabase
-    .from("games")
-    .insert({
-      group_id: groupId,
-      game_type: gameType,
-      game_number: gameNumber,
-      played_at: playedAt,
-      recorded_by: user.id,
-      event_id: eventId || null,
-      tobi_player_id: null,
-      tobi_guest_player_id: null,
-      yakuman_count: 0,
-    })
-    .select()
-    .single();
+  const { data: game, error: gameError } = await gamesRepo.createGame({
+    group_id: groupId,
+    game_type: gameType,
+    game_number: gameNumber,
+    played_at: playedAt,
+    recorded_by: user.id,
+    event_id: eventId || null,
+    tobi_player_id: null,
+    tobi_guest_player_id: null,
+    yakuman_count: 0,
+  });
 
   if (gameError) {
     console.error("Error creating game:", gameError);
@@ -168,12 +153,12 @@ export async function createGame(formData: FormData) {
     ...result,
   }));
 
-  const { error: resultsError } = await supabase.from("game_results").insert(gameResults);
+  const { error: resultsError } = await gamesRepo.createGameResults(gameResults);
 
   if (resultsError) {
     console.error("Error creating game results:", resultsError);
     // ゲームを削除してロールバック
-    await supabase.from("games").delete().eq("id", game.id);
+    await gamesRepo.deleteGame(game.id);
     return { error: "対局結果の保存に失敗しました" };
   }
 

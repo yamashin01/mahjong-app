@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import * as profileRepo from "@/lib/supabase/repositories/profile";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
@@ -23,14 +24,10 @@ export async function updateProfile(formData: FormData) {
   }
 
   // プロフィールを更新
-  const { error: updateError } = await supabase
-    .from("profiles")
-    .update({
-      display_name: displayName.trim(),
-      avatar_url: avatarUrl?.trim() || null,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", user.id);
+  const { error: updateError } = await profileRepo.updateProfile(user.id, {
+    display_name: displayName.trim(),
+    avatar_url: avatarUrl?.trim() || null,
+  });
 
   if (updateError) {
     console.error("Error updating profile:", updateError);

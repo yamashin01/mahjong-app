@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
-import { MobileAddGroupMenu } from "@/components/mobile-add-group-menu";
+import { MobileAddGroupMenu } from "@/app/components/mobile-add-group-menu";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -16,31 +17,14 @@ export default async function Home() {
   }
 
   // ユーザーが参加しているグループを取得
-  const { data: memberships, error } = await supabase
-    .from("group_members")
-    .select(
-      `
-      group_id,
-      role,
-      joined_at,
-      groups (
-        id,
-        name,
-        description,
-        invite_code,
-        created_at
-      )
-    `,
-    )
-    .eq("user_id", user.id)
-    .order("joined_at", { ascending: false });
+  const { data: memberships, error } = await groupsRepo.getUserGroups(user.id);
 
   if (error) {
     console.error("Error fetching groups:", error);
   }
 
   const groups = memberships?.map((m) => ({
-    ...(m.groups as any),
+    ...m.groups,
     role: m.role,
     joined_at: m.joined_at,
   }));

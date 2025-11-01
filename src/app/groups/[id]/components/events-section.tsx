@@ -1,17 +1,9 @@
 import Link from "next/link";
-
-type Event = {
-  id: string;
-  name: string;
-  description: string | null;
-  event_date: string;
-  status: "active" | "completed";
-  created_at: string;
-};
+import type { EventRow } from "@/types";
 
 type EventsSectionProps = {
   groupId: string;
-  events: Event[];
+  events: EventRow[];
   isAdmin: boolean;
 };
 

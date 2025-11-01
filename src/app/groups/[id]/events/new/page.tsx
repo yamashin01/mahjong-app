@@ -3,7 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { createEvent } from "@/app/actions/events";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
-import { EventRulesForm } from "@/components/event-rules-form";
+import { EventRulesForm } from "@/app/components/event-rules-form";
+import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function NewEventPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -23,8 +24,8 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
 
   // グループ情報とルール設定を取得
   const [groupResult, rulesResult] = await Promise.all([
-    supabase.from("groups").select("name").eq("id", groupId).single(),
-    supabase.from("group_rules").select("*").eq("group_id", groupId).single(),
+    groupsRepo.getGroupName(groupId),
+    groupsRepo.getGroupRules(groupId),
   ]);
 
   const { data: group } = groupResult;
@@ -46,7 +47,8 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
           <p className="text-gray-600">{group.name}</p>
         </div>
 
-        <form action={createEvent as any} className="space-y-8">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={createEvent} className="space-y-8">
           <input type="hidden" name="groupId" value={groupId} />
 
           <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">

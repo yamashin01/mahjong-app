@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { GoogleSignInButton } from "./google-sign-in-button";
+import { GoogleSignInButton } from "./components/google-sign-in-button";
 
 export default async function LoginPage() {
   const supabase = await createClient();

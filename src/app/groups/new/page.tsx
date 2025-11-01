@@ -22,7 +22,8 @@ export default async function NewGroupPage() {
           <p className="text-gray-600">麻雀サークルのグループを作成しましょう</p>
         </div>
 
-        <form action={createGroup as any} className="space-y-6">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={createGroup} className="space-y-6">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
               グループ名 <span className="text-red-500">*</span>

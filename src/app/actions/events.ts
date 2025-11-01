@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { EventInsert, EventUpdate } from "@/types";
+import * as eventsRepo from "@/lib/supabase/repositories/events";
 
 export async function createEvent(formData: FormData) {
   const supabase = await createClient();
@@ -28,7 +30,7 @@ export async function createEvent(formData: FormData) {
   }
 
   // イベントデータを構築
-  const eventData: any = {
+  const eventData: EventInsert = {
     group_id: groupId,
     name,
     description,
@@ -67,11 +69,7 @@ export async function createEvent(formData: FormData) {
   }
 
   // イベントを作成
-  const { data: event, error } = (await supabase
-    .from("events" as any)
-    .insert(eventData)
-    .select()
-    .single()) as any;
+  const { data: event, error } = await eventsRepo.createEvent(eventData);
 
   if (error) {
     console.error("Error creating event:", error);
@@ -97,12 +95,10 @@ export async function updateEventStatus(formData: FormData) {
   const status = formData.get("status") as "active" | "completed";
 
   // イベントを更新
-  const { data: event, error } = (await supabase
-    .from("events" as any)
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", eventId)
-    .select("group_id")
-    .single()) as any;
+  const { data: event, error } = await eventsRepo.updateEventStatus({
+    eventId,
+    status,
+  });
 
   if (error) {
     console.error("Error updating event status:", error);
@@ -130,7 +126,7 @@ export async function updateEventRules(formData: FormData) {
   const useCustomRules = formData.get("useCustomRules") === "true";
 
   // 更新データを構築
-  const updateData: any = {
+  const updateData: Partial<EventUpdate> & { updated_at: string } = {
     updated_at: new Date().toISOString(),
   };
 
@@ -178,12 +174,21 @@ export async function updateEventRules(formData: FormData) {
   }
 
   // イベントルールを更新
-  const { data: event, error } = (await supabase
-    .from("events" as any)
-    .update(updateData)
-    .eq("id", eventId)
-    .select("group_id")
-    .single()) as any;
+  const { data: event, error } = await eventsRepo.updateEventRules({
+    eventId,
+    gameType: updateData.game_type,
+    startPoints: updateData.start_points,
+    returnPoints: updateData.return_points,
+    umaFirst: updateData.uma_first,
+    umaSecond: updateData.uma_second,
+    umaThird: updateData.uma_third,
+    umaFourth: updateData.uma_fourth,
+    okaEnabled: updateData.oka_enabled,
+    rate: updateData.rate,
+    tobiPrize: updateData.tobi_prize,
+    yakumanPrize: updateData.yakuman_prize,
+    topPrize: updateData.top_prize,
+  });
 
   if (error) {
     console.error("Error updating event rules:", error);
@@ -211,7 +216,7 @@ export async function deleteEvent(formData: FormData) {
   const groupId = formData.get("groupId") as string;
 
   // イベントを削除（関連する対局のevent_idはON DELETE SET NULLで自動的にNULLになる）
-  const { error } = await supabase.from("events" as any).delete().eq("id", eventId);
+  const { error } = await eventsRepo.deleteEvent(eventId);
 
   if (error) {
     console.error("Error deleting event:", error);

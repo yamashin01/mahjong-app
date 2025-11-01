@@ -6,33 +6,88 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5";
   };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
+      events: {
+        Row: {
+          created_at: string;
+          created_by: string;
+          description: string | null;
+          event_date: string;
+          game_type: string | null;
+          group_id: string;
+          id: string;
+          name: string;
+          oka_enabled: boolean | null;
+          rate: number | null;
+          return_points: number | null;
+          start_points: number | null;
+          status: string;
+          tobi_prize: number | null;
+          top_prize: number | null;
+          uma_first: number | null;
+          uma_fourth: number | null;
+          uma_second: number | null;
+          uma_third: number | null;
+          updated_at: string;
+          yakuman_prize: number | null;
+        };
+        Insert: {
+          created_at?: string;
+          created_by: string;
+          description?: string | null;
+          event_date: string;
+          game_type?: string | null;
+          group_id: string;
+          id?: string;
+          name: string;
+          oka_enabled?: boolean | null;
+          rate?: number | null;
+          return_points?: number | null;
+          start_points?: number | null;
+          status?: string;
+          tobi_prize?: number | null;
+          top_prize?: number | null;
+          uma_first?: number | null;
+          uma_fourth?: number | null;
+          uma_second?: number | null;
+          uma_third?: number | null;
+          updated_at?: string;
+          yakuman_prize?: number | null;
+        };
+        Update: {
+          created_at?: string;
+          created_by?: string;
+          description?: string | null;
+          event_date?: string;
+          game_type?: string | null;
+          group_id?: string;
+          id?: string;
+          name?: string;
+          oka_enabled?: boolean | null;
+          rate?: number | null;
+          return_points?: number | null;
+          start_points?: number | null;
+          status?: string;
+          tobi_prize?: number | null;
+          top_prize?: number | null;
+          uma_first?: number | null;
+          uma_fourth?: number | null;
+          uma_second?: number | null;
+          uma_third?: number | null;
+          updated_at?: string;
+          yakuman_prize?: number | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "events_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       game_results: {
         Row: {
           created_at: string;
@@ -103,49 +158,87 @@ export type Database = {
       games: {
         Row: {
           created_at: string;
+          custom_rate: number | null;
+          custom_return_points: number | null;
+          custom_start_points: number | null;
+          custom_uma_first: number | null;
+          custom_uma_fourth: number | null;
+          custom_uma_second: number | null;
+          custom_uma_third: number | null;
+          event_id: string | null;
           game_number: number;
           game_type: string;
           group_id: string;
           id: string;
           played_at: string;
           recorded_by: string;
-          tobi_player_id: string | null;
           tobi_guest_player_id: string | null;
+          tobi_player_id: string | null;
           updated_at: string;
           yakuman_count: number | null;
         };
         Insert: {
           created_at?: string;
+          custom_rate?: number | null;
+          custom_return_points?: number | null;
+          custom_start_points?: number | null;
+          custom_uma_first?: number | null;
+          custom_uma_fourth?: number | null;
+          custom_uma_second?: number | null;
+          custom_uma_third?: number | null;
+          event_id?: string | null;
           game_number: number;
           game_type: string;
           group_id: string;
           id?: string;
           played_at?: string;
           recorded_by: string;
-          tobi_player_id?: string | null;
           tobi_guest_player_id?: string | null;
+          tobi_player_id?: string | null;
           updated_at?: string;
           yakuman_count?: number | null;
         };
         Update: {
           created_at?: string;
+          custom_rate?: number | null;
+          custom_return_points?: number | null;
+          custom_start_points?: number | null;
+          custom_uma_first?: number | null;
+          custom_uma_fourth?: number | null;
+          custom_uma_second?: number | null;
+          custom_uma_third?: number | null;
+          event_id?: string | null;
           game_number?: number;
           game_type?: string;
           group_id?: string;
           id?: string;
           played_at?: string;
           recorded_by?: string;
-          tobi_player_id?: string | null;
           tobi_guest_player_id?: string | null;
+          tobi_player_id?: string | null;
           updated_at?: string;
           yakuman_count?: number | null;
         };
         Relationships: [
           {
+            foreignKeyName: "games_event_id_fkey";
+            columns: ["event_id"];
+            isOneToOne: false;
+            referencedRelation: "events";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "games_group_id_fkey";
             columns: ["group_id"];
             isOneToOne: false;
             referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "games_tobi_guest_player_id_fkey";
+            columns: ["tobi_guest_player_id"];
+            isOneToOne: false;
+            referencedRelation: "guest_players";
             referencedColumns: ["id"];
           },
         ];
@@ -178,6 +271,13 @@ export type Database = {
             columns: ["group_id"];
             isOneToOne: false;
             referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "group_members_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
             referencedColumns: ["id"];
           },
         ];
@@ -247,38 +347,6 @@ export type Database = {
           },
         ];
       };
-      guest_players: {
-        Row: {
-          created_at: string;
-          group_id: string;
-          id: string;
-          name: string;
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          group_id: string;
-          id?: string;
-          name: string;
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          group_id?: string;
-          id?: string;
-          name?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "guest_players_group_id_fkey";
-            columns: ["group_id"];
-            isOneToOne: false;
-            referencedRelation: "groups";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       groups: {
         Row: {
           created_at: string;
@@ -308,6 +376,38 @@ export type Database = {
           updated_at?: string;
         };
         Relationships: [];
+      };
+      guest_players: {
+        Row: {
+          created_at: string | null;
+          group_id: string;
+          id: string;
+          name: string;
+          updated_at: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          group_id: string;
+          id?: string;
+          name: string;
+          updated_at?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          group_id?: string;
+          id?: string;
+          name?: string;
+          updated_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "guest_players_group_id_fkey";
+            columns: ["group_id"];
+            isOneToOne: false;
+            referencedRelation: "groups";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       profiles: {
         Row: {
@@ -351,6 +451,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "game_results_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "games_group_id_fkey";
             columns: ["group_id"];
             isOneToOne: false;
@@ -378,6 +485,13 @@ export type Database = {
         };
         Relationships: [
           {
+            foreignKeyName: "game_results_player_id_fkey";
+            columns: ["player_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
             foreignKeyName: "games_group_id_fkey";
             columns: ["group_id"];
             isOneToOne: false;
@@ -389,6 +503,14 @@ export type Database = {
     };
     Functions: {
       generate_invite_code: { Args: never; Returns: string };
+      is_group_admin: {
+        Args: { p_group_id: string; p_user_id: string };
+        Returns: boolean;
+      };
+      is_group_member: {
+        Args: { p_group_id: string; p_user_id: string };
+        Returns: boolean;
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -515,9 +637,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {},
   },

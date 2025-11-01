@@ -1,16 +1,4 @@
-type RankingData = {
-  player_id: string | null;
-  display_name: string | null;
-  games_played: number | null;
-  first_place_count: number | null;
-  second_place_count: number | null;
-  third_place_count: number | null;
-  fourth_place_count: number | null;
-  average_rank: number | null;
-  total_points: number | null;
-  game_date: string | null;
-  group_id: string | null;
-};
+import type { RankingData } from "@/types";
 
 export function RankingSection({ rankings }: { rankings: RankingData[] }) {
   if (!rankings || rankings.length === 0) {

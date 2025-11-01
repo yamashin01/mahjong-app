@@ -7,13 +7,7 @@
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-
-export type GroupMembership = {
-  role: "admin" | "member";
-  user_id: string;
-  group_id: string;
-  joined_at: string;
-};
+import type { GroupMembership } from "@/types";
 
 /**
  * Check if a user is a member of a group
@@ -92,5 +86,5 @@ export async function getGroupRole(
   userId: string,
 ): Promise<"admin" | "member" | null> {
   const membership = await checkGroupMembership(groupId, userId);
-  return membership?.role || null;
+  return membership?.role ?? null;
 }
