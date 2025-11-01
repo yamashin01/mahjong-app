@@ -11,12 +11,13 @@ export async function Header() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // プロフィール情報取得
-  let profile = null;
-  if (user) {
-    const { data } = await profileRepo.getProfileById(user.id);
-    profile = data;
+  // ユーザーが未認証の場合はヘッダーを表示しない
+  if (!user) {
+    return null;
   }
+
+  // プロフィール情報取得
+  const { data: profile } = await profileRepo.getProfileById(user.id);
 
   return (
     <header className="bg-emerald-100 shadow-sm border-b border-gray-200">
@@ -28,23 +29,19 @@ export async function Header() {
 
           {/* デスクトップメニュー */}
           <div className="hidden md:flex items-center gap-3">
-            {user && (
-              <UserMenu
-                userEmail={user.email}
-                avatarUrl={profile?.avatar_url}
-                displayName={profile?.display_name}
-              />
-            )}
-          </div>
-
-          {/* モバイルメニュー */}
-          {user && (
-            <MobileMenu
+            <UserMenu
               userEmail={user.email}
               avatarUrl={profile?.avatar_url}
               displayName={profile?.display_name}
             />
-          )}
+          </div>
+
+          {/* モバイルメニュー */}
+          <MobileMenu
+            userEmail={user.email}
+            avatarUrl={profile?.avatar_url}
+            displayName={profile?.display_name}
+          />
         </div>
       </div>
     </header>
