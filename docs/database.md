@@ -3,6 +3,14 @@
 本プロジェクトでは、バックエンドサービスとしてSupabaseを採用しています。
 Supabaseは、PostgreSQLを基盤としたオープンソースのバックエンドサービスです。
 
+## 目次
+
+1. [ER図](#1-er図)
+2. [テーブル定義](#2-テーブル定義)
+3. [ビュー](#3-ビュー)
+4. [トリガー](#4-トリガー)
+5. [マイグレーション順序](#5-マイグレーション順序)
+
 ## 1. ER図
 
 ```mermaid
@@ -169,10 +177,10 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_profiles_id` on (id)
 
-**RLSポリシー**:
+#### RLSポリシー
 - 自分のプロファイルは閲覧・更新可能
 
 ### 2.3 groups
@@ -189,11 +197,11 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_groups_created_by` on (created_by)
 - `idx_groups_invite_code` on (invite_code)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーのみ閲覧可能
 - ログインユーザーはグループ作成可能
 - グループ作成者のみ更新・削除可能
@@ -221,10 +229,10 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_group_rules_group_id` on (group_id)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーはルール閲覧可能
 - グループ作成者のみルール作成・更新可能
 
@@ -240,18 +248,18 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | role | text | NOT NULL, CHECK | 'member' | ロール ('admin', 'member') |
 | joined_at | timestamptz | DEFAULT NOW() | | 参加日時 |
 
-**ユニーク制約**:
+#### ユニーク制約
 - (group_id, user_id)
 
-**インデックス**:
+#### インデックス
 - `idx_group_members_group_id` on (group_id)
 - `idx_group_members_user_id` on (user_id)
 
-**ロールの定義**:
+#### ロールの定義
 - `admin`: グループ作成者、設定変更・メンバー管理可能
 - `member`: 半荘記録・編集・削除が可能
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーは自グループのメンバー一覧を閲覧可能
 - ユーザーは招待リンク経由でグループ参加可能
 - グループ管理者のみメンバーのロール変更可能
@@ -269,10 +277,10 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_guest_players_group_id` on (group_id)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーはゲストプレイヤーを閲覧可能
 - グループ管理者のみゲストプレイヤーを作成・更新・削除可能
 
@@ -304,16 +312,16 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_events_group_id` on (group_id)
 - `idx_events_status` on (status)
 - `idx_events_event_date` on (event_date)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーはイベントを閲覧・作成可能
 - グループ管理者のみイベントを更新・削除可能
 
-**ルール設定**:
+#### ルール設定
 - イベント独自のルールを設定可能（game_type, start_points等）
 - NULL の場合はグループのデフォルトルールを使用
 - イベント内の全対局に適用される（対局ごとのカスタムルールも可能）
@@ -344,17 +352,17 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | created_at | timestamptz | DEFAULT NOW() | | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | | 更新日時 |
 
-**インデックス**:
+#### インデックス
 - `idx_games_group_id` on (group_id)
 - `idx_games_event_id` on (event_id)
 - `idx_games_played_at` on (played_at)
 - `idx_games_recorded_by` on (recorded_by)
 - `idx_games_tobi_guest_player_id` on (tobi_guest_player_id)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーは半荘を閲覧・作成・更新・削除可能
 
-**ルール適用の優先順位**:
+#### ルール適用の優先順位
 1. カスタムルール（custom_*カラム）が設定されている場合はそれを使用
 2. イベントに紐づいている場合（event_id IS NOT NULL）はイベントルールを使用
 3. それ以外はグループのデフォルトルールを使用
@@ -378,23 +386,23 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | point_amount | numeric(10,2) | NOT NULL | レート適用後のポイント |
 | created_at | timestamptz | DEFAULT NOW() | 作成日時 |
 
-**チェック制約**:
+#### チェック制約
 - `game_results_player_check`: player_id と guest_player_id のどちらか一方のみが設定されている
 
-**ユニーク制約（パーシャルインデックス）**:
+#### ユニーク制約（パーシャルインデックス）
 - `game_results_game_regular_player_unique`: (game_id, player_id) WHERE player_id IS NOT NULL
 - `game_results_game_guest_player_unique`: (game_id, guest_player_id) WHERE guest_player_id IS NOT NULL
 - (game_id, seat): 同じゲームで座席が重複しない
 
-**インデックス**:
+#### インデックス
 - `idx_game_results_game_id` on (game_id)
 - `idx_game_results_player_id` on (player_id)
 - `idx_game_results_guest_player_id` on (guest_player_id)
 
-**RLSポリシー**:
+#### RLSポリシー
 - グループメンバーは結果を閲覧・作成・更新・削除可能
 
-**プレイヤー識別**:
+#### プレイヤー識別
 - 通常ユーザーの場合: player_id に値、guest_player_id は NULL
 - ゲストプレイヤーの場合: guest_player_id に値、player_id は NULL
 - 両方設定または両方 NULL は制約違反でエラー
@@ -491,26 +499,4 @@ Supabase のマイグレーションは以下の順序で実行すること
 
 ### 制約修正
 20. `021_fix_game_results_unique_constraint.sql` - game_results ユニーク制約修正（ゲストプレイヤー対応）
-
-## 6. 主要な機能
-
-### 6.1 ゲストプレイヤー機能
-- Googleログインなしで対局に参加可能なプレイヤー
-- グループ管理者が作成・管理
-- 通常ユーザーと同様に対局結果を記録可能
-- トビプレイヤーにも指定可能
-
-### 6.2 イベント機能
-- 大会や合宿などのイベントを管理
-- イベント独自のルール設定が可能
-- イベント内の対局を一括管理
-- 対局ごとにさらにカスタムルールも設定可能
-
-### 6.3 ルール適用の優先順位
-1. **対局のカスタムルール** (games.custom_*)
-   - 特定の対局のみ異なるルールを適用する場合
-2. **イベントルール** (events.*)
-   - イベントに紐づく対局の場合
-3. **グループデフォルトルール** (group_rules.*)
-   - 通常の対局で使用
 

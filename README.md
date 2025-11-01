@@ -30,7 +30,7 @@
 - [機能要件仕様書](./docs/functional-requirements.md) - 機能の詳細定義
 - [技術アーキテクチャ設計](./docs/technical-architecture.md) - システム構成と技術選定
 - [データベーススキーマ設計](./docs/database.md) - DB設計とRLSポリシー
-- [機能設計書](./docs/specification.md.md) - 機能設計と画面遷移
+- [機能設計書](./docs/specification.md) - 機能設計と画面遷移
 
 ## プロジェクト構成
 
