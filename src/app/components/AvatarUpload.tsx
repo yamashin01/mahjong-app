@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { uploadAvatar } from "@/app/actions/profile";
 
@@ -11,6 +12,7 @@ interface AvatarUploadProps {
 export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
   const [isPending, startTransition] = useTransition();
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,10 +43,8 @@ export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
           setMessage({ type: "error", text: result.error });
         } else if (result.success) {
           setMessage({ type: "success", text: "画像をアップロードしました！" });
-          // ページをリロードして画像を更新
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          // Next.jsのルーターでキャッシュを再検証（revalidatePathと連携）
+          router.refresh();
         }
       } catch (error) {
         console.error("予期しないエラー:", error);

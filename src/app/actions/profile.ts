@@ -1,7 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import * as profileRepo from "@/lib/supabase/repositories/profile";
 
@@ -72,9 +72,21 @@ export async function uploadAvatar(formData: FormData) {
     return { error: "JPEG、PNG、GIF、WebP形式の画像のみアップロード可能です" };
   }
 
+  // MIMEタイプから安全に拡張子をマッピング
+  const mimeToExt: Record<string, string> = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/gif": "gif",
+    "image/webp": "webp",
+  };
+
+  const fileExt = mimeToExt[file.type];
+  if (!fileExt) {
+    return { error: "サポートされていないファイル形式です" };
+  }
+
   try {
     // ファイル名生成（ユーザーID/タイムスタンプ.拡張子）
-    const fileExt = file.name.split(".").pop();
     const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
     // 既存の画像を削除（存在する場合）
@@ -84,7 +96,14 @@ export async function uploadAvatar(formData: FormData) {
       const urlParts = profile.avatar_url.split("/avatars/");
       if (urlParts.length > 1) {
         const oldPath = urlParts[1];
-        await supabase.storage.from("avatars").remove([oldPath]);
+        const { error: deleteError } = await supabase.storage
+          .from("avatars")
+          .remove([oldPath]);
+
+        // 削除エラーはログに記録するが、アップロードは続行
+        if (deleteError) {
+          console.error("Failed to delete old avatar:", deleteError);
+        }
       }
     }
 
