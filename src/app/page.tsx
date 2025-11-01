@@ -24,7 +24,7 @@ export default async function Home() {
   }
 
   const groups = memberships?.map((m) => ({
-    ...(m.groups as any),
+    ...m.groups,
     role: m.role,
     joined_at: m.joined_at,
   }));

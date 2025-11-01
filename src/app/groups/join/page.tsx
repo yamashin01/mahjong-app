@@ -22,7 +22,8 @@ export default async function JoinGroupPage() {
           <p className="text-gray-600">招待コードを入力してグループに参加しましょう</p>
         </div>
 
-        <form action={joinGroup as any} className="space-y-6">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={joinGroup} className="space-y-6">
           <div>
             <label htmlFor="inviteCode" className="block text-sm font-medium text-gray-700 mb-2">
               招待コード <span className="text-red-500">*</span>

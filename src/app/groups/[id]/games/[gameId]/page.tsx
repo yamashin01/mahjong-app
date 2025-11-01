@@ -190,9 +190,9 @@ export default async function GameDetailPage({
         </div>
 
         <div className="text-center">
-          {(game as any).event_id ? (
+          {game.event_id ? (
             <Link
-              href={`/groups/${groupId}/events/${(game as any).event_id}`}
+              href={`/groups/${groupId}/events/${game.event_id}`}
               className="text-blue-600 hover:text-blue-700 hover:underline"
             >
               イベントページに戻る

@@ -108,10 +108,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             {members?.map((member) => (
               <div key={member.user_id} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
-                  {hasPlayerAvatar(member as any) ? (
+                  {hasPlayerAvatar(member) ? (
                     <Image
-                      src={getPlayerAvatarUrl(member as any)!}
-                      alt={getPlayerDisplayName(member as any)}
+                      src={getPlayerAvatarUrl(member)!}
+                      alt={getPlayerDisplayName(member)}
                       width={40}
                       height={40}
                       className="rounded-full"
@@ -120,7 +120,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
                     <div className="h-10 w-10 rounded-full bg-gray-200" />
                   )}
                   <div>
-                    <p className="font-medium">{getPlayerDisplayName(member as any)}</p>
+                    <p className="font-medium">{getPlayerDisplayName(member)}</p>
                     <p className="text-sm text-gray-500">
                       参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
                     </p>

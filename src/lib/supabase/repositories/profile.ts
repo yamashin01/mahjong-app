@@ -48,11 +48,14 @@ export async function getUserGroupMemberships(userId: string) {
     .from("group_members")
     .select(
       `
+      group_id,
       role,
       joined_at,
       groups (
         id,
-        name
+        name,
+        description,
+        invite_code
       )
     `,
     )

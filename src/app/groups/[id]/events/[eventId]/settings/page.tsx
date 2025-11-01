@@ -89,7 +89,8 @@ export default async function EventSettingsPage({
           <p className="text-gray-600">{event.name}</p>
         </div>
 
-        <form action={updateEventRules as any} className="space-y-8">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={updateEventRules} className="space-y-8">
           <input type="hidden" name="eventId" value={eventId} />
 
           <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">

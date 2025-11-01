@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { EventInsert, EventUpdate } from "@/types";
 import * as eventsRepo from "@/lib/supabase/repositories/events";
 
 export async function createEvent(formData: FormData) {
@@ -29,7 +30,7 @@ export async function createEvent(formData: FormData) {
   }
 
   // イベントデータを構築
-  const eventData: any = {
+  const eventData: EventInsert = {
     group_id: groupId,
     name,
     description,
@@ -125,7 +126,7 @@ export async function updateEventRules(formData: FormData) {
   const useCustomRules = formData.get("useCustomRules") === "true";
 
   // 更新データを構築
-  const updateData: any = {
+  const updateData: Partial<EventUpdate> & { updated_at: string } = {
     updated_at: new Date().toISOString(),
   };
 

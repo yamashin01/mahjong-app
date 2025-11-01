@@ -89,7 +89,8 @@ export default async function NewGamePage({
           <p className="text-gray-600">{group.name}</p>
         </div>
 
-        <form action={createGame as any} className="space-y-8">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={createGame} className="space-y-8">
           <input type="hidden" name="groupId" value={groupId} />
 
           {/* 対局情報 */}
@@ -112,7 +113,7 @@ export default async function NewGamePage({
                     className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                   >
                     <option value="">イベントなし</option>
-                    {events.map((event: any) => (
+                    {events.map((event) => (
                       <option key={event.id} value={event.id}>
                         {event.name} ({new Date(event.event_date).toLocaleDateString("ja-JP")})
                       </option>
@@ -198,7 +199,7 @@ export default async function NewGamePage({
                       <optgroup label="メンバー">
                         {members?.map((member) => (
                           <option key={member.user_id} value={member.user_id}>
-                            {getPlayerDisplayName(member as any)}
+                            {getPlayerDisplayName(member)}
                           </option>
                         ))}
                       </optgroup>

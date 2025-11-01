@@ -107,6 +107,21 @@ export type FlexiblePlayerData = {
 // ============================================================================
 
 /**
+ * Server Action result type
+ * Used for form actions that return status/error information
+ */
+export type ServerActionResult =
+  | { error: string; success?: never }
+  | { success: true; error?: never }
+  | void;
+
+/**
+ * Server Action type for forms
+ * Next.js 15 + React 19 allows Server Actions to return data
+ */
+export type FormAction = (formData: FormData) => Promise<ServerActionResult>;
+
+/**
  * Group membership for authorization checks
  * Used by access control utilities
  * Note: role is refined to literal union type for type safety

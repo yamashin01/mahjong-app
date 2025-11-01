@@ -47,7 +47,8 @@ export default async function NewEventPage({ params }: { params: Promise<{ id: s
           <p className="text-gray-600">{group.name}</p>
         </div>
 
-        <form action={createEvent as any} className="space-y-8">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={createEvent} className="space-y-8">
           <input type="hidden" name="groupId" value={groupId} />
 
           <div className="rounded-lg border border-gray-200 p-6 space-y-6 bg-white">

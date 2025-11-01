@@ -56,7 +56,8 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
           <p className="text-gray-600">{group.name}</p>
         </div>
 
-        <form action={updateGroupRules as any} className="space-y-6">
+        {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+        <form action={updateGroupRules} className="space-y-6">
           <input type="hidden" name="groupId" value={groupId} />
 
           {/* 対局種別 */}

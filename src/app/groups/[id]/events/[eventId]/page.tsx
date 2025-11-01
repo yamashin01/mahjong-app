@@ -177,7 +177,8 @@ export default async function EventDetailPage({
               ルール設定
             </Link>
             {event.status === "active" && (
-              <form action={updateEventStatus as any}>
+              // @ts-expect-error - Next.js 15 Server Actions can return data
+              <form action={updateEventStatus}>
                 <input type="hidden" name="eventId" value={eventId} />
                 <input type="hidden" name="status" value="completed" />
                 <button
@@ -189,7 +190,8 @@ export default async function EventDetailPage({
               </form>
             )}
             {event.status === "completed" && (
-              <form action={updateEventStatus as any}>
+              // @ts-expect-error - Next.js 15 Server Actions can return data
+              <form action={updateEventStatus}>
                 <input type="hidden" name="eventId" value={eventId} />
                 <input type="hidden" name="status" value="active" />
                 <button

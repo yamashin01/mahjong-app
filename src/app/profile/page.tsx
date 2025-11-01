@@ -52,7 +52,8 @@ export default async function ProfilePage() {
         {/* プロフィール編集 */}
         <div className="rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold mb-4">プロフィール編集</h2>
-          <form action={updateProfile as any} className="space-y-4">
+          {/* @ts-expect-error - Next.js 15 Server Actions can return data */}
+          <form action={updateProfile} className="space-y-4">
             <div>
               <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-2">
                 表示名 <span className="text-red-500">*</span>
@@ -226,7 +227,7 @@ export default async function ProfilePage() {
 
           {memberships && memberships.length > 0 ? (
             <div className="space-y-3">
-              {memberships.map((membership: any) => (
+              {memberships.map((membership) => (
                 <Link
                   key={membership.group_id}
                   href={`/groups/${membership.groups.id}`}
