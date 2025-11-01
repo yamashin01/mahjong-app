@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
 import { createClient } from "@/lib/supabase/server";
 import * as profileRepo from "@/lib/supabase/repositories";
-import AvatarUpload from "@/components/AvatarUpload";
+import AvatarUpload from "@/app/components/AvatarUpload";
 
 export default async function ProfilePage() {
   const supabase = await createClient();

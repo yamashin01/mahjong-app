@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Image from "next/image";
 import { uploadAvatar } from "@/app/actions/profile";
 
 interface AvatarUploadProps {
@@ -57,10 +58,12 @@ export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
       {/* 現在の画像表示 */}
       {currentAvatar && (
         <div>
-          <img
+          <Image
             src={currentAvatar}
             alt="現在のアバター"
-            className="h-24 w-24 rounded-full border-2 border-gray-200 object-cover"
+            width={96}
+            height={96}
+            className="rounded-full border-2 border-gray-200 object-cover"
           />
         </div>
       )}
