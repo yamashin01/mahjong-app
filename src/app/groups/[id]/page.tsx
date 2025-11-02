@@ -5,6 +5,7 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./components/copy-button";
+import { EditGroupName } from "./components/edit-group-name";
 import { EventsSection } from "./components/events-section";
 import { GuestPlayerActions } from "./components/guest-player-actions";
 import { GuestPlayerForm } from "./components/guest-player-form";
@@ -76,8 +77,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl space-y-8">
         <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+          <div className="flex-1">
+            {isAdmin ? (
+              <div className="mb-2">
+                <EditGroupName groupId={groupId} currentName={group.name} />
+              </div>
+            ) : (
+              <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+            )}
             {group.description && <p className="text-gray-600">{group.description}</p>}
           </div>
           {isAdmin && (
