@@ -4,7 +4,8 @@ import { updateEventStatus } from "@/app/actions/events";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
-import { DeleteEventButton } from "./components/delete-event-button";
+import { EventActionsMenu } from "./components/event-actions-menu";
+import { EditEventName } from "./components/edit-event-name";
 import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import type { EventRules } from "@/types/event-rules";
 import * as groupsRepo from "@/lib/supabase/repositories";
@@ -82,25 +83,61 @@ export default async function EventDetailPage({
 
         {/* イベント情報 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold">{event.name}</h1>
-                <span
-                  className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
-                    event.status === "active"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {event.status === "active" ? "進行中" : "完了"}
-                </span>
-              </div>
-              <p className="text-gray-600">
-                開催日: {new Date(event.event_date).toLocaleDateString("ja-JP")}
-              </p>
-              {event.description && <p className="text-gray-700 mt-2">{event.description}</p>}
+          <div className="mb-4">
+            {/* モバイル: イベント名の上に右寄せでバッジと3点リーダー */}
+            <div className="flex items-center justify-end gap-2 mb-2 md:hidden">
+              <span
+                className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
+                  event.status === "active"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-gray-100 text-gray-600"
+                }`}
+              >
+                {event.status === "active" ? "進行中" : "完了"}
+              </span>
+              {isAdmin && <EventActionsMenu eventId={eventId} groupId={groupId} />}
             </div>
+
+            {/* デスクトップ: 横並びレイアウト */}
+            <div className="hidden md:flex md:items-start md:justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  {isAdmin ? (
+                    <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
+                  ) : (
+                    <h1 className="text-3xl font-bold">{event.name}</h1>
+                  )}
+                  <span
+                    className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
+                      event.status === "active"
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {event.status === "active" ? "進行中" : "完了"}
+                  </span>
+                </div>
+              </div>
+              {isAdmin && (
+                <div className="ml-4">
+                  <EventActionsMenu eventId={eventId} groupId={groupId} />
+                </div>
+              )}
+            </div>
+
+            {/* モバイル: イベント名を独立表示 */}
+            <div className="md:hidden mb-2">
+              {isAdmin ? (
+                <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
+              ) : (
+                <h1 className="text-3xl font-bold">{event.name}</h1>
+              )}
+            </div>
+
+            <p className="text-gray-600">
+              開催日: {new Date(event.event_date).toLocaleDateString("ja-JP")}
+            </p>
+            {event.description && <p className="text-gray-700 mt-2">{event.description}</p>}
           </div>
         </div>
 
@@ -202,7 +239,6 @@ export default async function EventDetailPage({
                 </button>
               </form>
             )}
-            <DeleteEventButton eventId={eventId} groupId={groupId} />
           </div>
         )}
 

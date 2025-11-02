@@ -215,3 +215,14 @@ export async function getGroupMemberNames(groupId: string) {
     .eq("group_id", groupId)
     .order("joined_at", { ascending: true });
 }
+
+/**
+ * グループ名を更新する
+ */
+export async function updateGroupName(params: { groupId: string; name: string }) {
+  const supabase = await createClient();
+  return await supabase
+    .from("groups")
+    .update({ name: params.name })
+    .eq("id", params.groupId);
+}

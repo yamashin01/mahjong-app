@@ -5,6 +5,7 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./components/copy-button";
+import { EditGroupName } from "./components/edit-group-name";
 import { EventsSection } from "./components/events-section";
 import { GuestPlayerActions } from "./components/guest-player-actions";
 import { GuestPlayerForm } from "./components/guest-player-form";
@@ -75,16 +76,46 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl space-y-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+        <div>
+          {/* モバイル: 管理者バッジを右上に表示 */}
+          {isAdmin && (
+            <div className="flex justify-end mb-2 md:hidden">
+              <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
+                管理者
+              </span>
+            </div>
+          )}
+
+          {/* デスクトップ: 横並びレイアウト */}
+          <div className="hidden md:flex md:items-start md:justify-between">
+            <div className="flex-1">
+              {isAdmin ? (
+                <div className="mb-2">
+                  <EditGroupName groupId={groupId} currentName={group.name} />
+                </div>
+              ) : (
+                <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+              )}
+              {group.description && <p className="text-gray-600">{group.description}</p>}
+            </div>
+            {isAdmin && (
+              <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
+                管理者
+              </span>
+            )}
+          </div>
+
+          {/* モバイル: グループ名と説明を独立表示 */}
+          <div className="md:hidden">
+            {isAdmin ? (
+              <div className="mb-2">
+                <EditGroupName groupId={groupId} currentName={group.name} />
+              </div>
+            ) : (
+              <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+            )}
             {group.description && <p className="text-gray-600">{group.description}</p>}
           </div>
-          {isAdmin && (
-            <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
-              管理者
-            </span>
-          )}
         </div>
 
         {/* 招待コード */}
@@ -104,45 +135,44 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">メンバー ({members?.length || 0}人)</h2>
           </div>
-          <div className="space-y-3 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             {members?.map((member) => (
-              <div key={member.user_id} className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
+              <div
+                key={member.user_id}
+                className="relative rounded-lg border border-gray-200 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+              >
+                <div className="flex flex-col items-center text-center">
                   {hasPlayerAvatar(member) ? (
                     <Image
                       src={getPlayerAvatarUrl(member)!}
                       alt={getPlayerDisplayName(member)}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
+                      width={64}
+                      height={64}
+                      className="rounded-full mb-3"
                     />
                   ) : (
-                    <div className="h-10 w-10 rounded-full bg-gray-200" />
+                    <div className="h-16 w-16 rounded-full bg-gray-200 mb-3" />
                   )}
-                  <div>
-                    <p className="font-medium">{getPlayerDisplayName(member)}</p>
-                    <p className="text-sm text-gray-500">
-                      参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
-                    </p>
-                  </div>
+                  <p className="font-medium text-base mb-1">{getPlayerDisplayName(member)}</p>
+                  <p className="text-xs text-gray-500 mb-2">
+                    参加日: {new Date(member.joined_at).toLocaleDateString("ja-JP")}
+                  </p>
+                  {member.role === "admin" && (
+                    <span className="inline-block rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800">
+                      管理者
+                    </span>
+                  )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <div>
-                    {member.role === "admin" && (
-                      <span className="inline-block rounded-full bg-purple-100 px-3 py-1 text-sm font-medium text-purple-800">
-                        管理者
-                      </span>
-                    )}
-                  </div>
-                  {isAdmin && (
+                {isAdmin && (
+                  <div className="absolute top-2 right-2">
                     <MemberActions
                       groupId={groupId}
                       userId={member.user_id}
                       currentRole={member.role as "admin" | "member"}
                       isCurrentUser={member.user_id === user.id}
                     />
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -153,40 +183,43 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               ゲストメンバー ({guestPlayers?.length || 0}人)
             </h2>
           </div>
-          <div className="space-y-3">
-            {guestPlayers && guestPlayers.length > 0 ? (
-              guestPlayers.map((guest) => (
-                <div key={guest.id} className="flex items-center justify-between py-2">
-                  <div className="flex items-center gap-3">
-                    <div className="h-16 w-16 rounded-full flex items-center justify-center">
-                      <GoPerson />
+          {guestPlayers && guestPlayers.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {guestPlayers.map((guest) => (
+                <div
+                  key={guest.id}
+                  className="relative rounded-lg border border-gray-200 p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="h-16 w-16 rounded-full flex items-center justify-center bg-gray-300 mb-3">
+                      <GoPerson className="w-8 h-8 text-gray-600" />
                     </div>
-                    <div>
-                      <p className="font-medium">{guest.name}</p>
-                      <p className="text-sm text-gray-500">
-                        追加日: {new Date(guest.created_at!).toLocaleDateString("ja-JP")}
-                      </p>
-                    </div>
+                    <p className="font-medium text-base mb-1">{guest.name}</p>
+                    <p className="text-xs text-gray-500">
+                      追加日: {new Date(guest.created_at!).toLocaleDateString("ja-JP")}
+                    </p>
                   </div>
                   {isAdmin && (
-                    <GuestPlayerActions
-                      groupId={groupId}
-                      guestPlayerId={guest.id}
-                      guestPlayerName={guest.name}
-                    />
+                    <div className="absolute top-2 right-2">
+                      <GuestPlayerActions
+                        groupId={groupId}
+                        guestPlayerId={guest.id}
+                        guestPlayerName={guest.name}
+                      />
+                    </div>
                   )}
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>ゲストメンバーーはいません</p>
-                {isAdmin && (
-                  <p className="text-sm mt-2">「ゲストメンバー追加」ボタンから追加できます</p>
-                )}
-              </div>
-            )}
-            {isAdmin && <GuestPlayerForm groupId={groupId} />}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 mb-4">
+              <p>ゲストメンバーはいません</p>
+              {isAdmin && (
+                <p className="text-sm mt-2">「ゲストメンバー追加」ボタンから追加できます</p>
+              )}
+            </div>
+          )}
+          {isAdmin && <GuestPlayerForm groupId={groupId} />}
         </div>
 
         {/* イベント */}

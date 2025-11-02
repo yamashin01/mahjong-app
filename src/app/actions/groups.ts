@@ -233,3 +233,48 @@ export async function updateGroupRules(formData: FormData) {
   revalidatePath(`/groups/${groupId}`);
   redirect(`/groups/${groupId}`);
 }
+
+export async function updateGroupName(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const groupId = formData.get("groupId") as string;
+  const name = formData.get("name") as string;
+
+  // 管理者権限チェック
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
+    return { error: "管理者権限がありません" };
+  }
+
+  // バリデーション
+  if (!name || name.trim() === "") {
+    return { error: "グループ名を入力してください" };
+  }
+
+  if (name.trim().length > 100) {
+    return { error: "グループ名は100文字以内で入力してください" };
+  }
+
+  // グループ名を更新
+  const { error: updateError } = await groupsRepo.updateGroupName({
+    groupId,
+    name: name.trim(),
+  });
+
+  if (updateError) {
+    console.error("Error updating group name:", updateError);
+    return { error: "グループ名の更新に失敗しました" };
+  }
+
+  revalidatePath(`/groups/${groupId}`);
+  return { success: true };
+}
