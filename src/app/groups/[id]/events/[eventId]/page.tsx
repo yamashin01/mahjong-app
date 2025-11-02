@@ -5,6 +5,7 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 import { DeleteEventButton } from "./components/delete-event-button";
+import { EditEventName } from "./components/edit-event-name";
 import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import type { EventRules } from "@/types/event-rules";
 import * as groupsRepo from "@/lib/supabase/repositories";
@@ -83,9 +84,13 @@ export default async function EventDetailPage({
         {/* イベント情報 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
           <div className="flex items-start justify-between mb-4">
-            <div>
+            <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold">{event.name}</h1>
+                {isAdmin ? (
+                  <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
+                ) : (
+                  <h1 className="text-3xl font-bold">{event.name}</h1>
+                )}
                 <span
                   className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
                     event.status === "active"

@@ -122,3 +122,19 @@ export async function getActiveGroupEvents(groupId: string) {
     .eq("status", "active")
     .order("event_date", { ascending: false });
 }
+
+/**
+ * イベント名を更新する
+ */
+export async function updateEventName(params: { eventId: string; name: string }) {
+  const supabase = await createClient();
+  return await supabase
+    .from("events")
+    .update({
+      name: params.name,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", params.eventId)
+    .select("group_id")
+    .single();
+}

@@ -226,3 +226,43 @@ export async function deleteEvent(formData: FormData) {
   revalidatePath(`/groups/${groupId}`);
   redirect(`/groups/${groupId}`);
 }
+
+export async function updateEventName(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const eventId = formData.get("eventId") as string;
+  const groupId = formData.get("groupId") as string;
+  const name = formData.get("name") as string;
+
+  // バリデーション
+  if (!name || name.trim() === "") {
+    return { error: "イベント名を入力してください" };
+  }
+
+  if (name.trim().length > 100) {
+    return { error: "イベント名は100文字以内で入力してください" };
+  }
+
+  // イベント名を更新
+  const { error: updateError } = await eventsRepo.updateEventName({
+    eventId,
+    name: name.trim(),
+  });
+
+  if (updateError) {
+    console.error("Error updating event name:", updateError);
+    return { error: "イベント名の更新に失敗しました" };
+  }
+
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}/events/${eventId}`);
+  return { success: true };
+}
