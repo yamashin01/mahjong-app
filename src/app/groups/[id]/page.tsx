@@ -76,8 +76,37 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl space-y-8">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
+        <div>
+          {/* モバイル: 管理者バッジを右上に表示 */}
+          {isAdmin && (
+            <div className="flex justify-end mb-2 md:hidden">
+              <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
+                管理者
+              </span>
+            </div>
+          )}
+
+          {/* デスクトップ: 横並びレイアウト */}
+          <div className="hidden md:flex md:items-start md:justify-between">
+            <div className="flex-1">
+              {isAdmin ? (
+                <div className="mb-2">
+                  <EditGroupName groupId={groupId} currentName={group.name} />
+                </div>
+              ) : (
+                <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
+              )}
+              {group.description && <p className="text-gray-600">{group.description}</p>}
+            </div>
+            {isAdmin && (
+              <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
+                管理者
+              </span>
+            )}
+          </div>
+
+          {/* モバイル: グループ名と説明を独立表示 */}
+          <div className="md:hidden">
             {isAdmin ? (
               <div className="mb-2">
                 <EditGroupName groupId={groupId} currentName={group.name} />
@@ -87,11 +116,6 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             )}
             {group.description && <p className="text-gray-600">{group.description}</p>}
           </div>
-          {isAdmin && (
-            <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
-              管理者
-            </span>
-          )}
         </div>
 
         {/* 招待コード */}
