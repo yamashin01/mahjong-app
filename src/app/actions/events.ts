@@ -169,7 +169,8 @@ export async function updateEventRules(formData: FormData) {
     const umaSecond = formData.get("uma_second");
     const umaThird = formData.get("uma_third");
     const umaFourth = formData.get("uma_fourth");
-    const okaEnabled = formData.get("oka_enabled");
+    const okaEnabledValues = formData.getAll("oka_enabled");
+    const okaEnabled = okaEnabledValues.includes("true");
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
@@ -181,7 +182,7 @@ export async function updateEventRules(formData: FormData) {
     updateData.uma_second = umaSecond ? Number(umaSecond) : null;
     updateData.uma_third = umaThird ? Number(umaThird) : null;
     updateData.uma_fourth = umaFourth ? Number(umaFourth) : null;
-    updateData.oka_enabled = okaEnabled !== null ? okaEnabled === "true" : null;
+    updateData.oka_enabled = okaEnabled;
     updateData.rate = rate ? Number(rate) : null;
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;

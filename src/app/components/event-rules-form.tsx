@@ -233,6 +233,8 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
 
           {/* オカ設定 */}
           <div className="flex items-center gap-3">
+            {/* hidden input to ensure oka_enabled is always sent */}
+            <input type="hidden" name="oka_enabled" value="false" />
             <input
               type="checkbox"
               id="oka_enabled"
