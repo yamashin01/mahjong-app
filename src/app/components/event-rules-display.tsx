@@ -80,42 +80,32 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
 
         {/* ウマ・レート */}
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-gray-700 border-b pb-1">ウマ・レート</h3>
+          <h3 className="text-sm font-medium text-gray-700 border-b pb-1">ウマ・レート等</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">ウマ</span>
               <span className="font-medium">
-                {displayRules.uma_first}/{displayRules.uma_second}/{displayRules.uma_third}/
-                {displayRules.uma_fourth}
+                {displayRules.uma_first} / {displayRules.uma_second}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">レート</span>
               <span className="font-medium">{displayRules.rate}</span>
             </div>
+            {displayRules.tobi_prize > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">トビ賞</span>
+                <span className="font-medium">{displayRules.tobi_prize}pt</span>
+              </div>
+            )}
+            {displayRules.yakuman_prize > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">役満賞</span>
+                <span className="font-medium">{displayRules.yakuman_prize}pt</span>
+              </div>
+            )}
           </div>
         </div>
-
-        {/* 賞金設定（設定されている場合のみ表示） */}
-        {(displayRules.tobi_prize > 0 || displayRules.yakuman_prize > 0) && (
-          <div className="col-span-2 space-y-3">
-            <h3 className="text-sm font-medium text-gray-700 border-b pb-1">賞金設定</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              {displayRules.tobi_prize > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">トビ賞</span>
-                  <span className="font-medium">{displayRules.tobi_prize}pt</span>
-                </div>
-              )}
-              {displayRules.yakuman_prize > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">役満賞</span>
-                  <span className="font-medium">{displayRules.yakuman_prize}pt</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

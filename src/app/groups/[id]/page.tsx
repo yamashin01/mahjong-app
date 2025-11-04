@@ -325,7 +325,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               <div className="col-span-2">
                 <dt className="text-sm text-gray-600">ウマ</dt>
                 <dd className="font-medium">
-                  {rules.uma_first}/{rules.uma_second}/{rules.uma_third}/{rules.uma_fourth}
+                  {rules.uma_first} / {rules.uma_second}
                 </dd>
               </div>
             </dl>
