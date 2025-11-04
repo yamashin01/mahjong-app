@@ -4,6 +4,8 @@ import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
+import { EditAllGameResults } from "./components/edit-all-game-results";
+import { EditGameInfo } from "./components/edit-game-info";
 
 export default async function GameDetailPage({
   params,
@@ -23,16 +25,18 @@ export default async function GameDetailPage({
   }
 
   // メンバーシップ確認とデータを並列取得（パフォーマンス最適化）
-  const [_membership, gameResult, resultsData, groupResult] = await Promise.all([
+  const [_membership, gameResult, resultsData, groupResult, groupRulesResult] = await Promise.all([
     requireGroupMembership(groupId, user.id),
     groupsRepo.getGameById(gameId),
     groupsRepo.getGameResults(gameId),
     groupsRepo.getGroupName(groupId),
+    groupsRepo.getGroupRules(groupId),
   ]);
 
   const { data: game } = gameResult;
   const { data: results } = resultsData;
   const { data: group } = groupResult;
+  const { data: groupRules } = groupRulesResult;
 
   if (!game) {
     notFound();
@@ -52,6 +56,15 @@ export default async function GameDetailPage({
     tobiPlayerName = data?.name;
   }
 
+  // イベントルールを考慮した開始点を取得
+  let startPoints = groupRules?.start_points ?? 25000;
+  if (game.event_id) {
+    const { data: event } = await groupsRepo.getEventById(game.event_id);
+    if (event?.start_points !== null && event?.start_points !== undefined) {
+      startPoints = event.start_points;
+    }
+  }
+
   const seatNames = {
     east: "東",
     south: "南",
@@ -69,7 +82,16 @@ export default async function GameDetailPage({
 
         {/* 対局情報 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <h2 className="text-lg font-semibold mb-4">対局情報</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">対局情報</h2>
+            <EditGameInfo
+              gameId={gameId}
+              groupId={groupId}
+              gameType={game.game_type as "tonpuu" | "tonnan"}
+              playedAt={game.played_at}
+              yakumanCount={game.yakuman_count ?? 0}
+            />
+          </div>
           <dl className="grid grid-cols-2 gap-4">
             <div>
               <dt className="text-sm text-gray-600">対局種別</dt>
@@ -106,7 +128,22 @@ export default async function GameDetailPage({
 
         {/* 対局結果 */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <h2 className="text-lg font-semibold mb-4">対局結果</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">対局結果</h2>
+            <EditAllGameResults
+              gameId={gameId}
+              groupId={groupId}
+              startPoints={startPoints}
+              results={
+                results?.map((result) => ({
+                  id: result.id,
+                  playerName: getPlayerDisplayName(result),
+                  seat: seatNames[result.seat as keyof typeof seatNames],
+                  finalPoints: result.final_points,
+                })) ?? []
+              }
+            />
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
