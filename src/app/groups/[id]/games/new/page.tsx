@@ -128,9 +128,9 @@ export default async function NewGamePage({
 
             {/* 対局種別 */}
             <div>
-              <text className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="block text-sm font-medium text-gray-700 mb-2">
                 対局種別 <span className="text-red-500">*</span>
-              </text>
+              </div>
               <div className="flex gap-4">
                 <label className="flex items-center">
                   <input

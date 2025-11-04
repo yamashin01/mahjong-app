@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { updateGroupRules } from "@/app/actions/groups";
-import { createClient } from "@/lib/supabase/server";
 import * as groupsRepo from "@/lib/supabase/repositories";
+import { createClient } from "@/lib/supabase/server";
+import { UmaInputs } from "./components/uma-inputs";
 
 export default async function GroupSettingsPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -62,9 +63,9 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
 
           {/* 対局種別 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="block text-sm font-medium text-gray-700 mb-2">
               対局種別 <span className="text-red-500">*</span>
-            </label>
+            </div>
             <div className="flex gap-4">
               <label className="flex items-center">
                 <input
@@ -90,123 +91,71 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
           </div>
 
           {/* 開始点 */}
-          <div>
-            <label htmlFor="startPoints" className="block text-sm font-medium text-gray-700 mb-2">
-              開始点 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="startPoints"
-              name="startPoints"
-              required
-              min="1000"
-              step="1000"
-              defaultValue={rules.start_points}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-            />
-          </div>
+          <div className="sm:flex sm:justify-between sm:gap-4">
+            <div className="mb-4">
+              <label htmlFor="startPoints" className="block text-sm font-medium text-gray-700 mb-2">
+                開始点 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="startPoints"
+                name="startPoints"
+                required
+                min="1000"
+                step="1000"
+                defaultValue={rules.start_points}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
 
-          {/* 返し点 */}
-          <div>
-            <label htmlFor="returnPoints" className="block text-sm font-medium text-gray-700 mb-2">
-              返し点 <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="returnPoints"
-              name="returnPoints"
-              required
-              min="1000"
-              step="1000"
-              defaultValue={rules.return_points}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-            />
-          </div>
+            {/* 返し点 */}
+            <div>
+              <label
+                htmlFor="returnPoints"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                返し点 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="returnPoints"
+                name="returnPoints"
+                required
+                min="1000"
+                step="1000"
+                defaultValue={rules.return_points}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
 
-          {/* レート */}
-          <div>
-            <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
-              レート <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="rate"
-              name="rate"
-              required
-              min="0.1"
-              step="0.1"
-              defaultValue={rules.rate}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-            />
+            {/* レート */}
+            <div>
+              <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
+                レート <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="rate"
+                name="rate"
+                required
+                min="0.1"
+                step="0.1"
+                defaultValue={rules.rate}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
           </div>
 
           {/* ウマ */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              ウマ <span className="text-red-500">*</span>
-            </label>
-            <div className="grid grid-cols-4 gap-4">
-              <div>
-                <label htmlFor="umaFirst" className="block text-xs text-gray-600 mb-1">
-                  1位
-                </label>
-                <input
-                  type="number"
-                  id="umaFirst"
-                  name="umaFirst"
-                  required
-                  defaultValue={rules.uma_first}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="umaSecond" className="block text-xs text-gray-600 mb-1">
-                  2位
-                </label>
-                <input
-                  type="number"
-                  id="umaSecond"
-                  name="umaSecond"
-                  required
-                  defaultValue={rules.uma_second}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="umaThird" className="block text-xs text-gray-600 mb-1">
-                  3位
-                </label>
-                <input
-                  type="number"
-                  id="umaThird"
-                  name="umaThird"
-                  required
-                  defaultValue={rules.uma_third}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="umaFourth" className="block text-xs text-gray-600 mb-1">
-                  4位
-                </label>
-                <input
-                  type="number"
-                  id="umaFourth"
-                  name="umaFourth"
-                  required
-                  defaultValue={rules.uma_fourth}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-            </div>
-          </div>
+          <UmaInputs defaultFirst={rules.uma_first} defaultSecond={rules.uma_second} />
 
           <div className="rounded-lg bg-yellow-50 p-4">
             <h3 className="font-semibold text-yellow-900 mb-2">注意事項</h3>
             <ul className="text-sm text-yellow-800 space-y-1">
               <li>• ルール変更は既存の対局には影響しません</li>
               <li>• 変更後の対局から新しいルールが適用されます</li>
-              <li>• ウマの合計は0になるように設定してください</li>
+              <li>• ウマは点棒で1000点単位で指定します（例: 1位=20000点、2位=10000点）</li>
+              <li>• 3位と4位は自動的に計算されます（3位=-2位、4位=-1位）</li>
             </ul>
           </div>
 
