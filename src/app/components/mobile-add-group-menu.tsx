@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { GoGear } from "react-icons/go";
 import { FaPlus } from "react-icons/fa";
+import { GoGear } from "react-icons/go";
 import { IoMdPersonAdd } from "react-icons/io";
 
 export function MobileAddGroupMenu() {
@@ -12,6 +12,7 @@ export function MobileAddGroupMenu() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
         aria-label="メニュー"
@@ -39,9 +40,11 @@ export function MobileAddGroupMenu() {
       {isOpen && (
         <>
           {/* 背景オーバーレイ */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          <button
+            type="button"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden border-0 p-0"
             onClick={() => setIsOpen(false)}
+            aria-label="メニューを閉じる"
           />
 
           {/* メニュー本体 */}

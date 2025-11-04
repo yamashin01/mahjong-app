@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminRole } from "@/lib/auth/group-access";
-import { createClient } from "@/lib/supabase/server";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
+import { createClient } from "@/lib/supabase/server";
 
 export async function createGroup(formData: FormData) {
   const supabase = await createClient();
@@ -60,8 +60,9 @@ export async function joinGroup(formData: FormData) {
   }
 
   // 招待コードでグループを検索
-  const { data: group, error: groupError } =
-    await groupsRepo.findGroupByInviteCode(inviteCode.trim().toUpperCase());
+  const { data: group, error: groupError } = await groupsRepo.findGroupByInviteCode(
+    inviteCode.trim().toUpperCase(),
+  );
 
   if (groupError || !group) {
     return { error: "招待コードが無効です" };

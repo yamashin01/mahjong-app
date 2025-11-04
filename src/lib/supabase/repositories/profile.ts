@@ -20,11 +20,7 @@ export async function updateProfile(userId: string, profile: ProfileUpdate) {
  */
 export async function getProfileById(userId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
+  return await supabase.from("profiles").select("*").eq("id", userId).single();
 }
 
 /**
@@ -68,9 +64,5 @@ export async function getUserGroupMemberships(userId: string) {
  */
 export async function getProfileDisplayName(userId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", userId)
-    .single();
+  return await supabase.from("profiles").select("display_name").eq("id", userId).single();
 }

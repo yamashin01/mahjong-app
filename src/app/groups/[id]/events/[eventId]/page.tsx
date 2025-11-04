@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { updateEventStatus } from "@/app/actions/events";
+import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
-import { EventActionsMenu } from "./components/event-actions-menu";
-import { EditEventName } from "./components/edit-event-name";
-import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import type { EventRules } from "@/types/event-rules";
-import * as groupsRepo from "@/lib/supabase/repositories";
+import { EditEventName } from "./components/edit-event-name";
+import { EventActionsMenu } from "./components/event-actions-menu";
 
 export default async function EventDetailPage({
   params,

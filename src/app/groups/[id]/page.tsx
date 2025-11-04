@@ -1,7 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { GoPerson } from "react-icons/go";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./components/copy-button";
@@ -11,8 +13,6 @@ import { GuestPlayerActions } from "./components/guest-player-actions";
 import { GuestPlayerForm } from "./components/guest-player-form";
 import { MemberActions } from "./components/member-actions";
 import { RankingSection } from "./components/ranking-section";
-import { GoPerson } from "react-icons/go";
-import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;

@@ -34,7 +34,9 @@ function UmaInputsForEvent({ defaultFirst, defaultSecond }: UmaInputsForEventPro
               onChange={(e) => setUmaFirst(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
             />
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">点</span>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
           </div>
         </div>
         <div>
@@ -52,7 +54,9 @@ function UmaInputsForEvent({ defaultFirst, defaultSecond }: UmaInputsForEventPro
               onChange={(e) => setUmaSecond(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
             />
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">点</span>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
           </div>
         </div>
       </div>

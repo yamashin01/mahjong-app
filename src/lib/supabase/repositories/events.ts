@@ -6,11 +6,7 @@ import type { EventInsert, EventRow, EventUpdate } from "@/types";
  */
 export async function createEvent(eventData: EventInsert) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .insert(eventData)
-    .select()
-    .single();
+  return await supabase.from("events").insert(eventData).select().single();
 }
 
 /**
@@ -80,10 +76,7 @@ export async function updateEventRules(params: {
  */
 export async function deleteEvent(eventId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .delete()
-    .eq("id", eventId);
+  return await supabase.from("events").delete().eq("id", eventId);
 }
 
 /**
@@ -91,11 +84,7 @@ export async function deleteEvent(eventId: string) {
  */
 export async function getEventById(eventId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .select("*")
-    .eq("id", eventId)
-    .single();
+  return await supabase.from("events").select("*").eq("id", eventId).single();
 }
 
 /**

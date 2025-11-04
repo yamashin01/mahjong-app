@@ -5,9 +5,9 @@
  * アプリケーション層（Server Actions等）からこれらの関数を呼び出してください。
  */
 
-export * from "./groups";
 export * from "./events";
 export * from "./games";
+export * from "./groups";
 export * from "./guest-players";
 export * from "./profile";
 export * from "./rankings";

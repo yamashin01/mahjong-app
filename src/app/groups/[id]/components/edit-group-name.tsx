@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { FiCheck, FiEdit2, FiX } from "react-icons/fi";
 import { updateGroupName } from "@/app/actions/groups";
-import { FiEdit2, FiCheck, FiX } from "react-icons/fi";
 
 interface EditGroupNameProps {
   groupId: string;
@@ -69,7 +69,6 @@ export function EditGroupName({ groupId, currentName }: EditGroupNameProps) {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 text-3xl font-bold border-b-2 border-blue-500 focus:outline-none"
-            autoFocus
             disabled={isLoading}
             maxLength={100}
           />

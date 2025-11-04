@@ -1,9 +1,9 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import * as profileRepo from "@/lib/supabase/repositories/profile";
+import { createClient } from "@/lib/supabase/server";
 
 export async function updateProfile(formData: FormData) {
   const supabase = await createClient();
@@ -96,9 +96,7 @@ export async function uploadAvatar(formData: FormData) {
       const urlParts = profile.avatar_url.split("/avatars/");
       if (urlParts.length > 1) {
         const oldPath = urlParts[1];
-        const { error: deleteError } = await supabase.storage
-          .from("avatars")
-          .remove([oldPath]);
+        const { error: deleteError } = await supabase.storage.from("avatars").remove([oldPath]);
 
         // 削除エラーはログに記録するが、アップロードは続行
         if (deleteError) {
@@ -121,9 +119,7 @@ export async function uploadAvatar(formData: FormData) {
     }
 
     // 公開URLを取得
-    const { data: urlData } = supabase.storage
-      .from("avatars")
-      .getPublicUrl(uploadData.path);
+    const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(uploadData.path);
 
     // プロフィールを更新
     const { error: updateError } = await profileRepo.updateProfile(user.id, {

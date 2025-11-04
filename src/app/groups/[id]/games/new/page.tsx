@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createGame } from "@/app/actions/games";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
-import * as groupsRepo from "@/lib/supabase/repositories";
 
 export default async function NewGamePage({
   params,

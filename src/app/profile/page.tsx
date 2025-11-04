@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
-import { createClient } from "@/lib/supabase/server";
-import * as profileRepo from "@/lib/supabase/repositories";
 import AvatarUpload from "@/app/components/AvatarUpload";
+import * as profileRepo from "@/lib/supabase/repositories";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -198,10 +198,7 @@ export default async function ProfilePage() {
         <div className="rounded-lg border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">参加グループ ({memberships?.length || 0})</h2>
-            <Link
-              href="/"
-              className="text-sm text-blue-600 hover:text-blue-700 hover:underline"
-            >
+            <Link href="/" className="text-sm text-blue-600 hover:text-blue-700 hover:underline">
               トップページ
             </Link>
           </div>

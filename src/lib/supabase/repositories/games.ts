@@ -44,11 +44,7 @@ export async function deleteGame(gameId: string) {
  */
 export async function getGameById(gameId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("games")
-    .select("*")
-    .eq("id", gameId)
-    .single();
+  return await supabase.from("games").select("*").eq("id", gameId).single();
 }
 
 /**

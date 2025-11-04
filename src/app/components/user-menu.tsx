@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { signOut } from "@/app/actions/auth";
 
 interface UserMenuProps {
@@ -57,6 +57,7 @@ export function UserMenu({ userEmail, avatarUrl, displayName }: UserMenuProps) {
     <div className="relative" ref={menuRef}>
       {/* アバターボタン */}
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all hover:opacity-80"
         aria-expanded={isOpen}
@@ -98,11 +99,14 @@ export function UserMenu({ userEmail, avatarUrl, displayName }: UserMenuProps) {
               onClick={() => setIsOpen(false)}
             >
               <svg
+                role="img"
+                aria-labelledby="profile-icon"
                 className="w-5 h-5 text-gray-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
+                <title id="profile-icon">プロフィール編集</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -114,15 +118,19 @@ export function UserMenu({ userEmail, avatarUrl, displayName }: UserMenuProps) {
             </Link>
 
             <button
+              type="button"
               onClick={handleSignOut}
               className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
               <svg
+                role="img"
+                aria-labelledby="logout-icon-menu"
                 className="w-5 h-5 text-red-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
               >
+                <title id="logout-icon-menu">ログアウト</title>
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

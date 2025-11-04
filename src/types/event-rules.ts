@@ -1,4 +1,4 @@
-import type { EventRow } from './index';
+import type { EventRow } from "./index";
 
 /**
  * イベントルール設定の型定義
@@ -6,18 +6,18 @@ import type { EventRow } from './index';
  */
 export type EventRules = Pick<
   EventRow,
-  | 'game_type'
-  | 'start_points'
-  | 'return_points'
-  | 'uma_first'
-  | 'uma_second'
-  | 'uma_third'
-  | 'uma_fourth'
-  | 'oka_enabled'
-  | 'rate'
-  | 'tobi_prize'
-  | 'yakuman_prize'
-  | 'top_prize'
+  | "game_type"
+  | "start_points"
+  | "return_points"
+  | "uma_first"
+  | "uma_second"
+  | "uma_third"
+  | "uma_fourth"
+  | "oka_enabled"
+  | "rate"
+  | "tobi_prize"
+  | "yakuman_prize"
+  | "top_prize"
 >;
 
 /**

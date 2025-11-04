@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { updateEventRules } from "@/app/actions/events";
-import { requireGroupMembership } from "@/lib/auth/group-access";
-import { createClient } from "@/lib/supabase/server";
 import { EventRulesForm } from "@/app/components/event-rules-form";
-import type { EventRules } from "@/types/event-rules";
+import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as groupsRepo from "@/lib/supabase/repositories";
+import { createClient } from "@/lib/supabase/server";
+import type { EventRules } from "@/types/event-rules";
 
 export default async function EventSettingsPage({
   params,

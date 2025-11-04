@@ -19,7 +19,10 @@ export function SignOutButton({ variant = "default" }: SignOutButtonProps) {
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
+            role="img"
+            aria-labelledby="logout-icon"
           >
+            <title id="logout-icon">ログアウト</title>
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
