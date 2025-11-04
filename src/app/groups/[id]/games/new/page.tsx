@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createGame } from "@/app/actions/games";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as groupsRepo from "@/lib/supabase/repositories";
+import * as eventsRepo from "@/lib/supabase/repositories/events";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
@@ -40,14 +41,36 @@ export default async function NewGamePage({
     ]);
 
   const { data: group } = groupResult;
-  const { data: rules } = rulesResult;
+  const { data: groupRules } = rulesResult;
   const { data: members } = membersResult;
   const { data: guestPlayers } = guestPlayersResult;
   const { data: events } = eventsResult;
 
-  if (!group || !rules) {
+  if (!group || !groupRules) {
     notFound();
   }
+
+  // イベント指定がある場合、イベントルールを取得
+  let eventRules = null;
+  if (eventId) {
+    const { data: event } = await eventsRepo.getEventById(eventId);
+    if (event) {
+      eventRules = event;
+    }
+  }
+
+  // 適用するルールを決定（イベントのカスタムルールがあればそれを、なければグループルール）
+  const rules = {
+    game_type: eventRules?.game_type ?? groupRules.game_type,
+    start_points: eventRules?.start_points ?? groupRules.start_points,
+    return_points: eventRules?.return_points ?? groupRules.return_points,
+    uma_first: eventRules?.uma_first ?? groupRules.uma_first,
+    uma_second: eventRules?.uma_second ?? groupRules.uma_second,
+    uma_third: eventRules?.uma_third ?? groupRules.uma_third,
+    uma_fourth: eventRules?.uma_fourth ?? groupRules.uma_fourth,
+    oka_enabled: eventRules?.oka_enabled ?? groupRules.oka_enabled,
+    rate: eventRules?.rate ?? groupRules.rate,
+  };
 
   // デフォルトの対局日時（現在時刻）
   const now = new Date();
