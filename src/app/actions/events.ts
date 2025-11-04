@@ -137,7 +137,10 @@ export async function updateEventRules(formData: FormData) {
   }
 
   const eventId = formData.get("eventId") as string;
-  const useCustomRules = formData.get("useCustomRules") === "true";
+  // チェックボックスはチェックされている場合のみ値を送信する
+  // hidden inputとcheckboxで同じnameを使用しているため、getAll()で両方取得
+  const useCustomRulesValues = formData.getAll("useCustomRules");
+  const useCustomRules = useCustomRulesValues.includes("true");
 
   // イベント情報を取得してgroupIdを確認
   const { data: eventData, error: fetchError } = await eventsRepo.getEventById(eventId);
@@ -170,7 +173,6 @@ export async function updateEventRules(formData: FormData) {
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
-    const topPrize = formData.get("top_prize");
 
     updateData.game_type = gameType || null;
     updateData.start_points = startPoints ? Number(startPoints) : null;
@@ -183,7 +185,7 @@ export async function updateEventRules(formData: FormData) {
     updateData.rate = rate ? Number(rate) : null;
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;
-    updateData.top_prize = topPrize ? Number(topPrize) : null;
+    updateData.top_prize = null;
 
     // バリデーション: 返し点は開始点以下である必要がある
     if (

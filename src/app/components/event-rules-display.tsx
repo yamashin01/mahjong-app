@@ -14,7 +14,6 @@ interface EventRulesDisplayProps {
     rate: number;
     tobi_prize: number | null;
     yakuman_prize: number | null;
-    top_prize: number | null;
   };
 }
 
@@ -35,7 +34,6 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
     rate: eventRules.rate ?? groupRules.rate,
     tobi_prize: eventRules.tobi_prize ?? groupRules.tobi_prize ?? 0,
     yakuman_prize: eventRules.yakuman_prize ?? groupRules.yakuman_prize ?? 0,
-    top_prize: eventRules.top_prize ?? groupRules.top_prize ?? 0,
   };
 
   return (
@@ -99,12 +97,10 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
         </div>
 
         {/* 賞金設定（設定されている場合のみ表示） */}
-        {(displayRules.tobi_prize > 0 ||
-          displayRules.yakuman_prize > 0 ||
-          displayRules.top_prize > 0) && (
+        {(displayRules.tobi_prize > 0 || displayRules.yakuman_prize > 0) && (
           <div className="col-span-2 space-y-3">
             <h3 className="text-sm font-medium text-gray-700 border-b pb-1">賞金設定</h3>
-            <div className="grid grid-cols-3 gap-4 text-sm">
+            <div className="grid grid-cols-2 gap-4 text-sm">
               {displayRules.tobi_prize > 0 && (
                 <div className="flex justify-between">
                   <span className="text-gray-600">トビ賞</span>
@@ -115,12 +111,6 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
                 <div className="flex justify-between">
                   <span className="text-gray-600">役満賞</span>
                   <span className="font-medium">{displayRules.yakuman_prize}pt</span>
-                </div>
-              )}
-              {displayRules.top_prize > 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">トップ賞</span>
-                  <span className="font-medium">{displayRules.top_prize}pt</span>
                 </div>
               )}
             </div>

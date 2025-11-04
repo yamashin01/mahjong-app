@@ -47,5 +47,4 @@ export interface CreateEventFormData {
   rate?: number;
   tobi_prize?: number;
   yakuman_prize?: number;
-  top_prize?: number;
 }

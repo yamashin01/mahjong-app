@@ -168,6 +168,8 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
     <div className="space-y-6">
       {/* カスタムルール有効化チェックボックス */}
       <div className="flex items-center gap-3">
+        {/* hidden input to ensure useCustomRules is always sent */}
+        <input type="hidden" name="useCustomRules" value="false" />
         <input
           type="checkbox"
           id="useCustomRules"
@@ -266,7 +268,7 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
           {/* 各種賞金 */}
           <div>
             <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">
                   トビ賞
@@ -288,18 +290,6 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
                   id="yakuman_prize"
                   name="yakuman_prize"
                   defaultValue={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="top_prize" className="block text-xs text-gray-600 mb-1">
-                  トップ賞
-                </label>
-                <input
-                  type="number"
-                  id="top_prize"
-                  name="top_prize"
-                  defaultValue={initialRules?.top_prize || groupRules.top_prize || 0}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
