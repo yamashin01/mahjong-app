@@ -184,6 +184,15 @@ export async function updateEventRules(formData: FormData) {
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;
     updateData.top_prize = topPrize ? Number(topPrize) : null;
+
+    // バリデーション: 返し点は開始点以下である必要がある
+    if (
+      updateData.start_points !== null &&
+      updateData.return_points !== null &&
+      updateData.return_points < updateData.start_points
+    ) {
+      return { error: "返し点は開始点以上である必要があります" };
+    }
   } else {
     // カスタムルールが無効な場合、全てNULLにしてグループルールを使用
     updateData.game_type = null;

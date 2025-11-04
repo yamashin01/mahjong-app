@@ -3,6 +3,76 @@
 import { useState } from "react";
 import type { EventRules } from "@/types/event-rules";
 
+interface PointsInputsForEventProps {
+  defaultStartPoints: number;
+  defaultReturnPoints: number;
+}
+
+function PointsInputsForEvent({
+  defaultStartPoints,
+  defaultReturnPoints,
+}: PointsInputsForEventProps) {
+  const [startPoints, setStartPoints] = useState(defaultStartPoints);
+  const [returnPoints, setReturnPoints] = useState(defaultReturnPoints);
+  const [error, setError] = useState("");
+
+  const handleStartPointsChange = (value: number) => {
+    setStartPoints(value);
+    if (returnPoints < value) {
+      setError("返し点は開始点以上である必要があります");
+    } else {
+      setError("");
+    }
+  };
+
+  const handleReturnPointsChange = (value: number) => {
+    setReturnPoints(value);
+    if (value < startPoints) {
+      setError("返し点は開始点以上である必要があります");
+    } else {
+      setError("");
+    }
+  };
+
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      <div>
+        <label htmlFor="start_points" className="block text-sm font-medium text-gray-700 mb-2">
+          開始持ち点
+        </label>
+        <input
+          type="number"
+          id="start_points"
+          name="start_points"
+          value={startPoints}
+          onChange={(e) => handleStartPointsChange(Number(e.target.value))}
+          step="1000"
+          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+        />
+      </div>
+      <div>
+        <label htmlFor="return_points" className="block text-sm font-medium text-gray-700 mb-2">
+          返し持ち点
+        </label>
+        <input
+          type="number"
+          id="return_points"
+          name="return_points"
+          value={returnPoints}
+          onChange={(e) => handleReturnPointsChange(Number(e.target.value))}
+          step="1000"
+          className={`w-full rounded-lg border px-4 py-2 focus:ring-2 outline-none transition ${
+            error
+              ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+              : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
+          }`}
+        />
+        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+      </div>
+    </div>
+  );
+}
+
 interface UmaInputsForEventProps {
   defaultFirst: number;
   defaultSecond: number;
@@ -148,40 +218,10 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
           </div>
 
           {/* 基本点数設定 */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label
-                htmlFor="start_points"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                開始持ち点
-              </label>
-              <input
-                type="number"
-                id="start_points"
-                name="start_points"
-                defaultValue={initialRules?.start_points || groupRules.start_points}
-                step="1000"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="return_points"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                返し持ち点
-              </label>
-              <input
-                type="number"
-                id="return_points"
-                name="return_points"
-                defaultValue={initialRules?.return_points || groupRules.return_points}
-                step="1000"
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-          </div>
+          <PointsInputsForEvent
+            defaultStartPoints={initialRules?.start_points || groupRules.start_points}
+            defaultReturnPoints={initialRules?.return_points || groupRules.return_points}
+          />
 
           {/* ウマ設定 */}
           <UmaInputsForEvent

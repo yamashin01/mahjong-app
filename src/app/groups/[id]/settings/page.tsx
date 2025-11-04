@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { updateGroupRules } from "@/app/actions/groups";
 import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
+import { PointsInputs } from "./components/points-inputs";
 import { UmaInputs } from "./components/uma-inputs";
 
 export default async function GroupSettingsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -90,61 +91,12 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          {/* 開始点 */}
-          <div className="sm:flex sm:justify-between sm:gap-4">
-            <div className="mb-4">
-              <label htmlFor="startPoints" className="block text-sm font-medium text-gray-700 mb-2">
-                開始点 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="startPoints"
-                name="startPoints"
-                required
-                min="1000"
-                step="1000"
-                defaultValue={rules.start_points}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-
-            {/* 返し点 */}
-            <div>
-              <label
-                htmlFor="returnPoints"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                返し点 <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="returnPoints"
-                name="returnPoints"
-                required
-                min="1000"
-                step="1000"
-                defaultValue={rules.return_points}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-
-            {/* レート */}
-            <div>
-              <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
-                レート <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="rate"
-                name="rate"
-                required
-                min="0.1"
-                step="0.1"
-                defaultValue={rules.rate}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-              />
-            </div>
-          </div>
+          {/* 開始点、返し点、レート */}
+          <PointsInputs
+            defaultStartPoints={rules.start_points}
+            defaultReturnPoints={rules.return_points}
+            defaultRate={rules.rate}
+          />
 
           {/* ウマ */}
           <UmaInputs defaultFirst={rules.uma_first} defaultSecond={rules.uma_second} />
