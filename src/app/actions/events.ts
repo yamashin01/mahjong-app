@@ -24,7 +24,8 @@ export async function createEvent(formData: FormData) {
   const eventDate = formData.get("eventDate") as string;
 
   // カスタムルール設定
-  const useCustomRules = formData.get("useCustomRules") === "true";
+  const useCustomRulesValues = formData.getAll("useCustomRules");
+  const useCustomRules = useCustomRulesValues.includes("true");
 
   if (!name || !eventDate) {
     return { error: "イベント名と開催日は必須です" };
@@ -49,7 +50,8 @@ export async function createEvent(formData: FormData) {
     const umaSecond = formData.get("uma_second");
     const umaThird = formData.get("uma_third");
     const umaFourth = formData.get("uma_fourth");
-    const okaEnabled = formData.get("oka_enabled");
+    const okaEnabledValues = formData.getAll("oka_enabled");
+    const okaEnabled = okaEnabledValues.includes("true");
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
@@ -62,7 +64,7 @@ export async function createEvent(formData: FormData) {
     if (umaSecond) eventData.uma_second = Number(umaSecond);
     if (umaThird) eventData.uma_third = Number(umaThird);
     if (umaFourth) eventData.uma_fourth = Number(umaFourth);
-    if (okaEnabled !== null) eventData.oka_enabled = okaEnabled === "true";
+    eventData.oka_enabled = okaEnabled;
     if (rate) eventData.rate = Number(rate);
     if (tobiPrize) eventData.tobi_prize = Number(tobiPrize);
     if (yakumanPrize) eventData.yakuman_prize = Number(yakumanPrize);

@@ -140,6 +140,65 @@ function UmaInputsForEvent({ defaultFirst, defaultSecond }: UmaInputsForEventPro
   );
 }
 
+interface PrizeInputsForEventProps {
+  defaultTobiPrize: number;
+  defaultYakumanPrize: number;
+}
+
+function PrizeInputsForEvent({ defaultTobiPrize, defaultYakumanPrize }: PrizeInputsForEventProps) {
+  const [tobiPrize, setTobiPrize] = useState(defaultTobiPrize);
+  const [yakumanPrize, setYakumanPrize] = useState(defaultYakumanPrize);
+
+  return (
+    <div>
+      <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
+      <p className="text-xs text-gray-500 mb-3">1000点単位で指定してください。</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">
+            トビ賞
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="tobi_prize"
+              name="tobi_prize"
+              min="0"
+              step="1000"
+              value={tobiPrize}
+              onChange={(e) => setTobiPrize(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="yakuman_prize" className="block text-xs text-gray-600 mb-1">
+            役満賞
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="yakuman_prize"
+              name="yakuman_prize"
+              min="0"
+              step="1000"
+              value={yakumanPrize}
+              onChange={(e) => setYakumanPrize(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface EventRulesFormProps {
   groupRules: {
     game_type: string;
@@ -268,35 +327,10 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
           </div>
 
           {/* 各種賞金 */}
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">
-                  トビ賞
-                </label>
-                <input
-                  type="number"
-                  id="tobi_prize"
-                  name="tobi_prize"
-                  defaultValue={initialRules?.tobi_prize || groupRules.tobi_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="yakuman_prize" className="block text-xs text-gray-600 mb-1">
-                  役満賞
-                </label>
-                <input
-                  type="number"
-                  id="yakuman_prize"
-                  name="yakuman_prize"
-                  defaultValue={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-            </div>
-          </div>
+          <PrizeInputsForEvent
+            defaultTobiPrize={initialRules?.tobi_prize || groupRules.tobi_prize || 0}
+            defaultYakumanPrize={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
+          />
         </div>
       )}
     </div>

@@ -75,12 +75,16 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
               <span className="text-gray-600">オカ</span>
               <span className="font-medium">{displayRules.oka_enabled ? "あり" : "なし"}</span>
             </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">レート(1000点当たり)</span>
+              <span className="font-medium">{displayRules.rate}pt</span>
+            </div>
           </div>
         </div>
 
-        {/* ウマ・レート */}
+        {/* ウマ・トビ賞・役満賞など */}
         <div className="space-y-3">
-          <h3 className="text-sm font-medium text-gray-700 border-b pb-1">ウマ・レート等</h3>
+          <h3 className="text-sm font-medium text-gray-700 border-b pb-1">各種賞金（任意）</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">ウマ</span>
@@ -88,20 +92,16 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
                 {displayRules.uma_first} / {displayRules.uma_second}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">レート</span>
-              <span className="font-medium">{displayRules.rate}</span>
-            </div>
             {displayRules.tobi_prize > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">トビ賞</span>
-                <span className="font-medium">{displayRules.tobi_prize}pt</span>
+                <span className="font-medium">{displayRules.tobi_prize}点</span>
               </div>
             )}
             {displayRules.yakuman_prize > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">役満賞</span>
-                <span className="font-medium">{displayRules.yakuman_prize}pt</span>
+                <span className="font-medium">{displayRules.yakuman_prize}点</span>
               </div>
             )}
           </div>
