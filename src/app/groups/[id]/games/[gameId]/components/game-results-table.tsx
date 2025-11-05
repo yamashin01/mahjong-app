@@ -15,10 +15,9 @@ interface GameResult {
 
 interface GameResultsTableProps {
   results: GameResult[];
-  seatNames: Record<string, string>;
 }
 
-export function GameResultsTable({ results, seatNames }: GameResultsTableProps) {
+export function GameResultsTable({ results }: GameResultsTableProps) {
   const getRankColor = (rank: number) => {
     switch (rank) {
       case 1:
@@ -78,12 +77,12 @@ export function GameResultsTable({ results, seatNames }: GameResultsTableProps) 
                   className={`py-3 px-4 text-right font-mono font-bold ${getScoreColor(result.total_score)}`}
                 >
                   {result.total_score >= 0 ? "+" : ""}
-                  {Number(result.total_score).toFixed(1)}
+                  {Number(result.total_score)}
                 </td>
                 <td
                   className={`py-3 px-4 text-right font-mono font-bold ${getScoreColor(result.point_amount)}`}
                 >
-                  {result.point_amount >= 0 ? "+" : ""}¥
+                  {result.point_amount >= 0 ? "+" : ""}
                   {Number(result.point_amount).toLocaleString()}
                 </td>
               </tr>
@@ -144,7 +143,7 @@ export function GameResultsTable({ results, seatNames }: GameResultsTableProps) 
                 <span
                   className={`font-mono font-bold text-lg ${getScoreColor(result.point_amount)}`}
                 >
-                  {result.point_amount >= 0 ? "+" : ""}¥
+                  {result.point_amount >= 0 ? "+" : ""}
                   {Number(result.point_amount).toLocaleString()}
                 </span>
               </div>

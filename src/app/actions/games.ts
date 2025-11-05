@@ -83,6 +83,13 @@ export async function createGame(formData: FormData) {
   // 座席を自動割り当て
   const seats = ["east", "south", "west", "north"];
 
+  // オカの計算（オカ有効な場合、全員の開始点と返し点の差分の合計）
+  let okaTotal = 0;
+  if (rules.oka_enabled) {
+    // 全員分の (返し点 - 開始点) の合計
+    okaTotal = (rules.return_points - rules.start_points) * 4;
+  }
+
   // 各プレイヤーのスコアを計算
   const results = players.map((player, index) => {
     const rank = playerRanks.get(player.playerId) || 1;
@@ -110,11 +117,14 @@ export async function createGame(formData: FormData) {
         break;
     }
 
-    // トータルスコア（素点/1000 + ウマ）
-    const totalScore = rawScore / 1000 + uma;
+    // オカはトップ（1位）のみに加算
+    const oka = rules.oka_enabled && rank === 1 ? okaTotal : 0;
 
-    // ポイント額（レート適用）
-    const pointAmount = totalScore * rules.rate;
+    // トータルスコア（素点 + ウマ + オカ）
+    const totalScore = rawScore + uma + oka;
+
+    // ポイント額（1.0なら1000点あたり100pt）
+    const pointAmount = (totalScore / 10) * rules.rate;
 
     return {
       player_id: actualPlayerId,
@@ -294,6 +304,12 @@ export async function updateGameResult(formData: FormData) {
     rankMap.set(r.id, index + 1);
   });
 
+  // オカの計算（オカ有効な場合、全員の開始点と返し点の差分の合計）
+  let okaTotal = 0;
+  if (rules.oka_enabled) {
+    okaTotal = (rules.return_points - rules.start_points) * 4;
+  }
+
   // 各プレイヤーのスコアを再計算して更新
   const updatePromises = updatedResults.map((result) => {
     const rank = rankMap.get(result.id) || 1;
@@ -316,11 +332,14 @@ export async function updateGameResult(formData: FormData) {
         break;
     }
 
-    // トータルスコア（素点/1000 + ウマ）
-    const totalScore = rawScore / 1000 + uma;
+    // オカはトップ（1位）のみに加算
+    const oka = rules.oka_enabled && rank === 1 ? okaTotal : 0;
 
-    // ポイント額（レート適用）
-    const pointAmount = totalScore * rules.rate;
+    // トータルスコア（素点 + ウマ + オカ）
+    const totalScore = rawScore + uma + oka;
+
+    // ポイント額（1.0なら1000点あたり100pt）
+    const pointAmount = (totalScore / 10) * rules.rate;
 
     return gamesRepo.updateGameResult(result.id, {
       final_points: result.final_points,

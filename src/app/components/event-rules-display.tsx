@@ -76,7 +76,7 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
               <span className="font-medium">{displayRules.oka_enabled ? "あり" : "なし"}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">レート(1000点当たり)</span>
+              <span className="text-gray-600">レート(1.0なら1000点あたり100pt)</span>
               <span className="font-medium">{displayRules.rate}pt</span>
             </div>
           </div>

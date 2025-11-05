@@ -145,7 +145,7 @@ export default async function GameDetailPage({
               }
             />
           </div>
-          <GameResultsTable results={results || []} seatNames={seatNames} />
+          <GameResultsTable results={results || []} />
         </div>
 
         <div className="text-center">

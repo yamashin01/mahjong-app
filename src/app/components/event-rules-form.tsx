@@ -314,7 +314,7 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
           {/* レート */}
           <div>
             <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
-              レート（点棒1000点あたりのポイント）
+              レート（1.0なら1000点あたり100pt）
             </label>
             <input
               type="number"

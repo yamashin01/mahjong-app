@@ -222,7 +222,7 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | uma_third | integer | NOT NULL | -10 | ウマ（3位） |
 | uma_fourth | integer | NOT NULL | -20 | ウマ（4位） |
 | oka_enabled | boolean | NOT NULL | TRUE | オカの有無 |
-| rate | numeric(10,2) | NOT NULL | 1.0 | レート（点棒1000点あたりのポイント） |
+| rate | numeric(10,2) | NOT NULL | 1.0 | レート（1.0なら1000点あたり100pt） |
 | tobi_prize | integer | | 0 | トビ賞（0なら無効） |
 | yakuman_prize | integer | | 0 | 役満祝儀 |
 | top_prize | integer | | 0 | トップ賞 |
