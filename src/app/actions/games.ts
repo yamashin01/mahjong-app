@@ -73,12 +73,42 @@ export async function createGame(formData: FormData) {
     }
   }
 
-  // 順位を計算（点数の降順）
+  // 順位を計算（点数の降順、同点の場合は同順位）
   const sortedPlayers = [...players].sort((a, b) => b.finalPoints - a.finalPoints);
+
+  // 同点処理を含む順位付け
   const playerRanks = new Map<string, number>();
-  sortedPlayers.forEach((p, index) => {
-    playerRanks.set(p.playerId, index + 1);
-  });
+  const rankGroups: { rank: number; players: typeof sortedPlayers; points: number }[] = [];
+
+  let currentRank = 1;
+  let i = 0;
+
+  while (i < sortedPlayers.length) {
+    const currentPoints = sortedPlayers[i].finalPoints;
+    const group = [sortedPlayers[i]];
+
+    // 同点のプレイヤーを探す
+    let j = i + 1;
+    while (j < sortedPlayers.length && sortedPlayers[j].finalPoints === currentPoints) {
+      group.push(sortedPlayers[j]);
+      j++;
+    }
+
+    // このグループの全員に同じ順位を割り当て
+    for (const player of group) {
+      playerRanks.set(player.playerId, currentRank);
+    }
+
+    rankGroups.push({
+      rank: currentRank,
+      players: group,
+      points: currentPoints,
+    });
+
+    // 次の順位は同点人数分スキップ
+    currentRank += group.length;
+    i = j;
+  }
 
   // 座席を自動割り当て
   const seats = ["east", "south", "west", "north"];
@@ -90,6 +120,29 @@ export async function createGame(formData: FormData) {
   // 素点の基準点（常に返し点を使用）
   const basePoints = rules.return_points;
 
+  // 各順位グループのウマとオカを事前計算
+  const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];
+  const groupUmaOka = new Map<number, { uma: number; oka: number }>();
+
+  for (const group of rankGroups) {
+    const groupSize = group.players.length;
+    const startRankIndex = group.rank - 1; // 0-indexed
+
+    // このグループが獲得するウマの合計を計算
+    let totalUma = 0;
+    for (let k = 0; k < groupSize && startRankIndex + k < 4; k++) {
+      totalUma += umaValues[startRankIndex + k];
+    }
+
+    // ウマを均等分割（整数に丸める）
+    const averageUma = Math.round(totalUma / groupSize);
+
+    // オカは1位グループのみに配分（均等分割、整数に丸める）
+    const averageOka = group.rank === 1 ? Math.round(okaTotal / groupSize) : 0;
+
+    groupUmaOka.set(group.rank, { uma: averageUma, oka: averageOka });
+  }
+
   // 各プレイヤーのスコアを計算
   const results = players.map((player, index) => {
     const rank = playerRanks.get(player.playerId) || 1;
@@ -100,25 +153,8 @@ export async function createGame(formData: FormData) {
     const actualPlayerId = isGuest ? null : player.playerId;
     const guestPlayerId = isGuest ? player.playerId.replace("guest-", "") : null;
 
-    // ウマの取得
-    let uma = 0;
-    switch (rank) {
-      case 1:
-        uma = rules.uma_first;
-        break;
-      case 2:
-        uma = rules.uma_second;
-        break;
-      case 3:
-        uma = rules.uma_third;
-        break;
-      case 4:
-        uma = rules.uma_fourth;
-        break;
-    }
-
-    // オカはトップ（1位）のみに加算
-    const oka = rank === 1 ? okaTotal : 0;
+    // 同点グループのウマとオカを取得
+    const { uma, oka } = groupUmaOka.get(rank) || { uma: 0, oka: 0 };
 
     // トータルスコア（素点 + ウマ + オカ）
     const totalScore = rawScore + uma + oka;
@@ -297,12 +333,42 @@ export async function updateGameResult(formData: FormData) {
     final_points: r.id === resultId ? finalPoints : r.final_points,
   }));
 
-  // 順位を再計算
+  // 順位を再計算（同点処理含む）
   const sortedResults = [...updatedResults].sort((a, b) => b.final_points - a.final_points);
+
+  // 同点処理を含む順位付け
   const rankMap = new Map<string, number>();
-  sortedResults.forEach((r, index) => {
-    rankMap.set(r.id, index + 1);
-  });
+  const rankGroups: { rank: number; results: typeof sortedResults; points: number }[] = [];
+
+  let currentRank = 1;
+  let i = 0;
+
+  while (i < sortedResults.length) {
+    const currentPoints = sortedResults[i].final_points;
+    const group = [sortedResults[i]];
+
+    // 同点のプレイヤーを探す
+    let j = i + 1;
+    while (j < sortedResults.length && sortedResults[j].final_points === currentPoints) {
+      group.push(sortedResults[j]);
+      j++;
+    }
+
+    // このグループの全員に同じ順位を割り当て
+    for (const result of group) {
+      rankMap.set(result.id, currentRank);
+    }
+
+    rankGroups.push({
+      rank: currentRank,
+      results: group,
+      points: currentPoints,
+    });
+
+    // 次の順位は同点人数分スキップ
+    currentRank += group.length;
+    i = j;
+  }
 
   // オカの計算（オカ有効な場合、全員の開始点と返し点の差分の合計）
   let okaTotal = 0;
@@ -313,30 +379,36 @@ export async function updateGameResult(formData: FormData) {
   // 素点の基準点（オカ有効時は返し点、無効時は開始点）
   const basePoints = rules.oka_enabled ? rules.return_points : rules.start_points;
 
+  // 各順位グループのウマとオカを事前計算
+  const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];
+  const groupUmaOka = new Map<number, { uma: number; oka: number }>();
+
+  for (const group of rankGroups) {
+    const groupSize = group.results.length;
+    const startRankIndex = group.rank - 1; // 0-indexed
+
+    // このグループが獲得するウマの合計を計算
+    let totalUma = 0;
+    for (let k = 0; k < groupSize && startRankIndex + k < 4; k++) {
+      totalUma += umaValues[startRankIndex + k];
+    }
+
+    // ウマを均等分割（整数に丸める）
+    const averageUma = Math.round(totalUma / groupSize);
+
+    // オカは1位グループのみに配分（均等分割、整数に丸める）
+    const averageOka = group.rank === 1 ? Math.round(okaTotal / groupSize) : 0;
+
+    groupUmaOka.set(group.rank, { uma: averageUma, oka: averageOka });
+  }
+
   // 各プレイヤーのスコアを再計算して更新
   const updatePromises = updatedResults.map((result) => {
     const rank = rankMap.get(result.id) || 1;
     const rawScore = result.final_points - basePoints;
 
-    // ウマの取得
-    let uma = 0;
-    switch (rank) {
-      case 1:
-        uma = rules.uma_first;
-        break;
-      case 2:
-        uma = rules.uma_second;
-        break;
-      case 3:
-        uma = rules.uma_third;
-        break;
-      case 4:
-        uma = rules.uma_fourth;
-        break;
-    }
-
-    // オカはトップ（1位）のみに加算
-    const oka = rank === 1 ? okaTotal : 0;
+    // 同点グループのウマとオカを取得
+    const { uma, oka } = groupUmaOka.get(rank) || { uma: 0, oka: 0 };
 
     // トータルスコア（素点 + ウマ + オカ）
     const totalScore = rawScore + uma + oka;

@@ -84,13 +84,38 @@ export async function getEventRankings(eventId: string) {
     else if (result.rank === 4) stats.fourthPlaceCount += 1;
   }
 
-  // 合計ポイント順にソートして順位を割り当て
-  const rankings = Array.from(playerStats.values())
-    .sort((a, b) => b.totalPoints - a.totalPoints)
-    .map((stats, index) => ({
-      rank: index + 1,
-      ...stats,
-    }));
+  // 合計ポイント順にソートして順位を割り当て（同点は同順位）
+  const sortedStats = Array.from(playerStats.values()).sort(
+    (a, b) => b.totalPoints - a.totalPoints,
+  );
+
+  const rankings = [];
+  let currentRank = 1;
+  let i = 0;
+
+  while (i < sortedStats.length) {
+    const currentPoints = sortedStats[i].totalPoints;
+    const group = [sortedStats[i]];
+
+    // 同点のプレイヤーを探す
+    let j = i + 1;
+    while (j < sortedStats.length && sortedStats[j].totalPoints === currentPoints) {
+      group.push(sortedStats[j]);
+      j++;
+    }
+
+    // このグループの全員に同じ順位を割り当て
+    for (const stats of group) {
+      rankings.push({
+        rank: currentRank,
+        ...stats,
+      });
+    }
+
+    // 次の順位は同点人数分スキップ
+    currentRank += group.length;
+    i = j;
+  }
 
   return { data: rankings, error: null };
 }
