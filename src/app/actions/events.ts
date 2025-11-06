@@ -24,7 +24,8 @@ export async function createEvent(formData: FormData) {
   const eventDate = formData.get("eventDate") as string;
 
   // カスタムルール設定
-  const useCustomRules = formData.get("useCustomRules") === "true";
+  const useCustomRulesValues = formData.getAll("useCustomRules");
+  const useCustomRules = useCustomRulesValues.includes("true");
 
   if (!name || !eventDate) {
     return { error: "イベント名と開催日は必須です" };
@@ -49,7 +50,6 @@ export async function createEvent(formData: FormData) {
     const umaSecond = formData.get("uma_second");
     const umaThird = formData.get("uma_third");
     const umaFourth = formData.get("uma_fourth");
-    const okaEnabled = formData.get("oka_enabled");
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
@@ -62,7 +62,6 @@ export async function createEvent(formData: FormData) {
     if (umaSecond) eventData.uma_second = Number(umaSecond);
     if (umaThird) eventData.uma_third = Number(umaThird);
     if (umaFourth) eventData.uma_fourth = Number(umaFourth);
-    if (okaEnabled !== null) eventData.oka_enabled = okaEnabled === "true";
     if (rate) eventData.rate = Number(rate);
     if (tobiPrize) eventData.tobi_prize = Number(tobiPrize);
     if (yakumanPrize) eventData.yakuman_prize = Number(yakumanPrize);
@@ -137,7 +136,10 @@ export async function updateEventRules(formData: FormData) {
   }
 
   const eventId = formData.get("eventId") as string;
-  const useCustomRules = formData.get("useCustomRules") === "true";
+  // チェックボックスはチェックされている場合のみ値を送信する
+  // hidden inputとcheckboxで同じnameを使用しているため、getAll()で両方取得
+  const useCustomRulesValues = formData.getAll("useCustomRules");
+  const useCustomRules = useCustomRulesValues.includes("true");
 
   // イベント情報を取得してgroupIdを確認
   const { data: eventData, error: fetchError } = await eventsRepo.getEventById(eventId);
@@ -166,11 +168,9 @@ export async function updateEventRules(formData: FormData) {
     const umaSecond = formData.get("uma_second");
     const umaThird = formData.get("uma_third");
     const umaFourth = formData.get("uma_fourth");
-    const okaEnabled = formData.get("oka_enabled");
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
-    const topPrize = formData.get("top_prize");
 
     updateData.game_type = gameType || null;
     updateData.start_points = startPoints ? Number(startPoints) : null;
@@ -179,11 +179,19 @@ export async function updateEventRules(formData: FormData) {
     updateData.uma_second = umaSecond ? Number(umaSecond) : null;
     updateData.uma_third = umaThird ? Number(umaThird) : null;
     updateData.uma_fourth = umaFourth ? Number(umaFourth) : null;
-    updateData.oka_enabled = okaEnabled !== null ? okaEnabled === "true" : null;
     updateData.rate = rate ? Number(rate) : null;
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;
-    updateData.top_prize = topPrize ? Number(topPrize) : null;
+    updateData.top_prize = null;
+
+    // バリデーション: 返し点は開始点以上である必要がある
+    if (
+      updateData.start_points !== null &&
+      updateData.return_points !== null &&
+      updateData.return_points < updateData.start_points
+    ) {
+      return { error: "返し点は開始点以上である必要があります" };
+    }
   } else {
     // カスタムルールが無効な場合、全てNULLにしてグループルールを使用
     updateData.game_type = null;
@@ -193,7 +201,6 @@ export async function updateEventRules(formData: FormData) {
     updateData.uma_second = null;
     updateData.uma_third = null;
     updateData.uma_fourth = null;
-    updateData.oka_enabled = null;
     updateData.rate = null;
     updateData.tobi_prize = null;
     updateData.yakuman_prize = null;
@@ -210,7 +217,6 @@ export async function updateEventRules(formData: FormData) {
     umaSecond: updateData.uma_second,
     umaThird: updateData.uma_third,
     umaFourth: updateData.uma_fourth,
-    okaEnabled: updateData.oka_enabled,
     rate: updateData.rate,
     tobiPrize: updateData.tobi_prize,
     yakumanPrize: updateData.yakuman_prize,

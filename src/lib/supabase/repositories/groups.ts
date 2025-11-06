@@ -221,8 +221,5 @@ export async function getGroupMemberNames(groupId: string) {
  */
 export async function updateGroupName(params: { groupId: string; name: string }) {
   const supabase = await createClient();
-  return await supabase
-    .from("groups")
-    .update({ name: params.name })
-    .eq("id", params.groupId);
+  return await supabase.from("groups").update({ name: params.name }).eq("id", params.groupId);
 }

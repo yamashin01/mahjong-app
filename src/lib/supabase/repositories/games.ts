@@ -40,15 +40,32 @@ export async function deleteGame(gameId: string) {
 }
 
 /**
+ * ゲーム情報を更新する
+ */
+export async function updateGame(gameId: string, gameData: Partial<GameInsert>) {
+  const supabase = await createClient();
+  return await supabase.from("games").update(gameData).eq("id", gameId).select().single();
+}
+
+/**
+ * ゲーム結果を更新する
+ */
+export async function updateGameResult(resultId: string, resultData: Partial<GameResultInsert>) {
+  const supabase = await createClient();
+  return await supabase
+    .from("game_results")
+    .update(resultData)
+    .eq("id", resultId)
+    .select()
+    .single();
+}
+
+/**
  * ゲーム詳細を取得する
  */
 export async function getGameById(gameId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("games")
-    .select("*")
-    .eq("id", gameId)
-    .single();
+  return await supabase.from("games").select("*").eq("id", gameId).single();
 }
 
 /**

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createEvent } from "@/app/actions/events";
-import { requireGroupMembership } from "@/lib/auth/group-access";
-import { createClient } from "@/lib/supabase/server";
 import { EventRulesForm } from "@/app/components/event-rules-form";
+import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as groupsRepo from "@/lib/supabase/repositories";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function NewEventPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;

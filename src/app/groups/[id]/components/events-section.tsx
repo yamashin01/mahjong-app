@@ -19,14 +19,15 @@ export function EventsSection({ groupId, events, isAdmin }: EventsSectionProps) 
       </div>
 
       {(activeEvents.length > 0 || completedEvents.length > 0) && (
-      <div className="w-full items-center text-center">
-        <Link
-          href={`/groups/${groupId}/events/new`}
-          className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 transition-colors"
-        >
-          新規イベント作成
-        </Link>
-      </div>)}
+        <div className="w-full items-center text-center">
+          <Link
+            href={`/groups/${groupId}/events/new`}
+            className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 transition-colors"
+          >
+            新規イベント作成
+          </Link>
+        </div>
+      )}
 
       {/* 進行中のイベント */}
       {activeEvents.length > 0 && (

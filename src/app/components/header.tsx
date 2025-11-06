@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { MobileMenu } from "@/app/components/mobile-menu";
 import { UserMenu } from "@/app/components/user-menu";
-import { createClient } from "@/lib/supabase/server";
 import * as profileRepo from "@/lib/supabase/repositories";
+import { createClient } from "@/lib/supabase/server";
 
 export async function Header() {
   const supabase = await createClient();
@@ -23,7 +23,10 @@ export async function Header() {
     <header className="bg-emerald-100 shadow-sm border-b border-gray-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors">
+          <Link
+            href="/"
+            className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
+          >
             麻雀スコア管理
           </Link>
 

@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminRole } from "@/lib/auth/group-access";
-import { createClient } from "@/lib/supabase/server";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
+import { createClient } from "@/lib/supabase/server";
 
 export async function createGroup(formData: FormData) {
   const supabase = await createClient();
@@ -60,8 +60,9 @@ export async function joinGroup(formData: FormData) {
   }
 
   // 招待コードでグループを検索
-  const { data: group, error: groupError } =
-    await groupsRepo.findGroupByInviteCode(inviteCode.trim().toUpperCase());
+  const { data: group, error: groupError } = await groupsRepo.findGroupByInviteCode(
+    inviteCode.trim().toUpperCase(),
+  );
 
   if (groupError || !group) {
     return { error: "招待コードが無効です" };
@@ -210,6 +211,11 @@ export async function updateGroupRules(formData: FormData) {
   // バリデーション
   if (startPoints <= 0 || returnPoints <= 0 || rate <= 0) {
     return { error: "正しい数値を入力してください" };
+  }
+
+  // 返し点は開始点以上である必要がある
+  if (returnPoints < startPoints) {
+    return { error: "返し点は開始点以上である必要があります" };
   }
 
   // ルールを更新

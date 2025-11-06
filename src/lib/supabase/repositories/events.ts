@@ -6,11 +6,7 @@ import type { EventInsert, EventRow, EventUpdate } from "@/types";
  */
 export async function createEvent(eventData: EventInsert) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .insert(eventData)
-    .select()
-    .single();
+  return await supabase.from("events").insert(eventData).select().single();
 }
 
 /**
@@ -44,7 +40,6 @@ export async function updateEventRules(params: {
   umaSecond: number | null;
   umaThird: number | null;
   umaFourth: number | null;
-  okaEnabled: boolean | null;
   rate: number | null;
   tobiPrize: number | null;
   yakumanPrize: number | null;
@@ -59,7 +54,6 @@ export async function updateEventRules(params: {
     uma_second: params.umaSecond,
     uma_third: params.umaThird,
     uma_fourth: params.umaFourth,
-    oka_enabled: params.okaEnabled,
     rate: params.rate,
     tobi_prize: params.tobiPrize,
     yakuman_prize: params.yakumanPrize,
@@ -80,10 +74,7 @@ export async function updateEventRules(params: {
  */
 export async function deleteEvent(eventId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .delete()
-    .eq("id", eventId);
+  return await supabase.from("events").delete().eq("id", eventId);
 }
 
 /**
@@ -91,11 +82,7 @@ export async function deleteEvent(eventId: string) {
  */
 export async function getEventById(eventId: string) {
   const supabase = await createClient();
-  return await supabase
-    .from("events")
-    .select("*")
-    .eq("id", eventId)
-    .single();
+  return await supabase.from("events").select("*").eq("id", eventId).single();
 }
 
 /**

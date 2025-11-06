@@ -3,6 +3,132 @@
 import { useState } from "react";
 import type { EventRules } from "@/types/event-rules";
 
+interface UmaInputsForEventProps {
+  defaultFirst: number;
+  defaultSecond: number;
+}
+
+function UmaInputsForEvent({ defaultFirst, defaultSecond }: UmaInputsForEventProps) {
+  const [umaFirst, setUmaFirst] = useState(defaultFirst);
+  const [umaSecond, setUmaSecond] = useState(defaultSecond);
+
+  return (
+    <div>
+      <div className="block text-sm font-medium text-gray-700 mb-2">ウマ（点棒）</div>
+      <p className="text-xs text-gray-500 mb-3">
+        1000点単位で指定してください。1位と2位の設定で3位と4位が自動計算されます。
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label htmlFor="uma_first" className="block text-xs text-gray-600 mb-1">
+            1位
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="uma_first"
+              name="uma_first"
+              min="0"
+              step="1000"
+              value={umaFirst}
+              onChange={(e) => setUmaFirst(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="uma_second" className="block text-xs text-gray-600 mb-1">
+            2位
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="uma_second"
+              name="uma_second"
+              min="0"
+              step="1000"
+              value={umaSecond}
+              onChange={(e) => setUmaSecond(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className="mt-2 p-2 bg-gray-50 rounded text-xs text-gray-600">
+        <span className="font-medium">自動計算：</span>
+        3位 = -{umaSecond}点 / 4位 = -{umaFirst}点
+      </div>
+      <input type="hidden" name="uma_third" value={-umaSecond} />
+      <input type="hidden" name="uma_fourth" value={-umaFirst} />
+    </div>
+  );
+}
+
+interface PrizeInputsForEventProps {
+  defaultTobiPrize: number;
+  defaultYakumanPrize: number;
+}
+
+function PrizeInputsForEvent({ defaultTobiPrize, defaultYakumanPrize }: PrizeInputsForEventProps) {
+  const [tobiPrize, setTobiPrize] = useState(defaultTobiPrize);
+  const [yakumanPrize, setYakumanPrize] = useState(defaultYakumanPrize);
+
+  return (
+    <div>
+      <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
+      <p className="text-xs text-gray-500 mb-3">1000点単位で指定してください。</p>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">
+            トビ賞
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="tobi_prize"
+              name="tobi_prize"
+              min="0"
+              step="1000"
+              value={tobiPrize}
+              onChange={(e) => setTobiPrize(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="yakuman_prize" className="block text-xs text-gray-600 mb-1">
+            役満賞
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="yakuman_prize"
+              name="yakuman_prize"
+              min="0"
+              step="1000"
+              value={yakumanPrize}
+              onChange={(e) => setYakumanPrize(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface EventRulesFormProps {
   groupRules: {
     game_type: string;
@@ -31,6 +157,8 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
     <div className="space-y-6">
       {/* カスタムルール有効化チェックボックス */}
       <div className="flex items-center gap-3">
+        {/* hidden input to ensure useCustomRules is always sent */}
+        <input type="hidden" name="useCustomRules" value="false" />
         <input
           type="checkbox"
           id="useCustomRules"
@@ -80,8 +208,9 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
             </select>
           </div>
 
-          {/* 基本点数設定 */}
+          {/* 開始点と返し点 */}
           <div className="grid grid-cols-2 gap-4">
+            {/* 開始点 */}
             <div>
               <label
                 htmlFor="start_points"
@@ -115,85 +244,14 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
               />
             </div>
           </div>
-
-          {/* ウマ設定 */}
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-2">ウマ（順位点）</div>
-            <div className="grid grid-cols-4 gap-2">
-              <div>
-                <label htmlFor="uma_first" className="block text-xs text-gray-600 mb-1">
-                  1位
-                </label>
-                <input
-                  type="number"
-                  id="uma_first"
-                  name="uma_first"
-                  defaultValue={initialRules?.uma_first || groupRules.uma_first}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="uma_second" className="block text-xs text-gray-600 mb-1">
-                  2位
-                </label>
-                <input
-                  type="number"
-                  id="uma_second"
-                  name="uma_second"
-                  defaultValue={initialRules?.uma_second || groupRules.uma_second}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="uma_third" className="block text-xs text-gray-600 mb-1">
-                  3位
-                </label>
-                <input
-                  type="number"
-                  id="uma_third"
-                  name="uma_third"
-                  defaultValue={initialRules?.uma_third || groupRules.uma_third}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="uma_fourth" className="block text-xs text-gray-600 mb-1">
-                  4位
-                </label>
-                <input
-                  type="number"
-                  id="uma_fourth"
-                  name="uma_fourth"
-                  defaultValue={initialRules?.uma_fourth || groupRules.uma_fourth}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* オカ設定 */}
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="oka_enabled"
-              name="oka_enabled"
-              value="true"
-              defaultChecked={
-                initialRules?.oka_enabled !== undefined
-                  ? (initialRules.oka_enabled ?? false)
-                  : (groupRules.oka_enabled ?? false)
-              }
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="oka_enabled" className="text-sm font-medium text-gray-700">
-              オカを有効にする
-            </label>
-          </div>
+          <p className="mt-1 text-sm text-gray-500">
+            オカなしなら返し持ち点を開始持ち点と同じ値にしてください
+          </p>
 
           {/* レート */}
           <div>
             <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
-              レート（点棒1000点あたりのポイント）
+              レート（1.0なら1000点あたり100pt）
             </label>
             <input
               type="number"
@@ -205,48 +263,17 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
             />
           </div>
 
+          {/* ウマ設定 */}
+          <UmaInputsForEvent
+            defaultFirst={initialRules?.uma_first || groupRules.uma_first}
+            defaultSecond={initialRules?.uma_second || groupRules.uma_second}
+          />
+
           {/* 各種賞金 */}
-          <div>
-            <div className="block text-sm font-medium text-gray-700 mb-2">各種賞金（任意）</div>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
-                <label htmlFor="tobi_prize" className="block text-xs text-gray-600 mb-1">
-                  トビ賞
-                </label>
-                <input
-                  type="number"
-                  id="tobi_prize"
-                  name="tobi_prize"
-                  defaultValue={initialRules?.tobi_prize || groupRules.tobi_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="yakuman_prize" className="block text-xs text-gray-600 mb-1">
-                  役満賞
-                </label>
-                <input
-                  type="number"
-                  id="yakuman_prize"
-                  name="yakuman_prize"
-                  defaultValue={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-              <div>
-                <label htmlFor="top_prize" className="block text-xs text-gray-600 mb-1">
-                  トップ賞
-                </label>
-                <input
-                  type="number"
-                  id="top_prize"
-                  name="top_prize"
-                  defaultValue={initialRules?.top_prize || groupRules.top_prize || 0}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                />
-              </div>
-            </div>
-          </div>
+          <PrizeInputsForEvent
+            defaultTobiPrize={initialRules?.tobi_prize || groupRules.tobi_prize || 0}
+            defaultYakumanPrize={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
+          />
         </div>
       )}
     </div>
