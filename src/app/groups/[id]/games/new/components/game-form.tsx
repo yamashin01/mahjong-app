@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createGame } from "@/app/actions/games";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
@@ -44,6 +44,7 @@ export function GameForm({
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
 
   const seatNames = ["東", "南", "西", "北"];
   const totalPoints = finalPoints.reduce((sum, points) => sum + points, 0);
@@ -74,9 +75,11 @@ export function GameForm({
     // 成功の場合はリダイレクトされるのでローディング状態を保持
   };
 
-  const handlePointsChange = (index: number, value: number) => {
+  const handlePointsChange = (index: number, valueStr: string) => {
     const newPoints = [...finalPoints];
-    newPoints[index] = value;
+    const value = Number(valueStr);
+    // NaNの場合（"-"のみや空文字など）は0として扱う（表示用のみ）
+    newPoints[index] = Number.isNaN(value) ? 0 : value;
     setFinalPoints(newPoints);
     setError(null);
   };
@@ -216,13 +219,17 @@ export function GameForm({
                   最終持ち点 <span className="text-red-500">*</span>
                 </label>
                 <input
+                  ref={(el) => {
+                    inputRefs.current[i - 1] = el;
+                  }}
                   type="number"
                   id={`player${i}FinalPoints`}
                   name={`player${i}FinalPoints`}
                   required
+                  min="-999900"
                   step="100"
-                  value={finalPoints[i - 1]}
-                  onChange={(e) => handlePointsChange(i - 1, Number(e.target.value))}
+                  defaultValue={finalPoints[i - 1]}
+                  onChange={(e) => handlePointsChange(i - 1, e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
