@@ -20,8 +20,10 @@ export async function createGame(formData: FormData) {
 
   const groupId = formData.get("groupId") as string;
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
-  const playedAt = formData.get("playedAt") as string;
   const eventId = formData.get("eventId") as string | null;
+
+  // 対局日時は現在時刻を使用
+  const playedAt = new Date().toISOString();
 
   // 回戦数を自動採番
   // イベントIDがある場合はイベント内、ない場合はグループ内の最新の対局記録+1

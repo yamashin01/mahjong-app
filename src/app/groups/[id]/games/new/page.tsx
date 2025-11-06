@@ -70,12 +70,6 @@ export default async function NewGamePage({
     rate: eventRules?.rate ?? groupRules.rate,
   };
 
-  // デフォルトの対局日時（現在時刻）
-  const now = new Date();
-  const defaultDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-    .toISOString()
-    .slice(0, 16);
-
   // デフォルトプレイヤーの設定（メンバー登録順、不足分はゲストメンバー）
   const defaultPlayers: (string | null)[] = [];
 
@@ -111,7 +105,6 @@ export default async function NewGamePage({
           groupId={groupId}
           eventId={eventId}
           rules={rules}
-          defaultDateTime={defaultDateTime}
           members={members}
           guestPlayers={guestPlayers}
           events={events}

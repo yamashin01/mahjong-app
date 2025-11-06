@@ -19,7 +19,6 @@ interface GameFormProps {
     oka_enabled: boolean;
     rate: number;
   };
-  defaultDateTime: string;
   members: Array<{ user_id: string; profiles: { display_name: string | null } | null }> | null;
   guestPlayers: Array<{ id: string; name: string }> | null;
   events: Array<{ id: string; name: string; event_date: string }> | null;
@@ -30,7 +29,6 @@ export function GameForm({
   groupId,
   eventId,
   rules,
-  defaultDateTime,
   members,
   guestPlayers,
   events,
@@ -150,20 +148,6 @@ export function GameForm({
           </div>
         </div>
 
-        {/* 対局日時 */}
-        <div>
-          <label htmlFor="playedAt" className="block text-sm font-medium text-gray-700 mb-2">
-            対局日時 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            id="playedAt"
-            name="playedAt"
-            required
-            defaultValue={defaultDateTime}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-          />
-        </div>
       </div>
 
       {/* プレイヤー情報 */}
