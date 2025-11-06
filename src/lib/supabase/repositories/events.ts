@@ -40,7 +40,6 @@ export async function updateEventRules(params: {
   umaSecond: number | null;
   umaThird: number | null;
   umaFourth: number | null;
-  okaEnabled: boolean | null;
   rate: number | null;
   tobiPrize: number | null;
   yakumanPrize: number | null;
@@ -55,7 +54,6 @@ export async function updateEventRules(params: {
     uma_second: params.umaSecond,
     uma_third: params.umaThird,
     uma_fourth: params.umaFourth,
-    oka_enabled: params.okaEnabled,
     rate: params.rate,
     tobi_prize: params.tobiPrize,
     yakuman_prize: params.yakumanPrize,

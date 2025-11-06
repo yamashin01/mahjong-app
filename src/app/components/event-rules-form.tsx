@@ -3,76 +3,6 @@
 import { useState } from "react";
 import type { EventRules } from "@/types/event-rules";
 
-interface PointsInputsForEventProps {
-  defaultStartPoints: number;
-  defaultReturnPoints: number;
-}
-
-function PointsInputsForEvent({
-  defaultStartPoints,
-  defaultReturnPoints,
-}: PointsInputsForEventProps) {
-  const [startPoints, setStartPoints] = useState(defaultStartPoints);
-  const [returnPoints, setReturnPoints] = useState(defaultReturnPoints);
-  const [error, setError] = useState("");
-
-  const handleStartPointsChange = (value: number) => {
-    setStartPoints(value);
-    if (returnPoints < value) {
-      setError("返し点は開始点以上である必要があります");
-    } else {
-      setError("");
-    }
-  };
-
-  const handleReturnPointsChange = (value: number) => {
-    setReturnPoints(value);
-    if (value < startPoints) {
-      setError("返し点は開始点以上である必要があります");
-    } else {
-      setError("");
-    }
-  };
-
-  return (
-    <div className="grid grid-cols-2 gap-4">
-      <div>
-        <label htmlFor="start_points" className="block text-sm font-medium text-gray-700 mb-2">
-          開始持ち点
-        </label>
-        <input
-          type="number"
-          id="start_points"
-          name="start_points"
-          value={startPoints}
-          onChange={(e) => handleStartPointsChange(Number(e.target.value))}
-          step="1000"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-        />
-      </div>
-      <div>
-        <label htmlFor="return_points" className="block text-sm font-medium text-gray-700 mb-2">
-          返し持ち点
-        </label>
-        <input
-          type="number"
-          id="return_points"
-          name="return_points"
-          value={returnPoints}
-          onChange={(e) => handleReturnPointsChange(Number(e.target.value))}
-          step="1000"
-          className={`w-full rounded-lg border px-4 py-2 focus:ring-2 outline-none transition ${
-            error
-              ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-              : "border-gray-300 focus:border-blue-500 focus:ring-blue-200"
-          }`}
-        />
-        {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
-      </div>
-    </div>
-  );
-}
-
 interface UmaInputsForEventProps {
   defaultFirst: number;
   defaultSecond: number;
@@ -278,38 +208,45 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
             </select>
           </div>
 
-          {/* 基本点数設定 */}
-          <PointsInputsForEvent
-            defaultStartPoints={initialRules?.start_points || groupRules.start_points}
-            defaultReturnPoints={initialRules?.return_points || groupRules.return_points}
-          />
-
-          {/* ウマ設定 */}
-          <UmaInputsForEvent
-            defaultFirst={initialRules?.uma_first || groupRules.uma_first}
-            defaultSecond={initialRules?.uma_second || groupRules.uma_second}
-          />
-
-          {/* オカ設定 */}
-          <div className="flex items-center gap-3">
-            {/* hidden input to ensure oka_enabled is always sent */}
-            <input type="hidden" name="oka_enabled" value="false" />
-            <input
-              type="checkbox"
-              id="oka_enabled"
-              name="oka_enabled"
-              value="true"
-              defaultChecked={
-                initialRules?.oka_enabled !== undefined
-                  ? (initialRules.oka_enabled ?? false)
-                  : (groupRules.oka_enabled ?? false)
-              }
-              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="oka_enabled" className="text-sm font-medium text-gray-700">
-              オカを有効にする
-            </label>
+          {/* 開始点と返し点 */}
+          <div className="grid grid-cols-2 gap-4">
+            {/* 開始点 */}
+            <div>
+              <label
+                htmlFor="start_points"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                開始持ち点
+              </label>
+              <input
+                type="number"
+                id="start_points"
+                name="start_points"
+                defaultValue={initialRules?.start_points || groupRules.start_points}
+                step="1000"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="return_points"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                返し持ち点
+              </label>
+              <input
+                type="number"
+                id="return_points"
+                name="return_points"
+                defaultValue={initialRules?.return_points || groupRules.return_points}
+                step="1000"
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
           </div>
+          <p className="mt-1 text-sm text-gray-500">
+            オカなしなら返し持ち点を開始持ち点と同じ値にしてください
+          </p>
 
           {/* レート */}
           <div>
@@ -325,6 +262,12 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
               className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
             />
           </div>
+
+          {/* ウマ設定 */}
+          <UmaInputsForEvent
+            defaultFirst={initialRules?.uma_first || groupRules.uma_first}
+            defaultSecond={initialRules?.uma_second || groupRules.uma_second}
+          />
 
           {/* 各種賞金 */}
           <PrizeInputsForEvent

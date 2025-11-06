@@ -213,7 +213,7 @@ export async function updateGroupRules(formData: FormData) {
     return { error: "正しい数値を入力してください" };
   }
 
-  // 返し点は開始点以下である必要がある
+  // 返し点は開始点以上である必要がある
   if (returnPoints < startPoints) {
     return { error: "返し点は開始点以上である必要があります" };
   }

@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { updateGroupRules } from "@/app/actions/groups";
 import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
-import { PointsInputs } from "./components/points-inputs";
 import { UmaInputs } from "./components/uma-inputs";
 
 export default async function GroupSettingsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -91,12 +90,62 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
             </div>
           </div>
 
-          {/* 開始点、返し点、レート */}
-          <PointsInputs
-            defaultStartPoints={rules.start_points}
-            defaultReturnPoints={rules.return_points}
-            defaultRate={rules.rate}
-          />
+          {/* 開始点と返し点 */}
+          <div className="grid grid-cols-2 gap-6">
+            <div>
+              <label htmlFor="startPoints" className="block text-sm font-medium text-gray-700 mb-2">
+                開始持ち点 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="startPoints"
+                name="startPoints"
+                required
+                min="1000"
+                step="1000"
+                defaultValue={rules.start_points}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="returnPoints"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                返し持ち点 <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="number"
+                id="returnPoints"
+                name="returnPoints"
+                required
+                min="1000"
+                step="1000"
+                defaultValue={rules.return_points}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+              />
+            </div>
+          </div>
+          <p className="text-sm text-gray-500">
+            オカなしなら返し持ち点を開始持ち点と同じ値にしてください
+          </p>
+
+          {/* レート */}
+          <div>
+            <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
+              レート（1.0なら1000点あたり100pt） <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="number"
+              id="rate"
+              name="rate"
+              required
+              min="0.1"
+              step="0.1"
+              defaultValue={rules.rate}
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+          </div>
 
           {/* ウマ */}
           <UmaInputs defaultFirst={rules.uma_first} defaultSecond={rules.uma_second} />
