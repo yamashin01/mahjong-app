@@ -23,8 +23,9 @@ export async function createGame(formData: FormData) {
   const playedAt = formData.get("playedAt") as string;
   const eventId = formData.get("eventId") as string | null;
 
-  // 回戦数を自動採番（グループ内の最新の対局記録+1）
-  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId);
+  // 回戦数を自動採番
+  // イベントIDがある場合はイベント内、ない場合はグループ内の最新の対局記録+1
+  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId, eventId);
 
   const gameNumber = latestGame ? latestGame.game_number + 1 : 1;
 

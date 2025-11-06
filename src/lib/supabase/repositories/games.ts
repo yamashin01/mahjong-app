@@ -4,15 +4,19 @@ import type { GameInsert, GameResultInsert } from "@/types";
 /**
  * グループの最新ゲーム番号を取得する
  */
-export async function getLatestGameNumber(groupId: string) {
+export async function getLatestGameNumber(groupId: string, eventId?: string | null) {
   const supabase = await createClient();
-  return await supabase
+  let query = supabase
     .from("games")
     .select("game_number")
-    .eq("group_id", groupId)
-    .order("game_number", { ascending: false })
-    .limit(1)
-    .single();
+    .eq("group_id", groupId);
+
+  // イベントIDが指定されている場合は、そのイベント内での最新番号を取得
+  if (eventId) {
+    query = query.eq("event_id", eventId);
+  }
+
+  return await query.order("game_number", { ascending: false }).limit(1).single();
 }
 
 /**
