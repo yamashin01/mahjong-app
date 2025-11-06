@@ -113,12 +113,15 @@ export async function createGame(formData: FormData) {
   // 座席を自動割り当て
   const seats = ["east", "south", "west", "north"];
 
-  // オカの計算（全員分の (返し点 - 開始点) の合計）
-  // オカなし（開始点 = 返し点）の場合は0になる
-  const okaTotal = (rules.return_points - rules.start_points) * 4;
+  // オカの計算
+  // オカあり: 全員分の (返し点 - 開始点) の合計
+  // オカなし: 0（開始点 = 返し点の場合も自動的に0になる）
+  const okaTotal = rules.oka_enabled ? (rules.return_points - rules.start_points) * 4 : 0;
 
-  // 素点の基準点（常に返し点を使用）
-  const basePoints = rules.return_points;
+  // 素点の基準点
+  // オカあり: 返し点を基準とする
+  // オカなし: 開始点を基準とする（開始点 = 返し点なので結果は同じ）
+  const basePoints = rules.oka_enabled ? rules.return_points : rules.start_points;
 
   // 各順位グループのウマとオカを事前計算
   const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];

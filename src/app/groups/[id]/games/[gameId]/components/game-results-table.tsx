@@ -131,7 +131,7 @@ export function GameResultsTable({ results }: GameResultsTableProps) {
                 <div className="text-xs text-gray-600 mb-1">スコア</div>
                 <div className={`font-mono font-bold ${getScoreColor(result.total_score)}`}>
                   {result.total_score >= 0 ? "+" : ""}
-                  {Number(result.total_score).toFixed(1)}
+                  {Number(result.total_score)}
                 </div>
               </div>
             </div>
