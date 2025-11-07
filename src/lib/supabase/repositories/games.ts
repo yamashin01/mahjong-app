@@ -124,7 +124,7 @@ export async function getEventGames(eventId: string) {
   const supabase = await createClient();
   return await supabase
     .from("games")
-    .select("*, game_results(rank, profiles(display_name), guest_players(name))")
+    .select("*, game_results(*, profiles(display_name), guest_players(name))")
     .eq("event_id", eventId)
     .order("played_at", { ascending: false });
 }

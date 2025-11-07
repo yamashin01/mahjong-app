@@ -9,6 +9,7 @@ import { getPlayerDisplayName } from "@/lib/utils/player";
 import type { EventRules } from "@/types/event-rules";
 import { EditEventName } from "./components/edit-event-name";
 import { EventActionsMenu } from "./components/event-actions-menu";
+import { GameStatusModal } from "./components/game-status-modal";
 
 export default async function EventDetailPage({
   params,
@@ -132,6 +133,9 @@ export default async function EventDetailPage({
             </p>
             {event.description && <p className="text-gray-700 mt-2">{event.description}</p>}
           </div>
+          {event.status === "active" && games && games.length > 0 && (
+            <GameStatusModal games={games} />
+          )}
         </div>
 
         {/* イベント最終結果（完了時のみ表示） */}
@@ -297,11 +301,11 @@ export default async function EventDetailPage({
           <div className="mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
           </div>
-          <div className="items-center text-center mb-4">
+          <div className="mb-4">
             {event.status === "active" && (
               <Link
                 href={`/groups/${groupId}/games/new?eventId=${eventId}`}
-                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors"
+                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 text-center hover:bg-gray-200 transition-colors"
               >
                 対局記録を追加
               </Link>
