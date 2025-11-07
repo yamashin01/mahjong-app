@@ -81,7 +81,19 @@ export async function getGameResults(gameId: string) {
     .from("game_results")
     .select(
       `
-      *,
+      id,
+      game_id,
+      player_id,
+      guest_player_id,
+      seat,
+      final_points,
+      raw_score,
+      uma,
+      oka,
+      rank,
+      total_score,
+      point_amount,
+      created_at,
       profiles (
         display_name,
         avatar_url

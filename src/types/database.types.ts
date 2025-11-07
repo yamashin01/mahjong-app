@@ -95,6 +95,7 @@ export type Database = {
           game_id: string;
           guest_player_id: string | null;
           id: string;
+          oka: number;
           player_id: string | null;
           point_amount: number;
           rank: number;
@@ -109,6 +110,7 @@ export type Database = {
           game_id: string;
           guest_player_id?: string | null;
           id?: string;
+          oka?: number;
           player_id?: string | null;
           point_amount: number;
           rank: number;
@@ -123,6 +125,7 @@ export type Database = {
           game_id?: string;
           guest_player_id?: string | null;
           id?: string;
+          oka?: number;
           player_id?: string | null;
           point_amount?: number;
           rank?: number;

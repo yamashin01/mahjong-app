@@ -9,6 +9,7 @@ interface GameResult {
   final_points: number;
   raw_score: number;
   uma: number;
+  oka: number;
   total_score: number;
   point_amount: number;
   profiles?: { display_name: string | null; avatar_url: string | null } | null;
@@ -23,9 +24,6 @@ interface PlayerDetailModalProps {
 
 export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModalProps) {
   if (!isOpen || !result) return null;
-
-  // オカを計算（total_score = raw_score + uma + oka）
-  const oka = Number(result.total_score) - result.raw_score - result.uma;
 
   const getRankColor = (rank: number) => {
     switch (rank) {
@@ -48,10 +46,26 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      }}
+      role="button"
+      tabIndex={0}
     >
       <div
         className="bg-white rounded-lg max-w-md w-full p-6 space-y-4"
         onClick={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         {/* ヘッダー */}
         <div className="flex items-center justify-between border-b border-gray-200 pb-4">
@@ -67,16 +81,12 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
             aria-label="閉じる"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -112,21 +122,19 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
             </span>
           </div>
 
-          {oka !== 0 && (
+          {result.oka !== 0 && (
             <div className="flex justify-between items-center py-2 border-b border-gray-100">
               <span className="text-sm text-gray-600">オカ</span>
-              <span className={`font-mono font-medium text-lg ${getScoreColor(oka)}`}>
-                {oka >= 0 ? "+" : ""}
-                {oka}
+              <span className={`font-mono font-medium text-lg ${getScoreColor(result.oka)}`}>
+                {result.oka >= 0 ? "+" : ""}
+                {result.oka}
               </span>
             </div>
           )}
 
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
             <span className="text-sm text-gray-600">スコア</span>
-            <span
-              className={`font-mono font-bold text-lg ${getScoreColor(result.total_score)}`}
-            >
+            <span className={`font-mono font-bold text-lg ${getScoreColor(result.total_score)}`}>
               {result.total_score >= 0 ? "+" : ""}
               {Number(result.total_score)}
             </span>
@@ -134,9 +142,7 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
 
           <div className="flex justify-between items-center py-3 bg-gray-50 rounded-lg px-3 mt-3">
             <span className="text-sm font-medium text-gray-700">ポイント</span>
-            <span
-              className={`font-mono font-bold text-2xl ${getScoreColor(result.point_amount)}`}
-            >
+            <span className={`font-mono font-bold text-2xl ${getScoreColor(result.point_amount)}`}>
               {result.point_amount >= 0 ? "+" : ""}
               {Number(result.point_amount).toLocaleString()}
             </span>
@@ -146,6 +152,7 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
         {/* 閉じるボタン */}
         <div className="pt-4">
           <button
+            type="button"
             onClick={onClose}
             className="w-full py-3 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
           >

@@ -11,6 +11,7 @@ interface GameResult {
   final_points: number;
   raw_score: number;
   uma: number;
+  oka: number;
   total_score: number;
   point_amount: number;
   profiles?: { display_name: string | null; avatar_url: string | null } | null;
@@ -102,6 +103,14 @@ export function GameResultsTable({ results }: GameResultsTableProps) {
             key={result.id}
             className="bg-gray-50 rounded-lg p-4 space-y-3 hover:bg-gray-100 cursor-pointer transition-colors"
             onClick={() => handleRowClick(result)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleRowClick(result);
+              }
+            }}
+            role="button"
+            tabIndex={0}
           >
             {/* ヘッダー: 順位とプレイヤー名 */}
             <div className="flex items-center gap-3">
