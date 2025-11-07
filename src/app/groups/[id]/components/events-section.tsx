@@ -7,7 +7,7 @@ type EventsSectionProps = {
   isAdmin: boolean;
 };
 
-export function EventsSection({ groupId, events, isAdmin }: EventsSectionProps) {
+export function EventsSection({ groupId, events }: EventsSectionProps) {
   const activeEvents = events.filter((e) => e.status === "active");
   const completedEvents = events.filter((e) => e.status === "completed");
 
@@ -22,7 +22,7 @@ export function EventsSection({ groupId, events, isAdmin }: EventsSectionProps) 
         <div className="w-full items-center text-center">
           <Link
             href={`/groups/${groupId}/events/new`}
-            className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200 transition-colors"
+            className="block rounded-lg border-2 border-green-500 hover:border-green-600 border-dotted bg-white hover:bg-green-50 p-4 font-semibold text-gray-900 transition-colors"
           >
             新規イベント作成
           </Link>
