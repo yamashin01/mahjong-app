@@ -46,10 +46,19 @@ export async function updateEventRules(params: {
   topPrize: number | null;
 }) {
   const supabase = await createClient();
+
+  // オカは返し点が開始点より大きい場合に自動的に有効
+  // nullの場合はnullのまま（グループルールを継承）
+  let okaEnabled: boolean | null = null;
+  if (params.startPoints !== null && params.returnPoints !== null) {
+    okaEnabled = params.returnPoints > params.startPoints;
+  }
+
   const updateData: EventUpdate = {
     game_type: params.gameType,
     start_points: params.startPoints,
     return_points: params.returnPoints,
+    oka_enabled: okaEnabled,
     uma_first: params.umaFirst,
     uma_second: params.umaSecond,
     uma_third: params.umaThird,

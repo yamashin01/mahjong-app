@@ -24,11 +24,8 @@ export default async function EventSettingsPage({
     redirect("/login");
   }
 
-  // メンバーシップ確認（管理者のみ）
-  const membership = await requireGroupMembership(groupId, user.id);
-  if (membership.role !== "admin") {
-    redirect(`/groups/${groupId}/events/${eventId}`);
-  }
+  // メンバーシップ確認
+  await requireGroupMembership(groupId, user.id);
 
   // イベント情報、グループ情報、グループルールを取得
   const [eventResult, groupResult, rulesResult] = await Promise.all([

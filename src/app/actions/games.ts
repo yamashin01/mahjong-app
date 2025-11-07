@@ -20,11 +20,14 @@ export async function createGame(formData: FormData) {
 
   const groupId = formData.get("groupId") as string;
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
-  const playedAt = formData.get("playedAt") as string;
   const eventId = formData.get("eventId") as string | null;
 
-  // 回戦数を自動採番（グループ内の最新の対局記録+1）
-  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId);
+  // 対局日時は現在時刻を使用
+  const playedAt = new Date().toISOString();
+
+  // 回戦数を自動採番
+  // イベントIDがある場合はイベント内、ない場合はグループ内の最新の対局記録+1
+  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId, eventId);
 
   const gameNumber = latestGame ? latestGame.game_number + 1 : 1;
 
@@ -118,10 +121,8 @@ export async function createGame(formData: FormData) {
   // オカなし: 0（開始点 = 返し点の場合も自動的に0になる）
   const okaTotal = rules.oka_enabled ? (rules.return_points - rules.start_points) * 4 : 0;
 
-  // 素点の基準点
-  // オカあり: 返し点を基準とする
-  // オカなし: 開始点を基準とする（開始点 = 返し点なので結果は同じ）
-  const basePoints = rules.oka_enabled ? rules.return_points : rules.start_points;
+  // 素点の基準点（常に返し点を基準とする）
+  const basePoints = rules.return_points;
 
   // 各順位グループのウマとオカを事前計算
   const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];
@@ -172,6 +173,7 @@ export async function createGame(formData: FormData) {
       final_points: player.finalPoints,
       raw_score: rawScore,
       uma,
+      oka,
       rank,
       total_score: totalScore,
       point_amount: pointAmount,

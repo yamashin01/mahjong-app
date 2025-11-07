@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createGame } from "@/app/actions/games";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
@@ -19,7 +19,6 @@ interface GameFormProps {
     oka_enabled: boolean;
     rate: number;
   };
-  defaultDateTime: string;
   members: Array<{ user_id: string; profiles: { display_name: string | null } | null }> | null;
   guestPlayers: Array<{ id: string; name: string }> | null;
   events: Array<{ id: string; name: string; event_date: string }> | null;
@@ -30,7 +29,6 @@ export function GameForm({
   groupId,
   eventId,
   rules,
-  defaultDateTime,
   members,
   guestPlayers,
   events,
@@ -44,6 +42,7 @@ export function GameForm({
   ]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([null, null, null, null]);
 
   const seatNames = ["東", "南", "西", "北"];
   const totalPoints = finalPoints.reduce((sum, points) => sum + points, 0);
@@ -74,9 +73,11 @@ export function GameForm({
     // 成功の場合はリダイレクトされるのでローディング状態を保持
   };
 
-  const handlePointsChange = (index: number, value: number) => {
+  const handlePointsChange = (index: number, valueStr: string) => {
     const newPoints = [...finalPoints];
-    newPoints[index] = value;
+    const value = Number(valueStr);
+    // NaNの場合（"-"のみや空文字など）は0として扱う（表示用のみ）
+    newPoints[index] = Number.isNaN(value) ? 0 : value;
     setFinalPoints(newPoints);
     setError(null);
   };
@@ -146,27 +147,11 @@ export function GameForm({
             </label>
           </div>
         </div>
-
-        {/* 対局日時 */}
-        <div>
-          <label htmlFor="playedAt" className="block text-sm font-medium text-gray-700 mb-2">
-            対局日時 <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="datetime-local"
-            id="playedAt"
-            name="playedAt"
-            required
-            defaultValue={defaultDateTime}
-            className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
-          />
-        </div>
       </div>
 
-      {/* プレイヤー情報 */}
+      {/* プレイヤースコア */}
       <div className="rounded-lg border border-gray-200 p-6 bg-white">
-        <h2 className="text-lg font-semibold mb-6">プレイヤー情報</h2>
-
+        <h2 className="text-lg font-semibold mb-6">プレイヤースコア</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-lg bg-gray-50 p-4 space-y-4">
@@ -216,13 +201,17 @@ export function GameForm({
                   最終持ち点 <span className="text-red-500">*</span>
                 </label>
                 <input
+                  ref={(el) => {
+                    inputRefs.current[i - 1] = el;
+                  }}
                   type="number"
                   id={`player${i}FinalPoints`}
                   name={`player${i}FinalPoints`}
                   required
+                  min="-999900"
                   step="100"
-                  value={finalPoints[i - 1]}
-                  onChange={(e) => handlePointsChange(i - 1, Number(e.target.value))}
+                  defaultValue={finalPoints[i - 1]}
+                  onChange={(e) => handlePointsChange(i - 1, e.target.value)}
                   className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
                 />
               </div>
@@ -257,10 +246,12 @@ export function GameForm({
 
       <div className="rounded-lg bg-yellow-50 p-4">
         <h3 className="font-semibold text-yellow-900 mb-2">注意事項</h3>
-        <ul className="text-sm text-yellow-800 space-y-1">
-          <li>• 4人のプレイヤーをすべて選択してください</li>
-          <li>• 4人の最終持ち点の合計が開始点の合計と一致する必要があります</li>
-          <li>• スコアは自動的に計算されます</li>
+        <ul className="list-disc text-sm text-yellow-800 space-y-1 px-2">
+          <li>4人の最終持ち点の合計が開始点の合計と一致する必要があります</li>
+          <li>席は必ずしも席順通りに保存する必要はありません</li>
+          <li>持ち点がマイナスになった場合は負の数値を入力してください</li>
+          <li>トビ賞や役満賞等のボーナス点は最終持ち点に反映して下さい</li>
+          <li>ウマやオカはシステム側で自動計算されますので、最終持ち点には含めないでください</li>
         </ul>
       </div>
 
