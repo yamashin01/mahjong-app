@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { FiEdit2 } from "react-icons/fi";
 import type { EventRules } from "@/types/event-rules";
 
 interface EventRulesDisplayProps {
@@ -15,12 +17,16 @@ interface EventRulesDisplayProps {
     tobi_prize: number | null;
     yakuman_prize: number | null;
   };
+  groupId: string;
+  eventId: string;
 }
 
-export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayProps) {
-  // イベントにカスタムルールが設定されているかチェック
-  const hasCustomRules = eventRules.game_type !== undefined && eventRules.game_type !== null;
-
+export function EventRulesDisplay({
+  eventRules,
+  groupRules,
+  groupId,
+  eventId,
+}: EventRulesDisplayProps) {
   // 表示用のルールを決定（カスタムルールがあればそれを、なければグループルール）
   const displayRules = {
     game_type: eventRules.game_type ?? groupRules.game_type,
@@ -40,16 +46,15 @@ export function EventRulesDisplay({ eventRules, groupRules }: EventRulesDisplayP
     <div className="rounded-lg border border-gray-200 p-6 bg-white">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">適用ルール</h2>
-        {!hasCustomRules && (
-          <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
-            グループデフォルト
-          </span>
-        )}
-        {hasCustomRules && (
-          <span className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
-            イベント専用ルール
-          </span>
-        )}
+        <Link
+          href={`/groups/${groupId}/events/${eventId}/settings`}
+          className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
+        >
+          {/* デスクトップ: テキスト表示 */}
+          <span className="hidden md:inline">ルール設定</span>
+          {/* モバイル: 鉛筆アイコンのみ */}
+          <FiEdit2 className="md:hidden h-4 w-4" />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -353,16 +353,15 @@ export default async function EventDetailPage({
         </div>
 
         {/* ルール表示 */}
-        <EventRulesDisplay eventRules={eventRules} groupRules={groupRules} />
+        <EventRulesDisplay
+          eventRules={eventRules}
+          groupRules={groupRules}
+          groupId={groupId}
+          eventId={eventId}
+        />
 
         {/* メンバー用操作 */}
         <div className="w-full flex flex-col gap-y-4">
-          <Link
-            href={`/groups/${groupId}/events/${eventId}/settings`}
-            className="rounded-lg w-full bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors text-center"
-          >
-            ルール設定
-          </Link>
           {event.status === "active" && (
             // @ts-expect-error - Next.js 15 Server Actions can return data
             <form action={updateEventStatus}>
