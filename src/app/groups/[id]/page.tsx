@@ -283,12 +283,6 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           )}
         </div>
 
-        {/* 今日のランキング */}
-        <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <h2 className="text-lg font-semibold mb-4">今日のランキング</h2>
-          <RankingSection rankings={rankings || []} />
-        </div>
-
         {/* グループルール */}
         {rules && (
           <div className="rounded-lg border border-gray-200 p-6 bg-white">
