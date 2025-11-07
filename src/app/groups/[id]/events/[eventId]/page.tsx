@@ -28,8 +28,7 @@ export default async function EventDetailPage({
   }
 
   // メンバーシップ確認
-  const membership = await requireGroupMembership(groupId, user.id);
-  const isAdmin = membership.role === "admin";
+  await requireGroupMembership(groupId, user.id);
 
   // イベント情報、グループ情報、グループルールを並列取得
   const [eventResult, groupResult, rulesResult] = await Promise.all([
@@ -99,18 +98,14 @@ export default async function EventDetailPage({
               >
                 {event.status === "active" ? "進行中" : "完了"}
               </span>
-              {isAdmin && <EventActionsMenu eventId={eventId} groupId={groupId} />}
+              <EventActionsMenu eventId={eventId} groupId={groupId} />
             </div>
 
             {/* デスクトップ: 横並びレイアウト */}
             <div className="hidden md:flex md:items-start md:justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  {isAdmin ? (
-                    <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
-                  ) : (
-                    <h1 className="text-3xl font-bold">{event.name}</h1>
-                  )}
+                  <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
                   <span
                     className={`inline-block rounded-full px-3 py-1 text-sm font-medium ${
                       event.status === "active"
@@ -122,20 +117,14 @@ export default async function EventDetailPage({
                   </span>
                 </div>
               </div>
-              {isAdmin && (
-                <div className="ml-4">
-                  <EventActionsMenu eventId={eventId} groupId={groupId} />
-                </div>
-              )}
+              <div className="ml-4">
+                <EventActionsMenu eventId={eventId} groupId={groupId} />
+              </div>
             </div>
 
             {/* モバイル: イベント名を独立表示 */}
             <div className="md:hidden mb-2">
-              {isAdmin ? (
-                <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
-              ) : (
-                <h1 className="text-3xl font-bold">{event.name}</h1>
-              )}
+              <EditEventName eventId={eventId} groupId={groupId} currentName={event.name} />
             </div>
 
             <p className="text-gray-600">
@@ -366,43 +355,41 @@ export default async function EventDetailPage({
         {/* ルール表示 */}
         <EventRulesDisplay eventRules={eventRules} groupRules={groupRules} />
 
-        {/* 管理者用操作 */}
-        {isAdmin && (
-          <div className="w-full flex flex-col gap-y-4">
-            <Link
-              href={`/groups/${groupId}/events/${eventId}/settings`}
-              className="rounded-lg w-full bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors text-center"
-            >
-              ルール設定
-            </Link>
-            {event.status === "active" && (
-              // @ts-expect-error - Next.js 15 Server Actions can return data
-              <form action={updateEventStatus}>
-                <input type="hidden" name="eventId" value={eventId} />
-                <input type="hidden" name="status" value="completed" />
-                <button
-                  type="submit"
-                  className="rounded-lg w-full bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition-colors"
-                >
-                  終了する
-                </button>
-              </form>
-            )}
-            {event.status === "completed" && (
-              // @ts-expect-error - Next.js 15 Server Actions can return data
-              <form action={updateEventStatus}>
-                <input type="hidden" name="eventId" value={eventId} />
-                <input type="hidden" name="status" value="active" />
-                <button
-                  type="submit"
-                  className="rounded-lg w-full bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 transition-colors"
-                >
-                  再開する
-                </button>
-              </form>
-            )}
-          </div>
-        )}
+        {/* メンバー用操作 */}
+        <div className="w-full flex flex-col gap-y-4">
+          <Link
+            href={`/groups/${groupId}/events/${eventId}/settings`}
+            className="rounded-lg w-full bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors text-center"
+          >
+            ルール設定
+          </Link>
+          {event.status === "active" && (
+            // @ts-expect-error - Next.js 15 Server Actions can return data
+            <form action={updateEventStatus}>
+              <input type="hidden" name="eventId" value={eventId} />
+              <input type="hidden" name="status" value="completed" />
+              <button
+                type="submit"
+                className="rounded-lg w-full bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 transition-colors"
+              >
+                終了する
+              </button>
+            </form>
+          )}
+          {event.status === "completed" && (
+            // @ts-expect-error - Next.js 15 Server Actions can return data
+            <form action={updateEventStatus}>
+              <input type="hidden" name="eventId" value={eventId} />
+              <input type="hidden" name="status" value="active" />
+              <button
+                type="submit"
+                className="rounded-lg w-full bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700 transition-colors"
+              >
+                再開する
+              </button>
+            </form>
+          )}
+        </div>
 
         <div className="text-center">
           <Link
