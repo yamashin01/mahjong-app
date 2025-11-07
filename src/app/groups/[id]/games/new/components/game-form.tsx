@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { createGame } from "@/app/actions/games";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 

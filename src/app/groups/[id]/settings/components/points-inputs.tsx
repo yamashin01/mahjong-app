@@ -7,10 +7,7 @@ interface PointsInputsProps {
   defaultOkaEnabled: boolean;
 }
 
-export function PointsInputs({
-  defaultReturnPoints,
-  defaultOkaEnabled,
-}: PointsInputsProps) {
+export function PointsInputs({ defaultReturnPoints, defaultOkaEnabled }: PointsInputsProps) {
   const [returnPoints, setReturnPoints] = useState(defaultReturnPoints);
   const [okaEnabled, setOkaEnabled] = useState(defaultOkaEnabled);
 
@@ -34,7 +31,9 @@ export function PointsInputs({
     <div>
       <label htmlFor="returnPoints" className="block text-sm font-medium text-gray-700 mb-2">
         返し点 <span className="text-red-500">*</span>
-        {!okaEnabled && <span className="ml-2 text-xs text-gray-500">(オカ無効時は使用されません)</span>}
+        {!okaEnabled && (
+          <span className="ml-2 text-xs text-gray-500">(オカ無効時は使用されません)</span>
+        )}
       </label>
       <input
         type="number"

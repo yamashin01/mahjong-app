@@ -6,10 +6,7 @@ import type { GameInsert, GameResultInsert } from "@/types";
  */
 export async function getLatestGameNumber(groupId: string, eventId?: string | null) {
   const supabase = await createClient();
-  let query = supabase
-    .from("games")
-    .select("game_number")
-    .eq("group_id", groupId);
+  let query = supabase.from("games").select("game_number").eq("group_id", groupId);
 
   // イベントIDが指定されている場合は、そのイベント内での最新番号を取得
   if (eventId) {

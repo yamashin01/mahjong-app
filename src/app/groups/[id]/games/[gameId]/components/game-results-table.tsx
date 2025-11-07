@@ -132,7 +132,9 @@ export function GameResultsTable({ results }: GameResultsTableProps) {
               </div>
               <div>
                 <div className="text-xs text-gray-600 mb-1">ポイント</div>
-                <div className={`font-mono font-bold text-lg ${getScoreColor(result.point_amount)}`}>
+                <div
+                  className={`font-mono font-bold text-lg ${getScoreColor(result.point_amount)}`}
+                >
                   {result.point_amount >= 0 ? "+" : ""}
                   {Number(result.point_amount).toLocaleString()}
                 </div>
