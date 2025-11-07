@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { requireAdminRole } from "@/lib/auth/group-access";
+import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as eventsRepo from "@/lib/supabase/repositories/events";
 import { createClient } from "@/lib/supabase/server";
 import type { EventInsert, EventUpdate } from "@/types";
@@ -100,11 +100,11 @@ export async function updateEventStatus(formData: FormData) {
     return { error: "イベントが見つかりません" };
   }
 
-  // 管理者権限チェック
+  // メンバーシップチェック
   try {
-    await requireAdminRole(event.group_id, user.id);
+    await requireGroupMembership(event.group_id, user.id);
   } catch {
-    return { error: "管理者権限がありません" };
+    return { error: "グループメンバーではありません" };
   }
 
   // イベントを更新
@@ -147,11 +147,11 @@ export async function updateEventRules(formData: FormData) {
     return { error: "イベントが見つかりません" };
   }
 
-  // 管理者権限チェック
+  // メンバーシップチェック
   try {
-    await requireAdminRole(eventData.group_id, user.id);
+    await requireGroupMembership(eventData.group_id, user.id);
   } catch {
-    return { error: "管理者権限がありません" };
+    return { error: "グループメンバーではありません" };
   }
 
   // 更新データを構築
@@ -248,11 +248,11 @@ export async function deleteEvent(formData: FormData) {
   const eventId = formData.get("eventId") as string;
   const groupId = formData.get("groupId") as string;
 
-  // 管理者権限チェック
+  // メンバーシップチェック
   try {
-    await requireAdminRole(groupId, user.id);
+    await requireGroupMembership(groupId, user.id);
   } catch {
-    return { error: "管理者権限がありません" };
+    return { error: "グループメンバーではありません" };
   }
 
   // イベントを削除（関連する対局のevent_idはON DELETE SET NULLで自動的にNULLになる）
@@ -282,11 +282,11 @@ export async function updateEventName(formData: FormData) {
   const groupId = formData.get("groupId") as string;
   const name = formData.get("name") as string;
 
-  // 管理者権限チェック
+  // メンバーシップチェック
   try {
-    await requireAdminRole(groupId, user.id);
+    await requireGroupMembership(groupId, user.id);
   } catch {
-    return { error: "管理者権限がありません" };
+    return { error: "グループメンバーではありません" };
   }
 
   // バリデーション

@@ -147,13 +147,11 @@ export function GameForm({
             </label>
           </div>
         </div>
-
       </div>
 
-      {/* プレイヤー情報 */}
+      {/* プレイヤースコア */}
       <div className="rounded-lg border border-gray-200 p-6 bg-white">
-        <h2 className="text-lg font-semibold mb-6">プレイヤー情報</h2>
-
+        <h2 className="text-lg font-semibold mb-6">プレイヤースコア</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="rounded-lg bg-gray-50 p-4 space-y-4">
@@ -248,10 +246,12 @@ export function GameForm({
 
       <div className="rounded-lg bg-yellow-50 p-4">
         <h3 className="font-semibold text-yellow-900 mb-2">注意事項</h3>
-        <ul className="text-sm text-yellow-800 space-y-1">
-          <li>• 4人のプレイヤーをすべて選択してください</li>
-          <li>• 4人の最終持ち点の合計が開始点の合計と一致する必要があります</li>
-          <li>• スコアは自動的に計算されます</li>
+        <ul className="list-disc text-sm text-yellow-800 space-y-1 px-2">
+          <li>4人の最終持ち点の合計が開始点の合計と一致する必要があります</li>
+          <li>席は必ずしも席順通りに保存する必要はありません</li>
+          <li>持ち点がマイナスになった場合は負の数値を入力してください</li>
+          <li>トビ賞や役満賞等のボーナス点は最終持ち点に反映して下さい</li>
+          <li>ウマやオカはシステム側で自動計算されますので、最終持ち点には含めないでください</li>
         </ul>
       </div>
 
