@@ -19,7 +19,7 @@ interface EventRulesDisplayProps {
     yakitori_prize: number | null;
   };
   groupId: string;
-  eventId: string;
+  eventId: string | null;
 }
 
 export function EventRulesDisplay({
@@ -44,12 +44,16 @@ export function EventRulesDisplay({
     yakitori_prize: eventRules.yakitori_prize ?? groupRules.yakitori_prize ?? 0,
   };
 
+  const settingsUrl = eventId
+    ? `/groups/${groupId}/events/${eventId}/settings`
+    : `/groups/${groupId}/settings`;
+
   return (
     <div className="rounded-lg border border-gray-200 p-6 bg-white">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">適用ルール</h2>
         <Link
-          href={`/groups/${groupId}/events/${eventId}/settings`}
+          href={settingsUrl}
           className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
         >
           {/* デスクトップ: テキスト表示 */}
