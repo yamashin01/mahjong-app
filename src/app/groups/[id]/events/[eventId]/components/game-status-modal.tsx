@@ -119,7 +119,7 @@ export function GameStatusModal({ games }: GameStatusModalProps) {
                       }`}
                     >
                       {player.totalPoints >= 0 ? "+" : ""}
-                      {player.totalPoints.toFixed(1)}
+                      {player.totalPoints.toLocaleString()}
                     </div>
                   </div>
 
@@ -180,7 +180,7 @@ export function GameStatusModal({ games }: GameStatusModalProps) {
                           }`}
                         >
                           {player.totalPoints >= 0 ? "+" : ""}
-                          {player.totalPoints.toFixed(1)}
+                          {player.totalPoints.toLocaleString()}
                         </div>
                       </td>
                       <td className="px-3 py-4 whitespace-nowrap text-right">

@@ -196,7 +196,7 @@ export default async function EventDetailPage({
                           }`}
                         >
                           {ranking.totalPoints >= 0 ? "+" : ""}
-                          {ranking.totalPoints.toFixed(1)}
+                          {ranking.totalPoints.toLocaleString()}
                         </div>
                       </div>
 
@@ -288,7 +288,7 @@ export default async function EventDetailPage({
                               }`}
                             >
                               {ranking.totalPoints >= 0 ? "+" : ""}
-                              {ranking.totalPoints.toFixed(1)}
+                              {ranking.totalPoints.toLocaleString()}
                             </div>
                           </td>
                           <td className="px-3 py-4 whitespace-nowrap text-right">

@@ -92,7 +92,8 @@ export function EventRulesDisplay({
             <div className="flex justify-between">
               <span className="text-gray-600">ウマ</span>
               <span className="font-medium">
-                {displayRules.uma_first} / {displayRules.uma_second}
+                {displayRules.uma_first.toLocaleString()} /{" "}
+                {displayRules.uma_second.toLocaleString()}
               </span>
             </div>
             <div className="flex justify-between">
@@ -102,19 +103,21 @@ export function EventRulesDisplay({
             {displayRules.tobi_prize > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">トビ賞</span>
-                <span className="font-medium">{displayRules.tobi_prize}点</span>
+                <span className="font-medium">{displayRules.tobi_prize.toLocaleString()}点</span>
               </div>
             )}
             {displayRules.yakuman_prize > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">役満賞</span>
-                <span className="font-medium">{displayRules.yakuman_prize}点</span>
+                <span className="font-medium">{displayRules.yakuman_prize.toLocaleString()}点</span>
               </div>
             )}
             {displayRules.yakitori_prize > 0 && (
               <div className="flex justify-between">
                 <span className="text-gray-600">ヤキトリ賞</span>
-                <span className="font-medium">{displayRules.yakitori_prize}点</span>
+                <span className="font-medium">
+                  {displayRules.yakitori_prize.toLocaleString()}点
+                </span>
               </div>
             )}
           </div>

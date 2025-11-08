@@ -12,7 +12,6 @@ import { EventsSection } from "./components/events-section";
 import { GuestPlayerActions } from "./components/guest-player-actions";
 import { GuestPlayerForm } from "./components/guest-player-form";
 import { MemberActions } from "./components/member-actions";
-import { RankingSection } from "./components/ranking-section";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -39,24 +38,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // 残りの全データを並列取得（パフォーマンス最適化）
-  const today = new Date().toISOString().split("T")[0];
-
-  const [
-    membersResult,
-    { data: rules },
-    gamesResult,
-    { data: rankings },
-    { data: guestPlayers },
-    eventsResult,
-  ] = await Promise.all([
-    groupsRepo.getGroupMembers(groupId),
-    groupsRepo.getGroupRules(groupId),
-    groupsRepo.getRecentGames({ groupId, limit: 5 }),
-    groupsRepo.getDailyRankings({ groupId, gameDate: today }),
-    groupsRepo.getGroupGuestPlayers(groupId),
-    groupsRepo.getGroupEvents(groupId),
-  ]);
+  const [membersResult, { data: rules }, gamesResult, { data: guestPlayers }, eventsResult] =
+    await Promise.all([
+      groupsRepo.getGroupMembers(groupId),
+      groupsRepo.getGroupRules(groupId),
+      groupsRepo.getRecentGames({ groupId, limit: 5 }),
+      groupsRepo.getGroupGuestPlayers(groupId),
+      groupsRepo.getGroupEvents(groupId),
+    ]);
 
   const { data: events } = eventsResult;
 
