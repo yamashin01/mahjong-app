@@ -55,6 +55,7 @@ export default async function EventSettingsPage({
     rate: event.rate,
     tobi_prize: event.tobi_prize,
     yakuman_prize: event.yakuman_prize,
+    yakitori_prize: event.yakitori_prize,
     top_prize: event.top_prize,
   };
 

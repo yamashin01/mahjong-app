@@ -16,6 +16,7 @@ interface EventRulesDisplayProps {
     rate: number;
     tobi_prize: number | null;
     yakuman_prize: number | null;
+    yakitori_prize: number | null;
   };
   groupId: string;
   eventId: string;
@@ -40,6 +41,7 @@ export function EventRulesDisplay({
     rate: eventRules.rate ?? groupRules.rate,
     tobi_prize: eventRules.tobi_prize ?? groupRules.tobi_prize ?? 0,
     yakuman_prize: eventRules.yakuman_prize ?? groupRules.yakuman_prize ?? 0,
+    yakitori_prize: eventRules.yakitori_prize ?? groupRules.yakitori_prize ?? 0,
   };
 
   return (
@@ -107,6 +109,12 @@ export function EventRulesDisplay({
               <div className="flex justify-between">
                 <span className="text-gray-600">役満賞</span>
                 <span className="font-medium">{displayRules.yakuman_prize}点</span>
+              </div>
+            )}
+            {displayRules.yakitori_prize > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">ヤキトリ賞</span>
+                <span className="font-medium">{displayRules.yakitori_prize}点</span>
               </div>
             )}
           </div>

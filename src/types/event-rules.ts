@@ -17,6 +17,7 @@ export type EventRules = Pick<
   | "rate"
   | "tobi_prize"
   | "yakuman_prize"
+  | "yakitori_prize"
   | "top_prize"
 >;
 
@@ -47,4 +48,5 @@ export interface CreateEventFormData {
   rate?: number;
   tobi_prize?: number;
   yakuman_prize?: number;
+  yakitori_prize?: number;
 }

@@ -43,6 +43,7 @@ export async function updateEventRules(params: {
   rate: number | null;
   tobiPrize: number | null;
   yakumanPrize: number | null;
+  yakitoriPrize: number | null;
   topPrize: number | null;
 }) {
   const supabase = await createClient();
@@ -66,6 +67,7 @@ export async function updateEventRules(params: {
     rate: params.rate,
     tobi_prize: params.tobiPrize,
     yakuman_prize: params.yakumanPrize,
+    yakitori_prize: params.yakitoriPrize,
     top_prize: params.topPrize,
     updated_at: new Date().toISOString(),
   };
