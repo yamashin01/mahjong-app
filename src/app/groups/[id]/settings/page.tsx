@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { updateGroupRules } from "@/app/actions/groups";
 import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
+import { PrizeInputs } from "./components/prize-inputs";
 import { UmaInputs } from "./components/uma-inputs";
 
 export default async function GroupSettingsPage({ params }: { params: Promise<{ id: string }> }) {
@@ -149,6 +150,13 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
 
           {/* ウマ */}
           <UmaInputs defaultFirst={rules.uma_first} defaultSecond={rules.uma_second} />
+
+          {/* 各種賞金 */}
+          <PrizeInputs
+            defaultTobiPrize={rules.tobi_prize || 0}
+            defaultYakumanPrize={rules.yakuman_prize || 0}
+            defaultYakitoriPrize={rules.yakitori_prize || 0}
+          />
 
           <div className="rounded-lg bg-yellow-50 p-4">
             <h3 className="font-semibold text-yellow-900 mb-2">注意事項</h3>

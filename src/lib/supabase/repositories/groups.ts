@@ -98,6 +98,9 @@ export async function updateGroupRules(params: {
   umaSecond: number;
   umaThird: number;
   umaFourth: number;
+  tobiPrize: number | null;
+  yakumanPrize: number | null;
+  yakitoriPrize: number | null;
 }) {
   const supabase = await createClient();
 
@@ -116,6 +119,9 @@ export async function updateGroupRules(params: {
       uma_second: params.umaSecond,
       uma_third: params.umaThird,
       uma_fourth: params.umaFourth,
+      tobi_prize: params.tobiPrize,
+      yakuman_prize: params.yakumanPrize,
+      yakitori_prize: params.yakitoriPrize,
     })
     .eq("group_id", params.groupId);
 }
