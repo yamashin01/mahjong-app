@@ -39,7 +39,7 @@ export async function createGroup(formData: FormData) {
   // トリガーによってgroup_membersとgroup_rulesが自動作成される
 
   revalidatePath("/");
-  redirect(`/groups/${group.id}`);
+  redirect(`/groups/${group.id}/settings`);
 }
 
 export async function joinGroup(formData: FormData) {

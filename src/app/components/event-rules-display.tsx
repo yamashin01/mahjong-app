@@ -54,7 +54,7 @@ export function EventRulesDisplay({
         <h2 className="text-lg font-semibold">適用ルール</h2>
         <Link
           href={settingsUrl}
-          className="flex items-center gap-2 rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
+          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
         >
           {/* デスクトップ: テキスト表示 */}
           <span className="hidden md:inline">ルール設定</span>
