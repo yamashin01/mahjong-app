@@ -5,11 +5,13 @@ type EventsSectionProps = {
   groupId: string;
   events: EventRow[];
   isAdmin: boolean;
+  totalPlayers: number;
 };
 
-export function EventsSection({ groupId, events }: EventsSectionProps) {
+export function EventsSection({ groupId, events, totalPlayers }: EventsSectionProps) {
   const activeEvents = events.filter((e) => e.status === "active");
   const completedEvents = events.filter((e) => e.status === "completed");
+  const hasEnoughPlayers = totalPlayers >= 4;
 
   return (
     <div className="space-y-6">
@@ -20,12 +22,28 @@ export function EventsSection({ groupId, events }: EventsSectionProps) {
 
       {(activeEvents.length > 0 || completedEvents.length > 0) && (
         <div className="w-full items-center text-center">
-          <Link
-            href={`/groups/${groupId}/events/new`}
-            className="block rounded-lg border-2 border-green-500 hover:border-green-600 border-dotted bg-white hover:bg-green-50 p-4 font-semibold text-gray-900 transition-colors"
-          >
-            新規イベント作成
-          </Link>
+          {hasEnoughPlayers ? (
+            <Link
+              href={`/groups/${groupId}/events/new`}
+              className="block rounded-lg border-2 border-green-500 hover:border-green-600 border-dotted bg-white hover:bg-green-50 p-4 font-semibold text-gray-900 transition-colors"
+            >
+              新規イベント作成
+            </Link>
+          ) : (
+            <div className="space-y-2">
+              <button
+                type="button"
+                disabled
+                className="block w-full rounded-lg border-2 border-gray-300 border-dotted bg-gray-100 p-4 font-semibold text-gray-400 cursor-not-allowed"
+              >
+                新規イベント作成
+              </button>
+              <p className="text-xs text-red-600">
+                イベントを作成するには、メンバーまたはゲストを合わせて4人以上必要です（現在
+                {totalPlayers}人）
+              </p>
+            </div>
+          )}
         </div>
       )}
 
@@ -109,12 +127,28 @@ export function EventsSection({ groupId, events }: EventsSectionProps) {
                 大会や合宿などのイベントを作成して、対局記録をまとめましょう
               </p>
             </div>
-            <Link
-              href={`/groups/${groupId}/events/new`}
-              className="inline-block rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700 transition-colors"
-            >
-              最初のイベントを作成
-            </Link>
+            {hasEnoughPlayers ? (
+              <Link
+                href={`/groups/${groupId}/events/new`}
+                className="inline-block rounded-lg bg-green-600 px-6 py-3 text-white hover:bg-green-700 transition-colors"
+              >
+                最初のイベントを作成
+              </Link>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  disabled
+                  className="inline-block rounded-lg bg-gray-400 px-6 py-3 text-white cursor-not-allowed"
+                >
+                  最初のイベントを作成
+                </button>
+                <p className="text-xs text-red-600">
+                  イベントを作成するには、メンバーまたはゲストを合わせて4人以上必要です（現在
+                  {totalPlayers}人）
+                </p>
+              </div>
+            )}
           </div>
         </div>
       )}

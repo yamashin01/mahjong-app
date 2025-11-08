@@ -63,6 +63,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
   const isAdmin = membership.role === "admin";
 
+  // 総プレイヤー数（メンバー + ゲスト）
+  const totalPlayers = (members?.length || 0) + (guestPlayers?.length || 0);
+  const hasEnoughPlayers = totalPlayers >= 4;
+
   return (
     <main className="min-h-screen p-8">
       <div className="mx-auto max-w-4xl space-y-8">
@@ -214,7 +218,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
         {/* イベント */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <EventsSection groupId={groupId} events={events || []} isAdmin={isAdmin} />
+          <EventsSection
+            groupId={groupId}
+            events={events || []}
+            isAdmin={isAdmin}
+            totalPlayers={totalPlayers}
+          />
         </div>
 
         {/* 対局記録 */}
@@ -223,12 +232,29 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             <h2 className="text-lg font-semibold">対局記録</h2>
           </div>
           <div className="w-full my-4">
-            <Link
-              href={`/groups/${groupId}/games/new`}
-              className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-center text-gray-800 hover:bg-gray-200 transition-colors"
-            >
-              新規対局を記録
-            </Link>
+            {hasEnoughPlayers ? (
+              <Link
+                href={`/groups/${groupId}/games/new`}
+                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-center text-gray-800 hover:bg-gray-200 transition-colors"
+              >
+                新規対局を記録
+              </Link>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  disabled
+                  className="block w-full rounded-lg bg-gray-300 px-4 py-2 text-sm text-center text-gray-500 cursor-not-allowed"
+                >
+                  新規対局を記録
+                </button>
+                <p className="text-xs text-red-600 text-center">
+                  対局を記録するには、メンバーまたはゲストを合わせて4人以上必要です（現在
+                  {totalPlayers}
+                  人）
+                </p>
+              </div>
+            )}
           </div>
 
           {recentGames && recentGames.length > 0 ? (
