@@ -113,7 +113,7 @@ export type FlexiblePlayerData = {
 export type ServerActionResult =
   | { error: string; success?: never }
   | { success: true; error?: never }
-  | void;
+  | undefined;
 
 /**
  * Server Action type for forms
