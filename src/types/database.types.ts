@@ -30,6 +30,7 @@ export type Database = {
           uma_second: number | null;
           uma_third: number | null;
           updated_at: string;
+          yakitori_prize: number | null;
           yakuman_prize: number | null;
         };
         Insert: {
@@ -53,6 +54,7 @@ export type Database = {
           uma_second?: number | null;
           uma_third?: number | null;
           updated_at?: string;
+          yakitori_prize?: number | null;
           yakuman_prize?: number | null;
         };
         Update: {
@@ -76,6 +78,7 @@ export type Database = {
           uma_second?: number | null;
           uma_third?: number | null;
           updated_at?: string;
+          yakitori_prize?: number | null;
           yakuman_prize?: number | null;
         };
         Relationships: [
@@ -302,6 +305,7 @@ export type Database = {
           uma_second: number;
           uma_third: number;
           updated_at: string;
+          yakitori_prize: number | null;
           yakuman_prize: number | null;
         };
         Insert: {
@@ -320,6 +324,7 @@ export type Database = {
           uma_second?: number;
           uma_third?: number;
           updated_at?: string;
+          yakitori_prize?: number | null;
           yakuman_prize?: number | null;
         };
         Update: {
@@ -338,6 +343,7 @@ export type Database = {
           uma_second?: number;
           uma_third?: number;
           updated_at?: string;
+          yakitori_prize?: number | null;
           yakuman_prize?: number | null;
         };
         Relationships: [

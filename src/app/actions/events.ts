@@ -171,6 +171,7 @@ export async function updateEventRules(formData: FormData) {
     const rate = formData.get("rate");
     const tobiPrize = formData.get("tobi_prize");
     const yakumanPrize = formData.get("yakuman_prize");
+    const yakitoriPrize = formData.get("yakitori_prize");
 
     updateData.game_type = gameType || null;
     updateData.start_points = startPoints ? Number(startPoints) : null;
@@ -182,6 +183,7 @@ export async function updateEventRules(formData: FormData) {
     updateData.rate = rate ? Number(rate) : null;
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;
+    updateData.yakitori_prize = yakitoriPrize ? Number(yakitoriPrize) : null;
     updateData.top_prize = null;
 
     // バリデーション: 返し点は開始点以上である必要がある
@@ -204,6 +206,7 @@ export async function updateEventRules(formData: FormData) {
     updateData.rate = null;
     updateData.tobi_prize = null;
     updateData.yakuman_prize = null;
+    updateData.yakitori_prize = null;
     updateData.top_prize = null;
   }
 
@@ -220,6 +223,7 @@ export async function updateEventRules(formData: FormData) {
     rate: updateData.rate,
     tobiPrize: updateData.tobi_prize,
     yakumanPrize: updateData.yakuman_prize,
+    yakitoriPrize: updateData.yakitori_prize,
     topPrize: updateData.top_prize,
   });
 

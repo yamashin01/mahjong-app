@@ -118,7 +118,7 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
             <span className="text-sm text-gray-600">ウマ</span>
             <span className={`font-mono font-medium text-lg ${getScoreColor(result.uma)}`}>
               {result.uma >= 0 ? "+" : ""}
-              {result.uma}
+              {result.uma.toLocaleString()}
             </span>
           </div>
 
@@ -127,7 +127,7 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
               <span className="text-sm text-gray-600">オカ</span>
               <span className={`font-mono font-medium text-lg ${getScoreColor(result.oka)}`}>
                 {result.oka >= 0 ? "+" : ""}
-                {result.oka}
+                {result.oka.toLocaleString()}
               </span>
             </div>
           )}
@@ -136,7 +136,7 @@ export function PlayerDetailModal({ result, isOpen, onClose }: PlayerDetailModal
             <span className="text-sm text-gray-600">スコア</span>
             <span className={`font-mono font-bold text-lg ${getScoreColor(result.total_score)}`}>
               {result.total_score >= 0 ? "+" : ""}
-              {Number(result.total_score)}
+              {Number(result.total_score).toLocaleString()}
             </span>
           </div>
 

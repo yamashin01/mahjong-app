@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef } from "react";
+import { useRef, useState } from "react";
 import { createGame } from "@/app/actions/games";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 
@@ -53,6 +53,26 @@ export function GameForm({
     e.preventDefault();
     setError(null);
 
+    const formData = new FormData(e.currentTarget);
+
+    // プレイヤー重複チェック
+    const players = [
+      formData.get("player1Id"),
+      formData.get("player2Id"),
+      formData.get("player3Id"),
+      formData.get("player4Id"),
+    ];
+
+    // 空でないプレイヤーを抽出
+    const selectedPlayers = players.filter((p) => p && p !== "");
+
+    // 重複チェック
+    const uniquePlayers = new Set(selectedPlayers);
+    if (selectedPlayers.length !== uniquePlayers.size) {
+      setError("同じプレイヤーが複数選択されています。異なるプレイヤーを選択してください。");
+      return;
+    }
+
     // 合計点のチェック
     if (!isValidTotal) {
       setError(
@@ -63,7 +83,6 @@ export function GameForm({
 
     setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
     const result = await createGame(formData);
 
     if (result?.error) {

@@ -39,7 +39,7 @@ export async function createGroup(formData: FormData) {
   // トリガーによってgroup_membersとgroup_rulesが自動作成される
 
   revalidatePath("/");
-  redirect(`/groups/${group.id}`);
+  redirect(`/groups/${group.id}/settings`);
 }
 
 export async function joinGroup(formData: FormData) {
@@ -207,6 +207,15 @@ export async function updateGroupRules(formData: FormData) {
   const umaSecond = Number.parseInt(formData.get("umaSecond") as string, 10);
   const umaThird = Number.parseInt(formData.get("umaThird") as string, 10);
   const umaFourth = Number.parseInt(formData.get("umaFourth") as string, 10);
+  const tobiPrize = formData.get("tobiPrize")
+    ? Number.parseInt(formData.get("tobiPrize") as string, 10)
+    : null;
+  const yakumanPrize = formData.get("yakumanPrize")
+    ? Number.parseInt(formData.get("yakumanPrize") as string, 10)
+    : null;
+  const yakitoriPrize = formData.get("yakitoriPrize")
+    ? Number.parseInt(formData.get("yakitoriPrize") as string, 10)
+    : null;
 
   // バリデーション
   if (startPoints <= 0 || returnPoints <= 0 || rate <= 0) {
@@ -229,6 +238,9 @@ export async function updateGroupRules(formData: FormData) {
     umaSecond,
     umaThird,
     umaFourth,
+    tobiPrize,
+    yakumanPrize,
+    yakitoriPrize,
   });
 
   if (updateError) {

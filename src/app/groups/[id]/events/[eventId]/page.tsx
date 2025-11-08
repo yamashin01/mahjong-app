@@ -9,6 +9,8 @@ import { getPlayerDisplayName } from "@/lib/utils/player";
 import type { EventRules } from "@/types/event-rules";
 import { EditEventName } from "./components/edit-event-name";
 import { EventActionsMenu } from "./components/event-actions-menu";
+import { GameStatusModal } from "./components/game-status-modal";
+import { PlayerGamesModal } from "./components/player-games-modal";
 
 export default async function EventDetailPage({
   params,
@@ -58,6 +60,7 @@ export default async function EventDetailPage({
     rate: event.rate,
     tobi_prize: event.tobi_prize,
     yakuman_prize: event.yakuman_prize,
+    yakitori_prize: event.yakitori_prize,
     top_prize: event.top_prize,
   };
 
@@ -132,6 +135,9 @@ export default async function EventDetailPage({
             </p>
             {event.description && <p className="text-gray-700 mt-2">{event.description}</p>}
           </div>
+          {event.status === "active" && games && games.length > 0 && (
+            <GameStatusModal games={games} />
+          )}
         </div>
 
         {/* イベント最終結果（完了時のみ表示） */}
@@ -153,56 +159,63 @@ export default async function EventDetailPage({
                     eventRankings[index + 1].totalPoints === ranking.totalPoints);
 
                 return (
-                  <div
+                  <PlayerGamesModal
                     key={ranking.playerId || ranking.guestPlayerId}
-                    className="rounded-lg border border-gray-200 p-4 bg-gray-50"
+                    playerName={ranking.displayName}
+                    playerId={ranking.playerId}
+                    guestPlayerId={ranking.guestPlayerId}
+                    eventId={eventId}
                   >
-                    {/* 順位とプレイヤー名 */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        {ranking.rank === 1 && <span className="text-3xl">🥇</span>}
-                        {ranking.rank === 2 && <span className="text-3xl">🥈</span>}
-                        {ranking.rank === 3 && <span className="text-3xl">🥉</span>}
-                        {ranking.rank > 3 && (
-                          <span className="text-lg font-bold text-gray-700">{ranking.rank}位</span>
-                        )}
-                        {showTieIndicator && (
-                          <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
-                            同点
-                          </span>
-                        )}
+                    <div className="rounded-lg border border-gray-200 p-4 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
+                      {/* 順位とプレイヤー名 */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          {ranking.rank === 1 && <span className="text-3xl">🥇</span>}
+                          {ranking.rank === 2 && <span className="text-3xl">🥈</span>}
+                          {ranking.rank === 3 && <span className="text-3xl">🥉</span>}
+                          {ranking.rank > 3 && (
+                            <span className="text-lg font-bold text-gray-700">
+                              {ranking.rank}位
+                            </span>
+                          )}
+                          {showTieIndicator && (
+                            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                              同点
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-lg font-bold text-gray-900">{ranking.displayName}</div>
                       </div>
-                      <div className="text-lg font-bold text-gray-900">{ranking.displayName}</div>
-                    </div>
 
-                    {/* 合計ポイント（大きく表示） */}
-                    <div className="mb-3 text-center py-2 bg-white rounded-md">
-                      <div className="text-xs text-gray-500 mb-1">合計ポイント</div>
-                      <div
-                        className={`text-2xl font-bold ${
-                          ranking.totalPoints >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {ranking.totalPoints >= 0 ? "+" : ""}
-                        {ranking.totalPoints.toFixed(1)}
+                      {/* 合計ポイント（大きく表示） */}
+                      <div className="mb-3 text-center py-2 bg-white rounded-md">
+                        <div className="text-xs text-gray-500 mb-1">合計ポイント</div>
+                        <div
+                          className={`text-2xl font-bold ${
+                            ranking.totalPoints >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {ranking.totalPoints >= 0 ? "+" : ""}
+                          {ranking.totalPoints.toLocaleString()}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* 統計情報 */}
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="bg-white rounded-md p-2 text-center">
-                        <div className="text-xs text-gray-500">対局数</div>
-                        <div className="font-semibold text-gray-900">{ranking.gamesPlayed}</div>
-                      </div>
-                      <div className="bg-white rounded-md p-2 text-center">
-                        <div className="text-xs text-gray-500">順位分布</div>
-                        <div className="font-semibold text-gray-900 text-xs">
-                          {ranking.firstPlaceCount}-{ranking.secondPlaceCount}-
-                          {ranking.thirdPlaceCount}-{ranking.fourthPlaceCount}
+                      {/* 統計情報 */}
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="bg-white rounded-md p-2 text-center">
+                          <div className="text-xs text-gray-500">対局数</div>
+                          <div className="font-semibold text-gray-900">{ranking.gamesPlayed}</div>
+                        </div>
+                        <div className="bg-white rounded-md p-2 text-center">
+                          <div className="text-xs text-gray-500">順位分布</div>
+                          <div className="font-semibold text-gray-900 text-xs">
+                            {ranking.firstPlaceCount}-{ranking.secondPlaceCount}-
+                            {ranking.thirdPlaceCount}-{ranking.fourthPlaceCount}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </PlayerGamesModal>
                 );
               })}
             </div>
@@ -240,50 +253,55 @@ export default async function EventDetailPage({
                         eventRankings[index + 1].totalPoints === ranking.totalPoints);
 
                     return (
-                      <tr
+                      <PlayerGamesModal
                         key={ranking.playerId || ranking.guestPlayerId}
-                        className="hover:bg-gray-50"
+                        playerName={ranking.displayName}
+                        playerId={ranking.playerId}
+                        guestPlayerId={ranking.guestPlayerId}
+                        eventId={eventId}
                       >
-                        <td className="px-3 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            {ranking.rank === 1 && <span className="text-2xl mr-2">🥇</span>}
-                            {ranking.rank === 2 && <span className="text-2xl mr-2">🥈</span>}
-                            {ranking.rank === 3 && <span className="text-2xl mr-2">🥉</span>}
-                            <span className="text-sm font-medium text-gray-900">
-                              {ranking.rank}位
-                            </span>
-                            {showTieIndicator && (
-                              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">
-                                同点
+                        <tr className="hover:bg-gray-50 cursor-pointer">
+                          <td className="px-3 py-4 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {ranking.rank === 1 && <span className="text-2xl mr-2">🥇</span>}
+                              {ranking.rank === 2 && <span className="text-2xl mr-2">🥈</span>}
+                              {ranking.rank === 3 && <span className="text-2xl mr-2">🥉</span>}
+                              <span className="text-sm font-medium text-gray-900">
+                                {ranking.rank}位
                               </span>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-3 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
-                            {ranking.displayName}
-                          </div>
-                        </td>
-                        <td className="px-3 py-4 whitespace-nowrap text-right">
-                          <div
-                            className={`text-sm font-semibold ${
-                              ranking.totalPoints >= 0 ? "text-green-600" : "text-red-600"
-                            }`}
-                          >
-                            {ranking.totalPoints >= 0 ? "+" : ""}
-                            {ranking.totalPoints.toFixed(1)}
-                          </div>
-                        </td>
-                        <td className="px-3 py-4 whitespace-nowrap text-right">
-                          <div className="text-sm text-gray-900">{ranking.gamesPlayed}</div>
-                        </td>
-                        <td className="px-3 py-4 whitespace-nowrap text-center">
-                          <div className="text-sm text-gray-900">
-                            {ranking.firstPlaceCount}-{ranking.secondPlaceCount}-
-                            {ranking.thirdPlaceCount}-{ranking.fourthPlaceCount}
-                          </div>
-                        </td>
-                      </tr>
+                              {showTieIndicator && (
+                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">
+                                  同点
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-3 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {ranking.displayName}
+                            </div>
+                          </td>
+                          <td className="px-3 py-4 whitespace-nowrap text-right">
+                            <div
+                              className={`text-sm font-semibold ${
+                                ranking.totalPoints >= 0 ? "text-green-600" : "text-red-600"
+                              }`}
+                            >
+                              {ranking.totalPoints >= 0 ? "+" : ""}
+                              {ranking.totalPoints.toLocaleString()}
+                            </div>
+                          </td>
+                          <td className="px-3 py-4 whitespace-nowrap text-right">
+                            <div className="text-sm text-gray-900">{ranking.gamesPlayed}</div>
+                          </td>
+                          <td className="px-3 py-4 whitespace-nowrap text-center">
+                            <div className="text-sm text-gray-900">
+                              {ranking.firstPlaceCount}-{ranking.secondPlaceCount}-
+                              {ranking.thirdPlaceCount}-{ranking.fourthPlaceCount}
+                            </div>
+                          </td>
+                        </tr>
+                      </PlayerGamesModal>
                     );
                   })}
                 </tbody>
@@ -297,11 +315,11 @@ export default async function EventDetailPage({
           <div className="mb-4">
             <h2 className="text-lg font-semibold">対局記録</h2>
           </div>
-          <div className="items-center text-center mb-4">
+          <div className="mb-4">
             {event.status === "active" && (
               <Link
                 href={`/groups/${groupId}/games/new?eventId=${eventId}`}
-                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors"
+                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-gray-800 text-center hover:bg-gray-200 transition-colors"
               >
                 対局記録を追加
               </Link>
@@ -353,16 +371,15 @@ export default async function EventDetailPage({
         </div>
 
         {/* ルール表示 */}
-        <EventRulesDisplay eventRules={eventRules} groupRules={groupRules} />
+        <EventRulesDisplay
+          eventRules={eventRules}
+          groupRules={groupRules}
+          groupId={groupId}
+          eventId={eventId}
+        />
 
         {/* メンバー用操作 */}
         <div className="w-full flex flex-col gap-y-4">
-          <Link
-            href={`/groups/${groupId}/events/${eventId}/settings`}
-            className="rounded-lg w-full bg-gray-100 px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 transition-colors text-center"
-          >
-            ルール設定
-          </Link>
           {event.status === "active" && (
             // @ts-expect-error - Next.js 15 Server Actions can return data
             <form action={updateEventStatus}>

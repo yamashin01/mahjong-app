@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { GoPerson } from "react-icons/go";
+import { EventRulesDisplay } from "@/app/components/event-rules-display";
 import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
@@ -12,7 +13,6 @@ import { EventsSection } from "./components/events-section";
 import { GuestPlayerActions } from "./components/guest-player-actions";
 import { GuestPlayerForm } from "./components/guest-player-form";
 import { MemberActions } from "./components/member-actions";
-import { RankingSection } from "./components/ranking-section";
 
 export default async function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const groupId: string = (await params).id;
@@ -39,24 +39,14 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
     notFound();
   }
 
-  // 残りの全データを並列取得（パフォーマンス最適化）
-  const today = new Date().toISOString().split("T")[0];
-
-  const [
-    membersResult,
-    { data: rules },
-    gamesResult,
-    { data: rankings },
-    { data: guestPlayers },
-    eventsResult,
-  ] = await Promise.all([
-    groupsRepo.getGroupMembers(groupId),
-    groupsRepo.getGroupRules(groupId),
-    groupsRepo.getRecentGames({ groupId, limit: 5 }),
-    groupsRepo.getDailyRankings({ groupId, gameDate: today }),
-    groupsRepo.getGroupGuestPlayers(groupId),
-    groupsRepo.getGroupEvents(groupId),
-  ]);
+  const [membersResult, { data: rules }, gamesResult, { data: guestPlayers }, eventsResult] =
+    await Promise.all([
+      groupsRepo.getGroupMembers(groupId),
+      groupsRepo.getGroupRules(groupId),
+      groupsRepo.getRecentGames({ groupId, limit: 5 }),
+      groupsRepo.getGroupGuestPlayers(groupId),
+      groupsRepo.getGroupEvents(groupId),
+    ]);
 
   const { data: events } = eventsResult;
 
@@ -72,6 +62,10 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
   }
 
   const isAdmin = membership.role === "admin";
+
+  // 総プレイヤー数（メンバー + ゲスト）
+  const totalPlayers = (members?.length || 0) + (guestPlayers?.length || 0);
+  const hasEnoughPlayers = totalPlayers >= 4;
 
   return (
     <main className="min-h-screen p-8">
@@ -224,7 +218,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
 
         {/* イベント */}
         <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <EventsSection groupId={groupId} events={events || []} isAdmin={isAdmin} />
+          <EventsSection
+            groupId={groupId}
+            events={events || []}
+            isAdmin={isAdmin}
+            totalPlayers={totalPlayers}
+          />
         </div>
 
         {/* 対局記録 */}
@@ -233,12 +232,29 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             <h2 className="text-lg font-semibold">対局記録</h2>
           </div>
           <div className="w-full my-4">
-            <Link
-              href={`/groups/${groupId}/games/new`}
-              className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-center text-gray-800 hover:bg-gray-200 transition-colors"
-            >
-              新規対局を記録
-            </Link>
+            {hasEnoughPlayers ? (
+              <Link
+                href={`/groups/${groupId}/games/new`}
+                className="block w-full rounded-lg bg-gray-100 px-4 py-2 text-sm text-center text-gray-800 hover:bg-gray-200 transition-colors"
+              >
+                新規対局を記録
+              </Link>
+            ) : (
+              <div className="space-y-2">
+                <button
+                  type="button"
+                  disabled
+                  className="block w-full rounded-lg bg-gray-300 px-4 py-2 text-sm text-center text-gray-500 cursor-not-allowed"
+                >
+                  新規対局を記録
+                </button>
+                <p className="text-xs text-red-600 text-center">
+                  対局を記録するには、メンバーまたはゲストを合わせて4人以上必要です（現在
+                  {totalPlayers}
+                  人）
+                </p>
+              </div>
+            )}
           </div>
 
           {recentGames && recentGames.length > 0 ? (
@@ -283,53 +299,28 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           )}
         </div>
 
-        {/* 今日のランキング */}
-        <div className="rounded-lg border border-gray-200 p-6 bg-white">
-          <h2 className="text-lg font-semibold mb-4">今日のランキング</h2>
-          <RankingSection rankings={rankings || []} />
-        </div>
-
         {/* グループルール */}
         {rules && (
-          <div className="rounded-lg border border-gray-200 p-6 bg-white">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">グループルール</h2>
-              {isAdmin && (
-                <Link
-                  href={`/groups/${groupId}/settings`}
-                  className="text-blue-600 hover:text-blue-700 hover:underline text-sm"
-                >
-                  設定を変更
-                </Link>
-              )}
-            </div>
-            <dl className="grid grid-cols-2 gap-4">
-              <div>
-                <dt className="text-sm text-gray-600">対局種別</dt>
-                <dd className="font-medium">
-                  {rules.game_type === "tonpuu" ? "東風戦" : "東南戦"}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm text-gray-600">開始点</dt>
-                <dd className="font-medium">{rules.start_points.toLocaleString()}点</dd>
-              </div>
-              <div>
-                <dt className="text-sm text-gray-600">返し点</dt>
-                <dd className="font-medium">{rules.return_points.toLocaleString()}点</dd>
-              </div>
-              <div>
-                <dt className="text-sm text-gray-600">レート</dt>
-                <dd className="font-medium">{rules.rate}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-sm text-gray-600">ウマ</dt>
-                <dd className="font-medium">
-                  {rules.uma_first} / {rules.uma_second}
-                </dd>
-              </div>
-            </dl>
-          </div>
+          <EventRulesDisplay
+            eventRules={{
+              game_type: null,
+              start_points: null,
+              return_points: null,
+              uma_first: null,
+              uma_second: null,
+              uma_third: null,
+              uma_fourth: null,
+              oka_enabled: null,
+              rate: null,
+              tobi_prize: null,
+              yakuman_prize: null,
+              yakitori_prize: null,
+              top_prize: null,
+            }}
+            groupRules={rules}
+            groupId={groupId}
+            eventId=""
+          />
         )}
 
         <div className="text-center">

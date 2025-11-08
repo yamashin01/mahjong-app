@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 import { uploadAvatar } from "@/app/actions/profile";
 
 interface AvatarUploadProps {
