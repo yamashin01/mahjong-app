@@ -36,13 +36,7 @@ export function EditAllGameResults({
 }: EditAllGameResultsProps) {
   const [open, setOpen] = useState(false);
   const [finalPoints, setFinalPoints] = useState<Record<string, number>>(
-    results.reduce(
-      (acc, result) => ({
-        ...acc,
-        [result.id]: result.finalPoints,
-      }),
-      {},
-    ),
+    Object.fromEntries(results.map((result) => [result.id, result.finalPoints])),
   );
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -99,15 +93,7 @@ export function EditAllGameResults({
   };
 
   const handleCancel = () => {
-    setFinalPoints(
-      results.reduce(
-        (acc, result) => ({
-          ...acc,
-          [result.id]: result.finalPoints,
-        }),
-        {},
-      ),
-    );
+    setFinalPoints(Object.fromEntries(results.map((result) => [result.id, result.finalPoints])));
     setError(null);
     setOpen(false);
   };

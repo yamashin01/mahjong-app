@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { EventInsert, EventRow, EventUpdate } from "@/types";
+import type { EventInsert, EventUpdate } from "@/types";
 
 /**
  * イベントを作成する
