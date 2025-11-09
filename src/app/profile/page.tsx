@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
-import AvatarUpload from "@/app/components/AvatarUpload";
+import AvatarUpload from "@/app/components/avatar-upload";
 import * as profileRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 

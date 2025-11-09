@@ -6,6 +6,7 @@ import * as eventsRepo from "@/lib/supabase/repositories/events";
 import * as gamesRepo from "@/lib/supabase/repositories/games";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
 import { createClient } from "@/lib/supabase/server";
+import { calculatePlayerRanks, calculateUmaAndOka } from "@/lib/utils/game-calculations";
 
 export async function createGame(formData: FormData) {
   const supabase = await createClient();
@@ -77,75 +78,16 @@ export async function createGame(formData: FormData) {
   }
 
   // 順位を計算（点数の降順、同点の場合は同順位）
-  const sortedPlayers = [...players].sort((a, b) => b.finalPoints - a.finalPoints);
-
-  // 同点処理を含む順位付け
-  const playerRanks = new Map<string, number>();
-  const rankGroups: { rank: number; players: typeof sortedPlayers; points: number }[] = [];
-
-  let currentRank = 1;
-  let i = 0;
-
-  while (i < sortedPlayers.length) {
-    const currentPoints = sortedPlayers[i].finalPoints;
-    const group = [sortedPlayers[i]];
-
-    // 同点のプレイヤーを探す
-    let j = i + 1;
-    while (j < sortedPlayers.length && sortedPlayers[j].finalPoints === currentPoints) {
-      group.push(sortedPlayers[j]);
-      j++;
-    }
-
-    // このグループの全員に同じ順位を割り当て
-    for (const player of group) {
-      playerRanks.set(player.playerId, currentRank);
-    }
-
-    rankGroups.push({
-      rank: currentRank,
-      players: group,
-      points: currentPoints,
-    });
-
-    // 次の順位は同点人数分スキップ
-    currentRank += group.length;
-    i = j;
-  }
+  const { rankGroups, playerRanks } = calculatePlayerRanks(players);
 
   // 座席を自動割り当て
   const seats = ["east", "south", "west", "north"];
-
-  // オカの計算
-  // オカあり: 全員分の (返し点 - 開始点) の合計
-  // オカなし: 0（開始点 = 返し点の場合も自動的に0になる）
-  const okaTotal = rules.oka_enabled ? (rules.return_points - rules.start_points) * 4 : 0;
 
   // 素点の基準点（常に返し点を基準とする）
   const basePoints = rules.return_points;
 
   // 各順位グループのウマとオカを事前計算
-  const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];
-  const groupUmaOka = new Map<number, { uma: number; oka: number }>();
-
-  for (const group of rankGroups) {
-    const groupSize = group.players.length;
-    const startRankIndex = group.rank - 1; // 0-indexed
-
-    // このグループが獲得するウマの合計を計算
-    let totalUma = 0;
-    for (let k = 0; k < groupSize && startRankIndex + k < 4; k++) {
-      totalUma += umaValues[startRankIndex + k];
-    }
-
-    // ウマを均等分割（整数に丸める）
-    const averageUma = Math.round(totalUma / groupSize);
-
-    // オカは1位グループのみに配分（均等分割、整数に丸める）
-    const averageOka = group.rank === 1 ? Math.round(okaTotal / groupSize) : 0;
-
-    groupUmaOka.set(group.rank, { uma: averageUma, oka: averageOka });
-  }
+  const groupUmaOka = calculateUmaAndOka(rankGroups, rules);
 
   // 各プレイヤーのスコアを計算
   const results = players.map((player, index) => {
