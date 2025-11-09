@@ -93,7 +93,7 @@ export default async function GameDetailPage({
               yakumanCount={game.yakuman_count ?? 0}
             />
           </div>
-          <dl className="grid grid-cols-2 gap-4">
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <dt className="text-sm text-gray-600">対局種別</dt>
               <dd className="font-medium">{game.game_type === "tonpuu" ? "東風戦" : "東南戦"}</dd>
@@ -114,16 +114,6 @@ export default async function GameDetailPage({
                 })}
               </dd>
             </div>
-            <div>
-              <dt className="text-sm text-gray-600">役満回数</dt>
-              <dd className="font-medium">{game.yakuman_count}回</dd>
-            </div>
-            {tobiPlayerName && (
-              <div className="col-span-2">
-                <dt className="text-sm text-gray-600">トビ</dt>
-                <dd className="font-medium">{tobiPlayerName || "名前未設定"}</dd>
-              </div>
-            )}
           </dl>
         </div>
 

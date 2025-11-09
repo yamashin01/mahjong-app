@@ -116,22 +116,6 @@ export function EditGameInfo({
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="yakumanCount" className="text-sm font-medium">
-                役満回数
-              </label>
-              <input
-                id="yakumanCount"
-                type="number"
-                min="0"
-                value={yakumanCount}
-                onChange={(e) => setYakumanCount(Number(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading}
-                required
-              />
-            </div>
-
             {error && <p className="text-sm text-red-600">{error}</p>}
           </div>
           <DialogFooter>
