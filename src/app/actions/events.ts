@@ -23,6 +23,13 @@ export async function createEvent(formData: FormData) {
   const description = formData.get("description") as string;
   const eventDate = formData.get("eventDate") as string;
 
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみがイベントを作成できます" };
+  }
+
   // カスタムルール設定
   const useCustomRulesValues = formData.getAll("useCustomRules");
   const useCustomRules = useCustomRulesValues.includes("true");
@@ -56,16 +63,39 @@ export async function createEvent(formData: FormData) {
     const topPrize = formData.get("top_prize");
 
     if (gameType) eventData.game_type = gameType;
-    if (startPoints) eventData.start_points = Number(startPoints);
-    if (returnPoints) eventData.return_points = Number(returnPoints);
+    if (startPoints) {
+      const points = Number(startPoints);
+      if (points <= 0 || points > 100000) {
+        return { error: "開始点は1〜100,000の範囲で入力してください" };
+      }
+      eventData.start_points = points;
+    }
+    if (returnPoints) {
+      const points = Number(returnPoints);
+      if (points <= 0 || points > 100000) {
+        return { error: "返し点は1〜100,000の範囲で入力してください" };
+      }
+      eventData.return_points = points;
+    }
     if (umaFirst) eventData.uma_first = Number(umaFirst);
     if (umaSecond) eventData.uma_second = Number(umaSecond);
     if (umaThird) eventData.uma_third = Number(umaThird);
     if (umaFourth) eventData.uma_fourth = Number(umaFourth);
-    if (rate) eventData.rate = Number(rate);
+    if (rate) {
+      const r = Number(rate);
+      if (r <= 0 || r > 10) {
+        return { error: "レートは0より大きく10以下で入力してください" };
+      }
+      eventData.rate = r;
+    }
     if (tobiPrize) eventData.tobi_prize = Number(tobiPrize);
     if (yakumanPrize) eventData.yakuman_prize = Number(yakumanPrize);
     if (topPrize) eventData.top_prize = Number(topPrize);
+
+    // 返し点は開始点以上である必要がある
+    if (eventData.return_points && eventData.start_points && eventData.return_points < eventData.start_points) {
+      return { error: "返し点は開始点以上である必要があります" };
+    }
   }
 
   // イベントを作成
@@ -174,13 +204,42 @@ export async function updateEventRules(formData: FormData) {
     const yakitoriPrize = formData.get("yakitori_prize");
 
     updateData.game_type = gameType || null;
-    updateData.start_points = startPoints ? Number(startPoints) : null;
-    updateData.return_points = returnPoints ? Number(returnPoints) : null;
+
+    if (startPoints) {
+      const points = Number(startPoints);
+      if (points <= 0 || points > 100000) {
+        return { error: "開始点は1〜100,000の範囲で入力してください" };
+      }
+      updateData.start_points = points;
+    } else {
+      updateData.start_points = null;
+    }
+
+    if (returnPoints) {
+      const points = Number(returnPoints);
+      if (points <= 0 || points > 100000) {
+        return { error: "返し点は1〜100,000の範囲で入力してください" };
+      }
+      updateData.return_points = points;
+    } else {
+      updateData.return_points = null;
+    }
+
     updateData.uma_first = umaFirst ? Number(umaFirst) : null;
     updateData.uma_second = umaSecond ? Number(umaSecond) : null;
     updateData.uma_third = umaThird ? Number(umaThird) : null;
     updateData.uma_fourth = umaFourth ? Number(umaFourth) : null;
-    updateData.rate = rate ? Number(rate) : null;
+
+    if (rate) {
+      const r = Number(rate);
+      if (r <= 0 || r > 10) {
+        return { error: "レートは0より大きく10以下で入力してください" };
+      }
+      updateData.rate = r;
+    } else {
+      updateData.rate = null;
+    }
+
     updateData.tobi_prize = tobiPrize ? Number(tobiPrize) : null;
     updateData.yakuman_prize = yakumanPrize ? Number(yakumanPrize) : null;
     updateData.yakitori_prize = yakitoriPrize ? Number(yakitoriPrize) : null;

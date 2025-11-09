@@ -47,23 +47,23 @@ export default async function GameDetailPage({
     notFound();
   }
 
-  // トビしたプレイヤー情報を取得
-  let tobiPlayerName = null;
-  if (game.tobi_player_id) {
-    const { data } = await groupsRepo.getProfileDisplayName(game.tobi_player_id);
-    tobiPlayerName = data?.display_name;
-  } else if (game.tobi_guest_player_id) {
-    const { data } = await groupsRepo.getGuestPlayerName(game.tobi_guest_player_id);
-    tobiPlayerName = data?.name;
-  }
+  // トビプレイヤー情報とイベントルールを並列取得（パフォーマンス最適化）
+  const [tobiPlayerResult, eventResult] = await Promise.all([
+    game.tobi_player_id
+      ? groupsRepo.getProfileDisplayName(game.tobi_player_id)
+      : game.tobi_guest_player_id
+        ? groupsRepo.getGuestPlayerName(game.tobi_guest_player_id)
+        : Promise.resolve({ data: null }),
+    game.event_id ? groupsRepo.getEventById(game.event_id) : Promise.resolve({ data: null }),
+  ]);
 
-  // イベントルールを考慮した開始点を取得
+  const tobiPlayerName = game.tobi_player_id
+    ? (tobiPlayerResult.data as { display_name: string | null } | null)?.display_name
+    : (tobiPlayerResult.data as { name: string } | null)?.name;
+
   let startPoints = groupRules?.start_points ?? 25000;
-  if (game.event_id) {
-    const { data: event } = await groupsRepo.getEventById(game.event_id);
-    if (event?.start_points !== null && event?.start_points !== undefined) {
-      startPoints = event.start_points;
-    }
+  if (eventResult.data?.start_points !== null && eventResult.data?.start_points !== undefined) {
+    startPoints = eventResult.data.start_points;
   }
 
   const seatNames = {
@@ -93,7 +93,7 @@ export default async function GameDetailPage({
               yakumanCount={game.yakuman_count ?? 0}
             />
           </div>
-          <dl className="grid grid-cols-2 gap-4">
+          <dl className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
               <dt className="text-sm text-gray-600">対局種別</dt>
               <dd className="font-medium">{game.game_type === "tonpuu" ? "東風戦" : "東南戦"}</dd>
@@ -114,16 +114,6 @@ export default async function GameDetailPage({
                 })}
               </dd>
             </div>
-            <div>
-              <dt className="text-sm text-gray-600">役満回数</dt>
-              <dd className="font-medium">{game.yakuman_count}回</dd>
-            </div>
-            {tobiPlayerName && (
-              <div className="col-span-2">
-                <dt className="text-sm text-gray-600">トビ</dt>
-                <dd className="font-medium">{tobiPlayerName || "名前未設定"}</dd>
-              </div>
-            )}
           </dl>
         </div>
 

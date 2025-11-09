@@ -64,12 +64,15 @@ export default async function EventDetailPage({
     top_prize: event.top_prize,
   };
 
-  // イベントに紐づく対局一覧を取得
-  const { data: games } = await groupsRepo.getEventGames(eventId);
+  // イベントに紐づく対局一覧とランキングを並列取得（パフォーマンス最適化）
+  const [{ data: games }, eventRankingsResult] = await Promise.all([
+    groupsRepo.getEventGames(eventId),
+    event.status === "completed"
+      ? groupsRepo.getEventRankings(eventId)
+      : Promise.resolve({ data: null }),
+  ]);
 
-  // イベントのランキングを取得（完了時のみ）
-  const { data: eventRankings } =
-    event.status === "completed" ? await groupsRepo.getEventRankings(eventId) : { data: null };
+  const { data: eventRankings } = eventRankingsResult;
 
   return (
     <main className="min-h-screen p-8">

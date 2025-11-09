@@ -28,14 +28,15 @@ export default async function NewGamePage({
   // メンバーシップ確認（404を返す）
   await requireGroupMembership(groupId, user.id);
 
-  // 全データを並列取得
-  const [groupResult, rulesResult, membersResult, guestPlayersResult, eventsResult] =
+  // 全データとイベントルールを並列取得（パフォーマンス最適化）
+  const [groupResult, rulesResult, membersResult, guestPlayersResult, eventsResult, eventResult] =
     await Promise.all([
       groupsRepo.getGroupName(groupId),
       groupsRepo.getGroupRules(groupId),
       groupsRepo.getGroupMemberNames(groupId),
       groupsRepo.getGroupGuestPlayers(groupId),
       groupsRepo.getActiveGroupEvents(groupId),
+      eventId ? eventsRepo.getEventById(eventId) : Promise.resolve({ data: null }),
     ]);
 
   const { data: group } = groupResult;
@@ -43,18 +44,10 @@ export default async function NewGamePage({
   const { data: members } = membersResult;
   const { data: guestPlayers } = guestPlayersResult;
   const { data: events } = eventsResult;
+  const eventRules = eventResult.data;
 
   if (!group || !groupRules) {
     notFound();
-  }
-
-  // イベント指定がある場合、イベントルールを取得
-  let eventRules = null;
-  if (eventId) {
-    const { data: event } = await eventsRepo.getEventById(eventId);
-    if (event) {
-      eventRules = event;
-    }
   }
 
   // 適用するルールを決定（イベントのカスタムルールがあればそれを、なければグループルール）

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { updateProfile } from "@/app/actions/profile";
-import AvatarUpload from "@/app/components/AvatarUpload";
+import AvatarUpload from "@/app/components/avatar-upload";
 import * as profileRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 
@@ -16,14 +16,12 @@ export default async function ProfilePage() {
     redirect("/login");
   }
 
-  // プロファイルデータを取得
-  const { data: profile } = await profileRepo.getProfileById(user.id);
-
-  // 参加グループ一覧を取得
-  const { data: memberships } = await profileRepo.getUserGroupMemberships(user.id);
-
-  // 個人成績を集計
-  const { data: gameResults } = await profileRepo.getUserGameStats(user.id);
+  // プロファイルデータ、参加グループ、個人成績を並列取得（パフォーマンス最適化）
+  const [{ data: profile }, { data: memberships }, { data: gameResults }] = await Promise.all([
+    profileRepo.getProfileById(user.id),
+    profileRepo.getUserGroupMemberships(user.id),
+    profileRepo.getUserGameStats(user.id),
+  ]);
 
   // 成績統計を計算
   const stats = {

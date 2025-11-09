@@ -16,16 +16,9 @@ export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("=== アップロード開始 ===");
 
     const formData = new FormData(event.currentTarget);
     const file = formData.get("avatar") as File;
-
-    console.log("選択されたファイル:", {
-      name: file?.name,
-      size: file?.size,
-      type: file?.type,
-    });
 
     if (!file || file.size === 0) {
       setMessage({ type: "error", text: "ファイルを選択してください" });
@@ -37,7 +30,6 @@ export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
     startTransition(async () => {
       try {
         const result = await uploadAvatar(formData);
-        console.log("アップロード結果:", result);
 
         if (result.error) {
           setMessage({ type: "error", text: result.error });
@@ -46,8 +38,7 @@ export default function AvatarUpload({ currentAvatar }: AvatarUploadProps) {
           // Next.jsのルーターでキャッシュを再検証（revalidatePathと連携）
           router.refresh();
         }
-      } catch (error) {
-        console.error("予期しないエラー:", error);
+      } catch {
         setMessage({ type: "error", text: "予期しないエラーが発生しました" });
       }
     });

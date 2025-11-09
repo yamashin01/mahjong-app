@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as eventsRepo from "@/lib/supabase/repositories/events";
 import * as gamesRepo from "@/lib/supabase/repositories/games";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
 import { createClient } from "@/lib/supabase/server";
+import { calculatePlayerRanks, calculateUmaAndOka } from "@/lib/utils/game-calculations";
 
 export async function createGame(formData: FormData) {
   const supabase = await createClient();
@@ -21,6 +23,13 @@ export async function createGame(formData: FormData) {
   const groupId = formData.get("groupId") as string;
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
   const eventId = formData.get("eventId") as string | null;
+
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局を記録できます" };
+  }
 
   // 対局日時は現在時刻を使用
   const playedAt = new Date().toISOString();
@@ -39,6 +48,11 @@ export async function createGame(formData: FormData) {
 
     if (!playerId || Number.isNaN(finalPoints)) {
       return { error: `プレイヤー${i}の情報が不足しています` };
+    }
+
+    // 入力値検証: 最終点数は-100,000〜200,000の範囲
+    if (finalPoints < -100000 || finalPoints > 200000) {
+      return { error: `プレイヤー${i}の最終点数が範囲外です（-100,000〜200,000）` };
     }
 
     players.push({ playerId, finalPoints });
@@ -77,75 +91,16 @@ export async function createGame(formData: FormData) {
   }
 
   // 順位を計算（点数の降順、同点の場合は同順位）
-  const sortedPlayers = [...players].sort((a, b) => b.finalPoints - a.finalPoints);
-
-  // 同点処理を含む順位付け
-  const playerRanks = new Map<string, number>();
-  const rankGroups: { rank: number; players: typeof sortedPlayers; points: number }[] = [];
-
-  let currentRank = 1;
-  let i = 0;
-
-  while (i < sortedPlayers.length) {
-    const currentPoints = sortedPlayers[i].finalPoints;
-    const group = [sortedPlayers[i]];
-
-    // 同点のプレイヤーを探す
-    let j = i + 1;
-    while (j < sortedPlayers.length && sortedPlayers[j].finalPoints === currentPoints) {
-      group.push(sortedPlayers[j]);
-      j++;
-    }
-
-    // このグループの全員に同じ順位を割り当て
-    for (const player of group) {
-      playerRanks.set(player.playerId, currentRank);
-    }
-
-    rankGroups.push({
-      rank: currentRank,
-      players: group,
-      points: currentPoints,
-    });
-
-    // 次の順位は同点人数分スキップ
-    currentRank += group.length;
-    i = j;
-  }
+  const { rankGroups, playerRanks } = calculatePlayerRanks(players);
 
   // 座席を自動割り当て
   const seats = ["east", "south", "west", "north"];
-
-  // オカの計算
-  // オカあり: 全員分の (返し点 - 開始点) の合計
-  // オカなし: 0（開始点 = 返し点の場合も自動的に0になる）
-  const okaTotal = rules.oka_enabled ? (rules.return_points - rules.start_points) * 4 : 0;
 
   // 素点の基準点（常に返し点を基準とする）
   const basePoints = rules.return_points;
 
   // 各順位グループのウマとオカを事前計算
-  const umaValues = [rules.uma_first, rules.uma_second, rules.uma_third, rules.uma_fourth];
-  const groupUmaOka = new Map<number, { uma: number; oka: number }>();
-
-  for (const group of rankGroups) {
-    const groupSize = group.players.length;
-    const startRankIndex = group.rank - 1; // 0-indexed
-
-    // このグループが獲得するウマの合計を計算
-    let totalUma = 0;
-    for (let k = 0; k < groupSize && startRankIndex + k < 4; k++) {
-      totalUma += umaValues[startRankIndex + k];
-    }
-
-    // ウマを均等分割（整数に丸める）
-    const averageUma = Math.round(totalUma / groupSize);
-
-    // オカは1位グループのみに配分（均等分割、整数に丸める）
-    const averageOka = group.rank === 1 ? Math.round(okaTotal / groupSize) : 0;
-
-    groupUmaOka.set(group.rank, { uma: averageUma, oka: averageOka });
-  }
+  const groupUmaOka = calculateUmaAndOka(rankGroups, rules);
 
   // 各プレイヤーのスコアを計算
   const results = players.map((player, index) => {
@@ -241,6 +196,18 @@ export async function updateGameInfo(formData: FormData) {
     return { error: "必須パラメータが不足しています" };
   }
 
+  // 入力値検証: 役満回数は0〜20の範囲
+  if (Number.isNaN(yakumanCount) || yakumanCount < 0 || yakumanCount > 20) {
+    return { error: "役満回数は0〜20の範囲で入力してください" };
+  }
+
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局情報を更新できます" };
+  }
+
   // 対局情報を更新
   const { error: updateError } = await gamesRepo.updateGame(gameId, {
     game_type: gameType,
@@ -282,6 +249,18 @@ export async function updateGameResult(formData: FormData) {
 
   if (!resultId || !gameId || !groupId || Number.isNaN(finalPoints)) {
     return { error: "必須パラメータが不足しています" };
+  }
+
+  // 入力値検証: 最終点数は-100,000〜200,000の範囲
+  if (finalPoints < -100000 || finalPoints > 200000) {
+    return { error: "最終点数が範囲外です（-100,000〜200,000）" };
+  }
+
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局結果を更新できます" };
   }
 
   // 現在の対局結果を全て取得
