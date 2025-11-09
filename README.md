@@ -27,6 +27,10 @@
 
 ## ドキュメント
 
+### ユーザー向け
+- [クイックスタートガイド](https://github.com/yamashin01/mahjong-app/wiki/%E3%82%AF%E3%82%A4%E3%83%83%E3%82%AF%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%88%E3%82%AC%E3%82%A4%E3%83%89) - アプリの使い方（初めてのユーザー向け）
+
+### 開発者向け
 - [機能要件仕様書](./docs/functional-requirements.md) - 機能の詳細定義
 - [技術アーキテクチャ設計](./docs/technical-architecture.md) - システム構成と技術選定
 - [データベーススキーマ設計](./docs/database.md) - DB設計とRLSポリシー
