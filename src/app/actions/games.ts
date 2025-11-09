@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireGroupMembership } from "@/lib/auth/group-access";
 import * as eventsRepo from "@/lib/supabase/repositories/events";
 import * as gamesRepo from "@/lib/supabase/repositories/games";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
@@ -23,6 +24,13 @@ export async function createGame(formData: FormData) {
   const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
   const eventId = formData.get("eventId") as string | null;
 
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局を記録できます" };
+  }
+
   // 対局日時は現在時刻を使用
   const playedAt = new Date().toISOString();
 
@@ -40,6 +48,11 @@ export async function createGame(formData: FormData) {
 
     if (!playerId || Number.isNaN(finalPoints)) {
       return { error: `プレイヤー${i}の情報が不足しています` };
+    }
+
+    // 入力値検証: 最終点数は-100,000〜200,000の範囲
+    if (finalPoints < -100000 || finalPoints > 200000) {
+      return { error: `プレイヤー${i}の最終点数が範囲外です（-100,000〜200,000）` };
     }
 
     players.push({ playerId, finalPoints });
@@ -183,6 +196,18 @@ export async function updateGameInfo(formData: FormData) {
     return { error: "必須パラメータが不足しています" };
   }
 
+  // 入力値検証: 役満回数は0〜20の範囲
+  if (Number.isNaN(yakumanCount) || yakumanCount < 0 || yakumanCount > 20) {
+    return { error: "役満回数は0〜20の範囲で入力してください" };
+  }
+
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局情報を更新できます" };
+  }
+
   // 対局情報を更新
   const { error: updateError } = await gamesRepo.updateGame(gameId, {
     game_type: gameType,
@@ -224,6 +249,18 @@ export async function updateGameResult(formData: FormData) {
 
   if (!resultId || !gameId || !groupId || Number.isNaN(finalPoints)) {
     return { error: "必須パラメータが不足しています" };
+  }
+
+  // 入力値検証: 最終点数は-100,000〜200,000の範囲
+  if (finalPoints < -100000 || finalPoints > 200000) {
+    return { error: "最終点数が範囲外です（-100,000〜200,000）" };
+  }
+
+  // セキュリティ: グループメンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "このグループのメンバーのみが対局結果を更新できます" };
   }
 
   // 現在の対局結果を全て取得
