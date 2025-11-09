@@ -47,23 +47,23 @@ export default async function GameDetailPage({
     notFound();
   }
 
-  // トビしたプレイヤー情報を取得
-  let tobiPlayerName = null;
-  if (game.tobi_player_id) {
-    const { data } = await groupsRepo.getProfileDisplayName(game.tobi_player_id);
-    tobiPlayerName = data?.display_name;
-  } else if (game.tobi_guest_player_id) {
-    const { data } = await groupsRepo.getGuestPlayerName(game.tobi_guest_player_id);
-    tobiPlayerName = data?.name;
-  }
+  // トビプレイヤー情報とイベントルールを並列取得（パフォーマンス最適化）
+  const [tobiPlayerResult, eventResult] = await Promise.all([
+    game.tobi_player_id
+      ? groupsRepo.getProfileDisplayName(game.tobi_player_id)
+      : game.tobi_guest_player_id
+        ? groupsRepo.getGuestPlayerName(game.tobi_guest_player_id)
+        : Promise.resolve({ data: null }),
+    game.event_id ? groupsRepo.getEventById(game.event_id) : Promise.resolve({ data: null }),
+  ]);
 
-  // イベントルールを考慮した開始点を取得
+  const tobiPlayerName = game.tobi_player_id
+    ? (tobiPlayerResult.data as { display_name: string | null } | null)?.display_name
+    : (tobiPlayerResult.data as { name: string } | null)?.name;
+
   let startPoints = groupRules?.start_points ?? 25000;
-  if (game.event_id) {
-    const { data: event } = await groupsRepo.getEventById(game.event_id);
-    if (event?.start_points !== null && event?.start_points !== undefined) {
-      startPoints = event.start_points;
-    }
+  if (eventResult.data?.start_points !== null && eventResult.data?.start_points !== undefined) {
+    startPoints = eventResult.data.start_points;
   }
 
   const seatNames = {
