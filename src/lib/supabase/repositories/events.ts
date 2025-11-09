@@ -136,3 +136,19 @@ export async function updateEventName(params: { eventId: string; name: string })
     .select("group_id")
     .single();
 }
+
+/**
+ * イベントの説明を更新する
+ */
+export async function updateEventDescription(params: { eventId: string; description: string }) {
+  const supabase = await createClient();
+  return await supabase
+    .from("events")
+    .update({
+      description: params.description,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", params.eventId)
+    .select("group_id")
+    .single();
+}

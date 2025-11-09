@@ -8,6 +8,7 @@ import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./components/copy-button";
+import { EditGroupDescription } from "./components/edit-group-description";
 import { EditGroupName } from "./components/edit-group-name";
 import { EventsSection } from "./components/events-section";
 import { GuestPlayerActions } from "./components/guest-player-actions";
@@ -90,7 +91,11 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
               ) : (
                 <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
               )}
-              {group.description && <p className="text-gray-600">{group.description}</p>}
+              {isAdmin ? (
+                <EditGroupDescription groupId={groupId} currentDescription={group.description} />
+              ) : (
+                group.description && <p className="text-gray-600">{group.description}</p>
+              )}
             </div>
             {isAdmin && (
               <span className="rounded-full bg-purple-100 px-4 py-2 text-sm font-medium text-purple-800">
@@ -108,7 +113,11 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             ) : (
               <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
             )}
-            {group.description && <p className="text-gray-600">{group.description}</p>}
+            {isAdmin ? (
+              <EditGroupDescription groupId={groupId} currentDescription={group.description} />
+            ) : (
+              group.description && <p className="text-gray-600">{group.description}</p>
+            )}
           </div>
         </div>
 

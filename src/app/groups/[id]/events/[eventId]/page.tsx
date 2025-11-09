@@ -7,6 +7,7 @@ import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 import type { EventRules } from "@/types/event-rules";
+import { EditEventDescription } from "./components/edit-event-description";
 import { EditEventName } from "./components/edit-event-name";
 import { EventActionsMenu } from "./components/event-actions-menu";
 import { GameStatusModal } from "./components/game-status-modal";
@@ -136,7 +137,13 @@ export default async function EventDetailPage({
             <p className="text-gray-600">
               開催日: {new Date(event.event_date).toLocaleDateString("ja-JP")}
             </p>
-            {event.description && <p className="text-gray-700 mt-2">{event.description}</p>}
+            <div className="mt-2">
+              <EditEventDescription
+                eventId={eventId}
+                groupId={groupId}
+                currentDescription={event.description}
+              />
+            </div>
           </div>
           {event.status === "active" && games && games.length > 0 && (
             <GameStatusModal games={games} />

@@ -376,3 +376,46 @@ export async function updateEventName(formData: FormData) {
   revalidatePath(`/groups/${groupId}/events/${eventId}`);
   return { success: true };
 }
+
+export async function updateEventDescription(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const eventId = formData.get("eventId") as string;
+  const groupId = formData.get("groupId") as string;
+  const description = formData.get("description") as string;
+
+  // メンバーシップチェック
+  try {
+    await requireGroupMembership(groupId, user.id);
+  } catch {
+    return { error: "グループメンバーではありません" };
+  }
+
+  // バリデーション
+  if (description.trim().length > 500) {
+    return { error: "説明は500文字以内で入力してください" };
+  }
+
+  // イベント説明を更新
+  const { error: updateError } = await eventsRepo.updateEventDescription({
+    eventId,
+    description: description.trim(),
+  });
+
+  if (updateError) {
+    console.error("Error updating event description:", updateError);
+    return { error: "イベント説明の更新に失敗しました" };
+  }
+
+  revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}/events/${eventId}`);
+  return { success: true };
+}

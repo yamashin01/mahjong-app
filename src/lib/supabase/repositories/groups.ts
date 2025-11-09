@@ -234,3 +234,14 @@ export async function updateGroupName(params: { groupId: string; name: string })
   const supabase = await createClient();
   return await supabase.from("groups").update({ name: params.name }).eq("id", params.groupId);
 }
+
+/**
+ * グループの説明を更新する
+ */
+export async function updateGroupDescription(params: { groupId: string; description: string }) {
+  const supabase = await createClient();
+  return await supabase
+    .from("groups")
+    .update({ description: params.description })
+    .eq("id", params.groupId);
+}
