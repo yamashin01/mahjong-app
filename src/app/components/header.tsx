@@ -33,6 +33,7 @@ export async function Header() {
               alt="麻雀スコア管理アプリ"
               width={40}
               height={40}
+              priority
               className="object-contain"
             />
             <span>雀の手帳</span>
