@@ -1,23 +1,25 @@
 "use client";
 
-import { deleteEvent } from "@/app/actions/events";
+import { deleteGroup } from "@/app/actions/groups";
 
-type DeleteEventButtonProps = {
-  eventId: string;
+type DeleteGroupButtonProps = {
   groupId: string;
 };
 
-export function DeleteEventButton({ eventId, groupId }: DeleteEventButtonProps) {
+export function DeleteGroupButton({ groupId }: DeleteGroupButtonProps) {
   const handleDelete = async () => {
-    if (!confirm("イベントを削除してもよろしいですか？")) {
+    if (
+      !confirm(
+        "グループを削除してもよろしいですか？\n関連するイベントや対局データもすべて削除されます。",
+      )
+    ) {
       return;
     }
 
     const formData = new FormData();
-    formData.append("eventId", eventId);
     formData.append("groupId", groupId);
 
-    const result = await deleteEvent(formData);
+    const result = await deleteGroup(formData);
     if (result?.error) {
       alert(result.error);
     }
@@ -29,7 +31,7 @@ export function DeleteEventButton({ eventId, groupId }: DeleteEventButtonProps) 
       onClick={handleDelete}
       className="text-sm text-gray-400 hover:text-red-600 transition-colors underline"
     >
-      イベントを削除
+      グループを削除
     </button>
   );
 }

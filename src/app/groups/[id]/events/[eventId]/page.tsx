@@ -7,6 +7,7 @@ import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerDisplayName } from "@/lib/utils/player";
 import type { EventRules } from "@/types/event-rules";
+import { DeleteEventButton } from "./components/delete-event-button";
 import { EditEventDescription } from "./components/edit-event-description";
 import { EditEventName } from "./components/edit-event-name";
 import { EventActionsMenu } from "./components/event-actions-menu";
@@ -418,7 +419,10 @@ export default async function EventDetailPage({
           )}
         </div>
 
-        <div className="text-center">
+        <div className="text-center border-t border-gray-100">
+          <DeleteEventButton eventId={eventId} groupId={groupId} />
+        </div>
+        <div className="text-center space-y-4">
           <Link
             href={`/groups/${groupId}`}
             className="text-blue-600 hover:text-blue-700 hover:underline"

@@ -8,6 +8,7 @@ import * as groupsRepo from "@/lib/supabase/repositories";
 import { createClient } from "@/lib/supabase/server";
 import { getPlayerAvatarUrl, getPlayerDisplayName, hasPlayerAvatar } from "@/lib/utils/player";
 import { CopyButton } from "./components/copy-button";
+import { DeleteGroupButton } from "./components/delete-group-button";
 import { EditGroupDescription } from "./components/edit-group-description";
 import { EditGroupName } from "./components/edit-group-name";
 import { EventsSection } from "./components/events-section";
@@ -332,7 +333,12 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
           />
         )}
 
-        <div className="text-center">
+        {isAdmin && (
+          <div className="text-center border-t border-gray-100">
+            <DeleteGroupButton groupId={groupId} />
+          </div>
+        )}
+        <div className="text-center space-y-4">
           <Link href="/" className="text-blue-600 hover:text-blue-700 hover:underline">
             トップページに戻る
           </Link>

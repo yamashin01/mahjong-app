@@ -235,6 +235,11 @@ export async function updateGroupName(params: { groupId: string; name: string })
   return await supabase.from("groups").update({ name: params.name }).eq("id", params.groupId);
 }
 
+export async function deleteGroup(groupId: string) {
+  const supabase = await createClient();
+  return await supabase.from("groups").delete().eq("id", groupId);
+}
+
 /**
  * グループの説明を更新する
  */
