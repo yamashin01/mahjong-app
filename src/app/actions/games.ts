@@ -3,11 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireGroupMembership } from "@/lib/auth/group-access";
+import { createGameWithResults } from "@/lib/services/game-service";
 import * as eventsRepo from "@/lib/supabase/repositories/events";
 import * as gamesRepo from "@/lib/supabase/repositories/games";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
 import { createClient } from "@/lib/supabase/server";
-import { calculatePlayerRanks, calculateUmaAndOka } from "@/lib/utils/game-calculations";
+import { parseFormData, parseGameFormData } from "@/lib/validation/form-data-parser";
+import { CreateGameInputSchema } from "@/lib/validation/game-schemas";
 
 export async function createGame(formData: FormData) {
   const supabase = await createClient();
@@ -20,159 +22,38 @@ export async function createGame(formData: FormData) {
     redirect("/login");
   }
 
-  const groupId = formData.get("groupId") as string;
-  const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
-  const eventId = formData.get("eventId") as string | null;
+  // FormDataをパースしてバリデーション
+  const parseResult = parseFormData(formData, CreateGameInputSchema, parseGameFormData);
+
+  if (!parseResult.success) {
+    return { error: parseResult.error };
+  }
+
+  const input = parseResult.data;
 
   // セキュリティ: グループメンバーシップチェック
   try {
-    await requireGroupMembership(groupId, user.id);
+    await requireGroupMembership(input.groupId, user.id);
   } catch {
     return { error: "このグループのメンバーのみが対局を記録できます" };
   }
 
-  // 対局日時は現在時刻を使用
-  const playedAt = new Date().toISOString();
-
-  // 回戦数を自動採番
-  // イベントIDがある場合はイベント内、ない場合はグループ内の最新の対局記録+1
-  const { data: latestGame } = await gamesRepo.getLatestGameNumber(groupId, eventId);
-
-  const gameNumber = latestGame ? latestGame.game_number + 1 : 1;
-
-  // プレイヤーと点数のデータを取得
-  const players = [];
-  for (let i = 1; i <= 4; i++) {
-    const playerId = formData.get(`player${i}Id`) as string;
-    const finalPoints = Number.parseInt(formData.get(`player${i}FinalPoints`) as string, 10);
-
-    if (!playerId || Number.isNaN(finalPoints)) {
-      return { error: `プレイヤー${i}の情報が不足しています` };
-    }
-
-    // 入力値検証: 最終点数は-100,000〜200,000の範囲
-    if (finalPoints < -100000 || finalPoints > 200000) {
-      return { error: `プレイヤー${i}の最終点数が範囲外です（-100,000〜200,000）` };
-    }
-
-    players.push({ playerId, finalPoints });
-  }
-
-  // グループルールを取得
-  const { data: groupRules } = await groupsRepo.getGroupRules(groupId);
-
-  if (!groupRules) {
-    return { error: "グループルールが見つかりません" };
-  }
-
-  // イベントIDが指定されている場合、イベントルールを取得
-  let rules = groupRules;
-  if (eventId) {
-    const { data: event } = await eventsRepo.getEventById(eventId);
-
-    if (event) {
-      // イベントにカスタムルールが設定されている場合は上書き
-      rules = {
-        ...groupRules,
-        ...(event.game_type !== null && { game_type: event.game_type }),
-        ...(event.start_points !== null && { start_points: event.start_points }),
-        ...(event.return_points !== null && { return_points: event.return_points }),
-        ...(event.uma_first !== null && { uma_first: event.uma_first }),
-        ...(event.uma_second !== null && { uma_second: event.uma_second }),
-        ...(event.uma_third !== null && { uma_third: event.uma_third }),
-        ...(event.uma_fourth !== null && { uma_fourth: event.uma_fourth }),
-        ...(event.oka_enabled !== null && { oka_enabled: event.oka_enabled }),
-        ...(event.rate !== null && { rate: event.rate }),
-        ...(event.tobi_prize !== null && { tobi_prize: event.tobi_prize }),
-        ...(event.yakuman_prize !== null && { yakuman_prize: event.yakuman_prize }),
-        ...(event.top_prize !== null && { top_prize: event.top_prize }),
-      };
-    }
-  }
-
-  // 順位を計算（点数の降順、同点の場合は同順位）
-  const { rankGroups, playerRanks } = calculatePlayerRanks(players);
-
-  // 座席を自動割り当て
-  const seats = ["east", "south", "west", "north"];
-
-  // 素点の基準点（常に返し点を基準とする）
-  const basePoints = rules.return_points;
-
-  // 各順位グループのウマとオカを事前計算
-  const groupUmaOka = calculateUmaAndOka(rankGroups, rules);
-
-  // 各プレイヤーのスコアを計算
-  const results = players.map((player, index) => {
-    const rank = playerRanks.get(player.playerId) || 1;
-    const rawScore = player.finalPoints - basePoints;
-
-    // ゲストメンバーかどうかをチェック
-    const isGuest = player.playerId.startsWith("guest-");
-    const actualPlayerId = isGuest ? null : player.playerId;
-    const guestPlayerId = isGuest ? player.playerId.replace("guest-", "") : null;
-
-    // 同点グループのウマとオカを取得
-    const { uma, oka } = groupUmaOka.get(rank) || { uma: 0, oka: 0 };
-
-    // トータルスコア（素点 + ウマ + オカ）
-    const totalScore = rawScore + uma + oka;
-
-    // ポイント額（1.0なら1000点あたり100pt）
-    const pointAmount = (totalScore / 10) * rules.rate;
-
+  // ゲーム作成サービスを実行
+  let game;
+  try {
+    game = await createGameWithResults(input, user.id);
+  } catch (error) {
     return {
-      player_id: actualPlayerId,
-      guest_player_id: guestPlayerId,
-      seat: seats[index],
-      final_points: player.finalPoints,
-      raw_score: rawScore,
-      uma,
-      oka,
-      rank,
-      total_score: totalScore,
-      point_amount: pointAmount,
+      error: error instanceof Error ? error.message : "対局の作成に失敗しました",
     };
-  });
-
-  // 対局記録を作成
-  const { data: game, error: gameError } = await gamesRepo.createGame({
-    group_id: groupId,
-    game_type: gameType,
-    game_number: gameNumber,
-    played_at: playedAt,
-    recorded_by: user.id,
-    event_id: eventId || null,
-    tobi_player_id: null,
-    tobi_guest_player_id: null,
-    yakuman_count: 0,
-  });
-
-  if (gameError) {
-    console.error("Error creating game:", gameError);
-    return { error: "対局の作成に失敗しました" };
   }
 
-  // 各プレイヤーの結果を保存
-  const gameResults = results.map((result) => ({
-    game_id: game.id,
-    ...result,
-  }));
-
-  const { error: resultsError } = await gamesRepo.createGameResults(gameResults);
-
-  if (resultsError) {
-    console.error("Error creating game results:", resultsError);
-    // ゲームを削除してロールバック
-    await gamesRepo.deleteGame(game.id);
-    return { error: "対局結果の保存に失敗しました" };
+  // revalidateとredirectはtry-catchの外で実行
+  revalidatePath(`/groups/${input.groupId}`);
+  if (input.eventId) {
+    revalidatePath(`/groups/${input.groupId}/events/${input.eventId}`);
   }
-
-  revalidatePath(`/groups/${groupId}`);
-  if (eventId) {
-    revalidatePath(`/groups/${groupId}/events/${eventId}`);
-  }
-  redirect(`/groups/${groupId}/games/${game.id}`);
+  redirect(`/groups/${input.groupId}/games/${game.id}`);
 }
 
 export async function updateGameInfo(formData: FormData) {
