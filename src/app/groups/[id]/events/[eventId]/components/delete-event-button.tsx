@@ -17,7 +17,10 @@ export function DeleteEventButton({ eventId, groupId }: DeleteEventButtonProps) 
     formData.append("eventId", eventId);
     formData.append("groupId", groupId);
 
-    await deleteEvent(formData);
+    const result = await deleteEvent(formData);
+    if (result?.error) {
+      alert(result.error);
+    }
   };
 
   return (

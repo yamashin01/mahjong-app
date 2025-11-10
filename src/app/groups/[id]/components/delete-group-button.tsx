@@ -19,7 +19,10 @@ export function DeleteGroupButton({ groupId }: DeleteGroupButtonProps) {
     const formData = new FormData();
     formData.append("groupId", groupId);
 
-    await deleteGroup(formData);
+    const result = await deleteGroup(formData);
+    if (result?.error) {
+      alert(result.error);
+    }
   };
 
   return (
