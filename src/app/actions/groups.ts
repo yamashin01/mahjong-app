@@ -297,6 +297,38 @@ export async function updateGroupName(formData: FormData) {
   return { success: true };
 }
 
+export async function deleteGroup(formData: FormData) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const groupId = formData.get("groupId") as string;
+
+  // 管理者権限チェック
+  try {
+    await requireAdminRole(groupId, user.id);
+  } catch {
+    return { error: "管理者権限がありません" };
+  }
+
+  // グループを削除（関連するイベント、対局、メンバーなども CASCADE で削除される）
+  const { error } = await groupsRepo.deleteGroup(groupId);
+
+  if (error) {
+    console.error("Error deleting group:", error);
+    return { error: "グループの削除に失敗しました" };
+  }
+
+  revalidatePath("/groups");
+  redirect("/groups");
+}
+
 export async function updateGroupDescription(formData: FormData) {
   const supabase = await createClient();
 
