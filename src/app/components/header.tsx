@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { MobileMenu } from "@/app/components/mobile-menu";
 import { UserMenu } from "@/app/components/user-menu";
@@ -25,9 +26,17 @@ export async function Header() {
         <div className="flex h-16 items-center justify-between">
           <Link
             href="/"
-            className="text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
+            className="flex items-center gap-3 text-xl font-bold text-gray-900 hover:text-gray-700 transition-colors"
           >
-            麻雀スコア管理
+            <Image
+              src="/logo.png"
+              alt="麻雀スコア管理アプリ"
+              width={40}
+              height={40}
+              priority
+              className="object-contain"
+            />
+            <span>雀の手帳</span>
           </Link>
 
           {/* デスクトップメニュー */}
