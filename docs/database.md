@@ -8,8 +8,9 @@ Supabaseは、PostgreSQLを基盤としたオープンソースのバックエ�
 1. [ER図](#1-er図)
 2. [テーブル定義](#2-テーブル定義)
 3. [ビュー](#3-ビュー)
-4. [トリガー](#4-トリガー)
-5. [マイグレーション順序](#5-マイグレーション順序)
+4. [Storage](#4-storage)
+5. [トリガー](#5-トリガー)
+6. [マイグレーション順序](#6-マイグレーション順序)
 
 ## 1. ER図
 
@@ -70,6 +71,7 @@ erDiagram
         numeric rate
         integer tobi_prize
         integer yakuman_prize
+        integer yakitori_prize
         integer top_prize
         timestamptz created_at
         timestamptz updated_at
@@ -110,6 +112,7 @@ erDiagram
         numeric rate
         integer tobi_prize
         integer yakuman_prize
+        integer yakitori_prize
         integer top_prize
         timestamptz created_at
         timestamptz updated_at
@@ -146,6 +149,7 @@ erDiagram
         integer final_points
         integer raw_score
         integer uma
+        integer oka
         integer rank
         numeric total_score
         numeric point_amount
@@ -217,15 +221,16 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | game_type | text | NOT NULL, CHECK | 'tonnan' | 東風/東南 ('tonpuu' or 'tonnan') |
 | start_points | integer | NOT NULL | 25000 | 開始点数 |
 | return_points | integer | NOT NULL | 30000 | 返し点 |
-| uma_first | integer | NOT NULL | 20 | ウマ（1位） |
-| uma_second | integer | NOT NULL | 10 | ウマ（2位） |
-| uma_third | integer | NOT NULL | -10 | ウマ（3位） |
-| uma_fourth | integer | NOT NULL | -20 | ウマ（4位） |
+| uma_first | integer | NOT NULL | 10000 | ウマ（1位）（点棒単位） |
+| uma_second | integer | NOT NULL | 5000 | ウマ（2位）（点棒単位） |
+| uma_third | integer | NOT NULL | -5000 | ウマ（3位）（点棒単位） |
+| uma_fourth | integer | NOT NULL | -10000 | ウマ（4位）（点棒単位） |
 | oka_enabled | boolean | NOT NULL | TRUE | オカの有無 |
 | rate | numeric(10,2) | NOT NULL | 1.0 | レート（1.0なら1000点あたり100pt） |
-| tobi_prize | integer | | 0 | トビ賞（0なら無効） |
-| yakuman_prize | integer | | 0 | 役満祝儀 |
-| top_prize | integer | | 0 | トップ賞 |
+| tobi_prize | integer | | NULL | トビ賞（NULLなら無効） |
+| yakuman_prize | integer | | NULL | 役満祝儀（NULLなら無効） |
+| yakitori_prize | integer | | NULL | ヤキトリ賞（NULLなら無効） |
+| top_prize | integer | | NULL | トップ賞（NULLなら無効） |
 | created_at | timestamptz | DEFAULT NOW() | | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | | 更新日時 |
 
@@ -308,6 +313,7 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | rate | numeric(10,2) | | | レート（NULL = グループルール使用） |
 | tobi_prize | integer | | | トビ賞（NULL = グループルール使用） |
 | yakuman_prize | integer | | | 役満祝儀（NULL = グループルール使用） |
+| yakitori_prize | integer | | | ヤキトリ賞（NULL = グループルール使用） |
 | top_prize | integer | | | トップ賞（NULL = グループルール使用） |
 | created_at | timestamptz | DEFAULT NOW() | | 作成日時 |
 | updated_at | timestamptz | DEFAULT NOW() | | 更新日時 |
@@ -318,8 +324,7 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 - `idx_events_event_date` on (event_date)
 
 #### RLSポリシー
-- グループメンバーはイベントを閲覧・作成可能
-- グループ管理者のみイベントを更新・削除可能
+- グループメンバーはイベントを閲覧・作成・更新・削除可能
 
 #### ルール設定
 - イベント独自のルールを設定可能（game_type, start_points等）
@@ -381,6 +386,7 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | final_points | integer | NOT NULL | 最終持ち点 |
 | raw_score | integer | NOT NULL | 素点（返し点からの差分） |
 | uma | integer | NOT NULL | ウマ |
+| oka | integer | NOT NULL | オカ |
 | rank | integer | NOT NULL, CHECK (1-4) | 順位 |
 | total_score | numeric(10,2) | NOT NULL | ウマオカ込みのスコア |
 | point_amount | numeric(10,2) | NOT NULL | レート適用後のポイント |
@@ -440,33 +446,46 @@ Supabase Auth が管理するテーブル。直接操作せず参照のみ。
 | third_place_count | bigint | 3位の回数 |
 | fourth_place_count | bigint | 4位の回数 |
 
-## 4. トリガー
+## 4. Storage
 
-### 4.1 updated_at 自動更新
+### 4.1 avatars バケット
+
+プロフィール画像保存用のStorageバケット
+
+#### 設定
+- **バケット名**: `avatars`
+- **公開設定**: public（全員が閲覧可能）
+- **保存形式**: `{user_id}/{filename}`
+
+#### RLSポリシー
+- **アップロード**: 認証済みユーザーが自分のフォルダにアップロード可能
+- **更新**: 自分のファイルのみ更新可能
+- **削除**: 自分のファイルのみ削除可能
+- **閲覧**: 全員が全ての画像を閲覧可能
+
+## 5. トリガー
+
+### 5.1 updated_at 自動更新
 
 以下のテーブルで `updated_at` カラムが自動更新される
 - profiles
 - groups
 - group_rules
 - games
+- guest_players
+- events
 
-### 4.2 グループ作成時の自動処理
+### 5.2 グループ作成時の自動処理
 
 グループ作成時に以下が自動的に実行される
 1. デフォルトルールの作成（group_rules）
 2. 作成者を管理者として追加（group_members）
 
-### 4.3 プロファイル自動作成
+### 5.3 プロファイル自動作成
 
-ユーザー登録（auth.users）時に profiles レコードが自動作成される。
+ユーザー登録（auth.users）時に profiles レコードが自動作成される
 
-### 4.4 updated_at 自動更新（追加テーブル）
-
-以下のテーブルでも `updated_at` カラムが自動更新される
-- guest_players
-- events
-
-## 5. マイグレーション順序
+## 6. マイグレーション順序
 
 Supabase のマイグレーションは以下の順序で実行すること
 
@@ -499,4 +518,13 @@ Supabase のマイグレーションは以下の順序で実行すること
 
 ### 制約修正
 20. `021_fix_game_results_unique_constraint.sql` - game_results ユニーク制約修正（ゲストプレイヤー対応）
+
+### Storage & 機能追加
+21. `022_create_avatars_bucket.sql` - Storageバケット作成（プロフィール画像用）
+22. `023_add_oka_to_game_results.sql` - game_results にオカカラム追加
+23. `024_remove_tobi_prize_from_game_results.sql` - game_results からトビ賞カラム削除
+24. `025_update_events_rls_policies.sql` - events RLSポリシー更新（管理者のみ→全メンバー）
+25. `026_add_yakitori_prize_to_events.sql` - events にヤキトリ賞カラム追加
+26. `027_add_yakitori_prize_to_group_rules.sql` - group_rules にヤキトリ賞カラム追加
+27. `028_update_uma_default_values.sql` - ウマのデフォルト値を点棒単位に変更（10000/5000/-5000/-10000）
 
