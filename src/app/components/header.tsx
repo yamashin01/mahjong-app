@@ -1,5 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { MobileMenu } from "@/app/components/mobile-menu";
 import { UserMenu } from "@/app/components/user-menu";
 import * as profileRepo from "@/lib/supabase/repositories";
