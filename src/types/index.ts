@@ -133,42 +133,6 @@ export type GroupMembership = Omit<
   role: "admin" | "member";
 };
 
-/**
- * Ranking data for display components
- * Represents aggregated player statistics
- */
-export type RankingData = {
-  player_id: string | null;
-  display_name: string | null;
-  games_played: number | null;
-  first_place_count: number | null;
-  second_place_count: number | null;
-  third_place_count: number | null;
-  fourth_place_count: number | null;
-  average_rank: number | null;
-  total_points: number | null;
-  game_date: string | null;
-  group_id: string | null;
-};
-
-/**
- * Daily ranking data from database view
- * Used for today's ranking display
- */
-export type DailyRanking = {
-  player_id: string | null;
-  group_id: string | null;
-  game_date: string | null;
-  display_name: string | null;
-  games_played: number | null;
-  total_points: number | null;
-  average_rank: number | null;
-  first_place_count: number | null;
-  second_place_count: number | null;
-  third_place_count: number | null;
-  fourth_place_count: number | null;
-};
-
 // ============================================================================
 // LEGACY EXPORTS - Backward Compatibility
 // ============================================================================

@@ -21,6 +21,7 @@ interface EventRulesDisplayProps {
   };
   groupId: string;
   eventId: string | null;
+  isAdmin: boolean;
 }
 
 export function EventRulesDisplay({
@@ -28,6 +29,7 @@ export function EventRulesDisplay({
   groupRules,
   groupId,
   eventId,
+  isAdmin,
 }: EventRulesDisplayProps) {
   // 表示用のルールを決定（カスタムルールがあればそれを、なければグループルール）
   const displayRules = {
@@ -54,15 +56,17 @@ export function EventRulesDisplay({
     <div className="rounded-lg border border-gray-200 p-6 bg-white">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">適用ルール</h2>
-        <Link
-          href={settingsUrl}
-          className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
-        >
-          {/* デスクトップ: テキスト表示 */}
-          <span className="hidden md:inline">ルール設定</span>
-          {/* モバイル: 鉛筆アイコンのみ */}
-          <FiEdit2 className="md:hidden h-4 w-4" />
-        </Link>
+        {isAdmin && (
+          <Link
+            href={settingsUrl}
+            className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm text-gray-800 hover:bg-gray-200 bg-opacity-0 md:bg-gray-50 transition-colors"
+          >
+            {/* デスクトップ: テキスト表示 */}
+            <span className="hidden md:inline">ルール設定</span>
+            {/* モバイル: 鉛筆アイコンのみ */}
+            <FiEdit2 className="md:hidden h-4 w-4" />
+          </Link>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
