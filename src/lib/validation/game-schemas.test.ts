@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   CreateGameInputSchema,
-  UpdateGameInfoSchema,
-  PlayerInputSchema,
   GAME_LIMITS,
+  PlayerInputSchema,
+  UpdateGameInfoSchema,
 } from "./game-schemas";
 
 describe("PlayerInputSchema", () => {

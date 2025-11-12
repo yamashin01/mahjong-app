@@ -93,7 +93,11 @@ export async function createEvent(formData: FormData) {
     if (topPrize) eventData.top_prize = Number(topPrize);
 
     // 返し点は開始点以上である必要がある
-    if (eventData.return_points && eventData.start_points && eventData.return_points < eventData.start_points) {
+    if (
+      eventData.return_points &&
+      eventData.start_points &&
+      eventData.return_points < eventData.start_points
+    ) {
       return { error: "返し点は開始点以上である必要があります" };
     }
   }

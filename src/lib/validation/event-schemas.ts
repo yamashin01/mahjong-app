@@ -5,8 +5,8 @@ import { z } from "zod";
  * Defines validation rules for event-related inputs
  */
 
-// イベントステータス
-export const EventStatusSchema = z.enum(["upcoming", "ongoing", "completed"]);
+// イベントステータス (repositoryの型に合わせる)
+export const EventStatusSchema = z.enum(["active", "completed"]);
 
 // イベント作成の入力スキーマ
 export const CreateEventInputSchema = z.object({

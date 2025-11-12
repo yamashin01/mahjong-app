@@ -122,3 +122,36 @@ export function parseEventFormData(formData: FormData) {
     endDate: getStringValue(formData, "endDate") || null,
   };
 }
+
+/**
+ * Parse group rules FormData
+ */
+export function parseGroupRulesFormData(formData: FormData) {
+  const startPoints = getIntValue(formData, "startPoints");
+  const returnPoints = getIntValue(formData, "returnPoints");
+
+  return {
+    groupId: getStringValue(formData, "groupId"),
+    gameType: getStringValue(formData, "gameType"),
+    startPoints,
+    returnPoints,
+    okaEnabled: returnPoints !== null && startPoints !== null ? returnPoints > startPoints : false,
+    rate: getNumberValue(formData, "rate"),
+    umaFirst: getIntValue(formData, "umaFirst"),
+    umaSecond: getIntValue(formData, "umaSecond"),
+    umaThird: getIntValue(formData, "umaThird"),
+    umaFourth: getIntValue(formData, "umaFourth"),
+    tobiPrize: getIntValue(formData, "tobiPrize") || 0,
+    yakumanPrize: getIntValue(formData, "yakumanPrize") || 0,
+    topPrize: getIntValue(formData, "topPrize") || 0,
+  };
+}
+
+/**
+ * Parse join group FormData
+ */
+export function parseJoinGroupFormData(formData: FormData) {
+  return {
+    inviteCode: getStringValue(formData, "inviteCode"),
+  };
+}

@@ -3,8 +3,21 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdminRole } from "@/lib/auth/group-access";
+import { createNewGroup, joinGroupByInviteCode, updateRules } from "@/lib/services/group-service";
 import * as groupsRepo from "@/lib/supabase/repositories/groups";
 import { createClient } from "@/lib/supabase/server";
+import {
+  getStringValue,
+  parseFormData,
+  parseGroupFormData,
+  parseGroupRulesFormData,
+  parseJoinGroupFormData,
+} from "@/lib/validation/form-data-parser";
+import {
+  CreateGroupInputSchema,
+  JoinGroupInputSchema,
+  UpdateGroupRulesSchema,
+} from "@/lib/validation/group-schemas";
 
 export async function createGroup(formData: FormData) {
   const supabase = await createClient();
@@ -17,23 +30,23 @@ export async function createGroup(formData: FormData) {
     redirect("/login");
   }
 
-  const name = formData.get("name") as string;
-  const description = formData.get("description") as string;
+  // FormDataをパースしてバリデーション
+  const parseResult = parseFormData(formData, CreateGroupInputSchema, parseGroupFormData);
 
-  if (!name || name.trim() === "") {
-    return { error: "グループ名を入力してください" };
+  if (!parseResult.success) {
+    return { error: parseResult.error };
   }
 
-  // グループを作成
-  const { data: group, error: groupError } = await groupsRepo.createGroup({
-    name: name.trim(),
-    description: description?.trim() || null,
-    createdBy: user.id,
-  });
+  const input = parseResult.data;
 
-  if (groupError) {
-    console.error("Error creating group:", groupError);
-    return { error: "グループの作成に失敗しました" };
+  // グループを作成
+  let group: { id: string };
+  try {
+    group = await createNewGroup(input, user.id);
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "グループの作成に失敗しました",
+    };
   }
 
   // トリガーによってgroup_membersとgroup_rulesが自動作成される
@@ -53,41 +66,23 @@ export async function joinGroup(formData: FormData) {
     redirect("/login");
   }
 
-  const inviteCode = formData.get("inviteCode") as string;
+  // FormDataをパースしてバリデーション
+  const parseResult = parseFormData(formData, JoinGroupInputSchema, parseJoinGroupFormData);
 
-  if (!inviteCode || inviteCode.trim() === "") {
-    return { error: "招待コードを入力してください" };
+  if (!parseResult.success) {
+    return { error: parseResult.error };
   }
 
-  // 招待コードでグループを検索
-  const { data: group, error: groupError } = await groupsRepo.findGroupByInviteCode(
-    inviteCode.trim().toUpperCase(),
-  );
-
-  if (groupError || !group) {
-    return { error: "招待コードが無効です" };
-  }
-
-  // すでにメンバーかチェック
-  const { data: existingMember } = await groupsRepo.findGroupMember({
-    groupId: group.id,
-    userId: user.id,
-  });
-
-  if (existingMember) {
-    return { error: "すでにこのグループに参加しています" };
-  }
+  const input = parseResult.data;
 
   // グループに参加
-  const { error: joinError } = await groupsRepo.addGroupMember({
-    groupId: group.id,
-    userId: user.id,
-    role: "member",
-  });
-
-  if (joinError) {
-    console.error("Error joining group:", joinError);
-    return { error: "グループへの参加に失敗しました" };
+  let group: { id: string };
+  try {
+    group = await joinGroupByInviteCode(input.inviteCode.toUpperCase(), user.id);
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "グループへの参加に失敗しました",
+    };
   }
 
   revalidatePath("/");
@@ -189,7 +184,11 @@ export async function updateGroupRules(formData: FormData) {
     redirect("/login");
   }
 
-  const groupId = formData.get("groupId") as string;
+  const groupId = getStringValue(formData, "groupId");
+
+  if (!groupId) {
+    return { error: "グループIDが不正です" };
+  }
 
   // 管理者権限チェック
   try {
@@ -198,54 +197,22 @@ export async function updateGroupRules(formData: FormData) {
     return { error: "管理者権限がありません" };
   }
 
-  // フォームデータから値を取得
-  const gameType = formData.get("gameType") as "tonpuu" | "tonnan";
-  const startPoints = Number.parseInt(formData.get("startPoints") as string, 10);
-  const returnPoints = Number.parseInt(formData.get("returnPoints") as string, 10);
-  const rate = Number.parseFloat(formData.get("rate") as string);
-  const umaFirst = Number.parseInt(formData.get("umaFirst") as string, 10);
-  const umaSecond = Number.parseInt(formData.get("umaSecond") as string, 10);
-  const umaThird = Number.parseInt(formData.get("umaThird") as string, 10);
-  const umaFourth = Number.parseInt(formData.get("umaFourth") as string, 10);
-  const tobiPrize = formData.get("tobiPrize")
-    ? Number.parseInt(formData.get("tobiPrize") as string, 10)
-    : null;
-  const yakumanPrize = formData.get("yakumanPrize")
-    ? Number.parseInt(formData.get("yakumanPrize") as string, 10)
-    : null;
-  const yakitoriPrize = formData.get("yakitoriPrize")
-    ? Number.parseInt(formData.get("yakitoriPrize") as string, 10)
-    : null;
+  // FormDataをパースしてバリデーション
+  const parseResult = parseFormData(formData, UpdateGroupRulesSchema, parseGroupRulesFormData);
 
-  // バリデーション
-  if (startPoints <= 0 || returnPoints <= 0 || rate <= 0) {
-    return { error: "正しい数値を入力してください" };
+  if (!parseResult.success) {
+    return { error: parseResult.error };
   }
 
-  // 返し点は開始点以上である必要がある
-  if (returnPoints < startPoints) {
-    return { error: "返し点は開始点以上である必要があります" };
-  }
+  const input = parseResult.data;
 
   // ルールを更新
-  const { error: updateError } = await groupsRepo.updateGroupRules({
-    groupId,
-    gameType,
-    startPoints,
-    returnPoints,
-    rate,
-    umaFirst,
-    umaSecond,
-    umaThird,
-    umaFourth,
-    tobiPrize,
-    yakumanPrize,
-    yakitoriPrize,
-  });
-
-  if (updateError) {
-    console.error("Error updating rules:", updateError);
-    return { error: "ルールの更新に失敗しました" };
+  try {
+    await updateRules(input.groupId, input);
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "ルールの更新に失敗しました",
+    };
   }
 
   revalidatePath(`/groups/${groupId}`);

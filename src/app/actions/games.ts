@@ -39,7 +39,7 @@ export async function createGame(formData: FormData) {
   }
 
   // ゲーム作成サービスを実行
-  let game;
+  let game: { id: string };
   try {
     game = await createGameWithResults(input, user.id);
   } catch (error) {
