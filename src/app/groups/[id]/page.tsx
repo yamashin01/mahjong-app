@@ -330,6 +330,7 @@ export default async function GroupDetailPage({ params }: { params: Promise<{ id
             groupRules={rules}
             groupId={groupId}
             eventId=""
+            isAdmin={isAdmin}
           />
         )}
 

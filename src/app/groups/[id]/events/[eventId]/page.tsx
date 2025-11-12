@@ -387,6 +387,7 @@ export default async function EventDetailPage({
           groupRules={groupRules}
           groupId={groupId}
           eventId={eventId}
+          isAdmin={true}
         />
 
         {/* メンバー用操作 */}
