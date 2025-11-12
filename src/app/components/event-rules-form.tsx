@@ -154,7 +154,7 @@ function PrizeInputsForEvent({
           </div>
         </div>
         <div>
-          <label htmlFor="yakitori_prize" className="block text-xs text-gray-600 mb-1">
+          <label htmlFor="top_prize" className="block text-xs text-gray-600 mb-1">
             トップ賞
           </label>
           <div className="relative">

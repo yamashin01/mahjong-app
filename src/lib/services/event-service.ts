@@ -135,7 +135,7 @@ export async function updateRules(eventId: string, rules: UpdateEventRules) {
     rate: rules.rate ?? null,
     tobiPrize: rules.tobiPrize ?? null,
     yakumanPrize: rules.yakumanPrize ?? null,
-    yakitoriPrize: null,
+    yakitoriPrize: rules.yakitoriPrize ?? null,
     topPrize: rules.topPrize ?? null,
   });
 
