@@ -1,20 +1,19 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { updateGroupRules } from "@/app/actions/groups";
 import { PrizeInputs } from "./prize-inputs";
 import { UmaInputs } from "./uma-inputs";
 
 // useActionState用のラッパー関数
-async function updateGroupRulesAction(
-  _prevState: { error: string } | null,
-  formData: FormData,
-) {
+async function updateGroupRulesAction(_prevState: { error: string } | null, formData: FormData) {
   return await updateGroupRules(formData);
 }
 
 interface RulesFormProps {
   groupId: string;
+  cancelUrl: string;
   defaultValues: {
     gameType: string;
     startPoints: number;
@@ -29,7 +28,7 @@ interface RulesFormProps {
   };
 }
 
-export function RulesForm({ groupId, defaultValues }: RulesFormProps) {
+export function RulesForm({ groupId, cancelUrl, defaultValues }: RulesFormProps) {
   const [state, formAction, isPending] = useActionState(updateGroupRulesAction, null);
 
   return (
@@ -115,7 +114,7 @@ export function RulesForm({ groupId, defaultValues }: RulesFormProps) {
       {/* レート */}
       <div>
         <label htmlFor="rate" className="block text-sm font-medium text-gray-700 mb-2">
-          レート <span className="text-red-500">*</span>
+          レート（1.0なら1000点あたり100pt） <span className="text-red-500">*</span>
         </label>
         <input
           type="number"
@@ -123,7 +122,6 @@ export function RulesForm({ groupId, defaultValues }: RulesFormProps) {
           name="rate"
           required
           min="0.1"
-          max="10"
           step="0.1"
           defaultValue={defaultValues.rate}
           disabled={isPending}
@@ -142,15 +140,21 @@ export function RulesForm({ groupId, defaultValues }: RulesFormProps) {
         defaultTopPrize={defaultValues.topPrize}
       />
 
-      {/* 保存ボタン */}
-      <div className="flex justify-end">
+      {/* 保存・キャンセルボタン */}
+      <div className="flex gap-4">
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="flex-1 rounded-lg bg-blue-600 px-6 py-3 text-white font-medium hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          {isPending ? "保存中..." : "保存する"}
+          {isPending ? "保存中..." : "設定を保存"}
         </button>
+        <Link
+          href={cancelUrl}
+          className="flex-1 rounded-lg bg-gray-200 px-6 py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors text-center"
+        >
+          キャンセル
+        </Link>
       </div>
     </form>
   );

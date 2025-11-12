@@ -58,6 +58,7 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
 
         <RulesForm
           groupId={groupId}
+          cancelUrl={`/groups/${groupId}`}
           defaultValues={{
             gameType: rules.game_type,
             startPoints: rules.start_points,
@@ -80,15 +81,6 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
             <li>• ウマは点棒で1000点単位で指定します（例: 1位=20000点、2位=10000点）</li>
             <li>• 3位と4位は自動的に計算されます（3位=-2位、4位=-1位）</li>
           </ul>
-        </div>
-
-        <div className="flex justify-center">
-          <Link
-            href={`/groups/${groupId}`}
-            className="rounded-lg bg-gray-200 px-6 py-3 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
-          >
-            グループページに戻る
-          </Link>
         </div>
       </div>
     </main>
