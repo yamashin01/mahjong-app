@@ -26,6 +26,7 @@ export async function GET(
     .select(
       `
       rank,
+      final_points,
       raw_score,
       point_amount,
       uma,
@@ -66,6 +67,7 @@ export async function GET(
         }),
         gameType: game.game_type,
         rank: result.rank,
+        finalPoints: result.final_points,
         rawScore: result.raw_score,
         pointAmount: result.point_amount,
         uma: result.uma,
