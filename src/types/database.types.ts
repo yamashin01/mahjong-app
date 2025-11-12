@@ -444,71 +444,7 @@ export type Database = {
       };
     };
     Views: {
-      daily_rankings: {
-        Row: {
-          average_rank: number | null;
-          display_name: string | null;
-          first_place_count: number | null;
-          fourth_place_count: number | null;
-          game_date: string | null;
-          games_played: number | null;
-          group_id: string | null;
-          player_id: string | null;
-          second_place_count: number | null;
-          third_place_count: number | null;
-          total_points: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "game_results_player_id_fkey";
-            columns: ["player_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "games_group_id_fkey";
-            columns: ["group_id"];
-            isOneToOne: false;
-            referencedRelation: "groups";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      group_statistics: {
-        Row: {
-          average_points: number | null;
-          average_rank: number | null;
-          display_name: string | null;
-          first_place_count: number | null;
-          first_place_rate: number | null;
-          fourth_place_count: number | null;
-          group_id: string | null;
-          last_played_at: string | null;
-          player_id: string | null;
-          second_place_count: number | null;
-          third_place_count: number | null;
-          tobi_count: number | null;
-          total_games: number | null;
-          total_points: number | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "game_results_player_id_fkey";
-            columns: ["player_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-          {
-            foreignKeyName: "games_group_id_fkey";
-            columns: ["group_id"];
-            isOneToOne: false;
-            referencedRelation: "groups";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
+      [_ in never]: never;
     };
     Functions: {
       generate_invite_code: { Args: never; Returns: string };
