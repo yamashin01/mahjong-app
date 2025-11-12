@@ -156,6 +156,7 @@ export default async function GroupSettingsPage({ params }: { params: Promise<{ 
             defaultTobiPrize={rules.tobi_prize || 0}
             defaultYakumanPrize={rules.yakuman_prize || 0}
             defaultYakitoriPrize={rules.yakitori_prize || 0}
+            defaultTopPrize={rules.top_prize || 0}
           />
 
           <div className="rounded-lg bg-yellow-50 p-4">

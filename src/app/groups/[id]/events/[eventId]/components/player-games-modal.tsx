@@ -14,6 +14,7 @@ interface GameResult {
   gameDate: string;
   gameType: string;
   rank: number;
+  finalPoints: number;
   rawScore: number;
   pointAmount: number;
   uma: number;
@@ -102,44 +103,77 @@ export function PlayerGamesModal({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="bg-white rounded-md p-2">
-                      <div className="text-xs text-gray-500">得点</div>
-                      <div className="font-semibold text-gray-900">
-                        {game.rawScore.toLocaleString()}点
+                  <div className="space-y-2">
+                    {/* 上段: 得点と素点 */}
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">得点</div>
+                        <div className="font-semibold text-gray-900">
+                          {game.finalPoints.toLocaleString()}点
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">素点</div>
+                        <div
+                          className={`font-semibold ${
+                            game.rawScore >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.rawScore >= 0 ? "+" : ""}
+                          {game.rawScore.toLocaleString()}
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-md p-2">
-                      <div className="text-xs text-gray-500">ポイント</div>
-                      <div
-                        className={`font-semibold ${
-                          game.pointAmount >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {game.pointAmount >= 0 ? "+" : ""}
-                        {game.pointAmount.toFixed(1)}
+
+                    {/* 中段: ウマとオカ */}
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">ウマ</div>
+                        <div
+                          className={`font-semibold ${
+                            game.uma >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.uma >= 0 ? "+" : ""}
+                          {game.uma.toFixed(1)}
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">オカ</div>
+                        <div
+                          className={`font-semibold ${
+                            game.oka >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.oka >= 0 ? "+" : ""}
+                          {game.oka.toFixed(1)}
+                        </div>
                       </div>
                     </div>
-                    <div className="bg-white rounded-md p-2">
-                      <div className="text-xs text-gray-500">ウマ</div>
-                      <div
-                        className={`font-semibold ${
-                          game.uma >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {game.uma >= 0 ? "+" : ""}
-                        {game.uma.toFixed(1)}
+
+                    {/* 下段: 合計点とポイント */}
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">合計点</div>
+                        <div
+                          className={`font-semibold ${
+                            game.rawScore + game.uma + game.oka >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.rawScore + game.uma + game.oka >= 0 ? "+" : ""}
+                          {(game.rawScore + game.uma + game.oka).toFixed(1)}
+                        </div>
                       </div>
-                    </div>
-                    <div className="bg-white rounded-md p-2">
-                      <div className="text-xs text-gray-500">オカ</div>
-                      <div
-                        className={`font-semibold ${
-                          game.oka >= 0 ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {game.oka >= 0 ? "+" : ""}
-                        {game.oka.toFixed(1)}
+                      <div className="bg-white rounded-md p-2">
+                        <div className="text-xs text-gray-500">ポイント</div>
+                        <div
+                          className={`font-semibold ${
+                            game.pointAmount >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.pointAmount >= 0 ? "+" : ""}
+                          {game.pointAmount.toFixed(1)}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -165,10 +199,16 @@ export function PlayerGamesModal({
                       得点
                     </th>
                     <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      素点
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ウマ
                     </th>
                     <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       オカ
+                    </th>
+                    <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      合計点
                     </th>
                     <th className="px-3 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       ポイント
@@ -193,7 +233,17 @@ export function PlayerGamesModal({
                         <span className="text-sm font-semibold text-gray-900">{game.rank}位</span>
                       </td>
                       <td className="px-3 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                        {game.rawScore.toLocaleString()}点
+                        {game.finalPoints.toLocaleString()}点
+                      </td>
+                      <td className="px-3 py-4 whitespace-nowrap text-right">
+                        <span
+                          className={`text-sm font-semibold ${
+                            game.rawScore >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.rawScore >= 0 ? "+" : ""}
+                          {game.rawScore.toLocaleString()}
+                        </span>
                       </td>
                       <td className="px-3 py-4 whitespace-nowrap text-right">
                         <span
@@ -213,6 +263,16 @@ export function PlayerGamesModal({
                         >
                           {game.oka >= 0 ? "+" : ""}
                           {game.oka.toFixed(1)}
+                        </span>
+                      </td>
+                      <td className="px-3 py-4 whitespace-nowrap text-right">
+                        <span
+                          className={`text-sm font-semibold ${
+                            game.rawScore + game.uma + game.oka >= 0 ? "text-green-600" : "text-red-600"
+                          }`}
+                        >
+                          {game.rawScore + game.uma + game.oka >= 0 ? "+" : ""}
+                          {(game.rawScore + game.uma + game.oka).toFixed(1)}
                         </span>
                       </td>
                       <td className="px-3 py-4 whitespace-nowrap text-right">

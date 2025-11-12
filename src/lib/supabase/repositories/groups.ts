@@ -101,6 +101,7 @@ export async function updateGroupRules(params: {
   tobiPrize: number | null;
   yakumanPrize: number | null;
   yakitoriPrize: number | null;
+  topPrize: number | null;
 }) {
   const supabase = await createClient();
 
@@ -122,6 +123,7 @@ export async function updateGroupRules(params: {
       tobi_prize: params.tobiPrize,
       yakuman_prize: params.yakumanPrize,
       yakitori_prize: params.yakitoriPrize,
+      top_prize: params.topPrize,
     })
     .eq("group_id", params.groupId);
 }
