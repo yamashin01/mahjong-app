@@ -61,9 +61,10 @@ jobs:
 
       - name: Check for secrets
         run: |
-          # .mdファイルと.github/workflows/*.ymlを除外してシークレット検出
+          # .mdファイル、.github/workflows/*.yml、ロックファイルを除外してシークレット検出
           # （ドキュメントやワークフロー定義では"secret"等の単語が正常に使用されるため）
-          changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -v -E "(\.md$|\.github/workflows/.*\.yml$)" || true)
+          # （ロックファイルにはパッケージのハッシュ値が含まれるため）
+          changed_files=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -v -E "(\.md$|\.github/workflows/.*\.yml$|pnpm-lock\.yaml$|package-lock\.json$|yarn\.lock$)" || true)
           if [ -n "$changed_files" ]; then
             for file in $changed_files; do
               if [ -f "$file" ]; then
