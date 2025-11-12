@@ -210,12 +210,14 @@ export async function updateGroupRules(formData: FormData) {
   try {
     await updateRules(input.groupId, input);
   } catch (error) {
+    console.error("Failed to update group rules:", error);
     return {
       error: error instanceof Error ? error.message : "ルールの更新に失敗しました",
     };
   }
 
   revalidatePath(`/groups/${groupId}`);
+  revalidatePath(`/groups/${groupId}/settings`);
   redirect(`/groups/${groupId}`);
 }
 
