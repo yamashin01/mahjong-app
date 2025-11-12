@@ -27,6 +27,7 @@ type EventInsert = {
   rate?: number;
   tobi_prize?: number;
   yakuman_prize?: number;
+  yakitori_prize?: number;
   top_prize?: number;
 };
 
@@ -77,6 +78,8 @@ export async function createNewEvent(
       eventData.tobi_prize = customRules.tobiPrize ?? undefined;
     if (customRules.yakumanPrize !== undefined)
       eventData.yakuman_prize = customRules.yakumanPrize ?? undefined;
+    if (customRules.yakitoriPrize !== undefined)
+      eventData.yakitori_prize = customRules.yakitoriPrize ?? undefined;
     if (customRules.topPrize !== undefined) eventData.top_prize = customRules.topPrize ?? undefined;
   }
 

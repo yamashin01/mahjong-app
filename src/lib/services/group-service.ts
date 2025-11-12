@@ -44,7 +44,7 @@ export async function updateRules(groupId: string, rules: UpdateGroupRules) {
     umaFourth: rules.umaFourth,
     tobiPrize: rules.tobiPrize,
     yakumanPrize: rules.yakumanPrize,
-    yakitoriPrize: null, // デフォルトはnull
+    yakitoriPrize: rules.yakitoriPrize,
     topPrize: rules.topPrize,
   });
 

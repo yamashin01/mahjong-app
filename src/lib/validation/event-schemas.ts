@@ -82,6 +82,12 @@ export const UpdateEventRulesSchema = z.object({
     .min(0, "役満賞は0以上である必要があります")
     .nullable()
     .optional(),
+  yakitoriPrize: z
+    .number()
+    .int("役満賞は整数である必要があります")
+    .min(0, "役満賞は0以上である必要があります")
+    .nullable()
+    .optional(),
   topPrize: z
     .number()
     .int("トップ賞は整数である必要があります")

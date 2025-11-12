@@ -143,6 +143,7 @@ export function parseGroupRulesFormData(formData: FormData) {
     umaFourth: getIntValue(formData, "umaFourth"),
     tobiPrize: getIntValue(formData, "tobiPrize") || 0,
     yakumanPrize: getIntValue(formData, "yakumanPrize") || 0,
+    yakitoriPrize: getIntValue(formData, "yakitoriPrize") || 0,
     topPrize: getIntValue(formData, "topPrize") || 0,
   };
 }

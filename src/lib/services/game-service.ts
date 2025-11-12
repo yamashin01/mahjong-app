@@ -21,6 +21,7 @@ interface GameRules {
   rate: number;
   tobi_prize: number;
   yakuman_prize: number;
+  yakitori_prize: number;
   top_prize: number;
 }
 
@@ -67,6 +68,9 @@ export async function getRulesForGame(
     ...(event.tobi_prize !== null && { tobi_prize: event.tobi_prize }),
     ...(event.yakuman_prize !== null && {
       yakuman_prize: event.yakuman_prize,
+    }),
+    ...(event.yakitori_prize !== null && {
+      yakitori_prize: event.yakitori_prize,
     }),
     ...(event.top_prize !== null && { top_prize: event.top_prize }),
   };

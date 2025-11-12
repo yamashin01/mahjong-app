@@ -17,6 +17,7 @@ interface EventRulesDisplayProps {
     tobi_prize: number | null;
     yakuman_prize: number | null;
     yakitori_prize: number | null;
+    top_prize: number | null;
   };
   groupId: string;
   eventId: string | null;
@@ -42,6 +43,7 @@ export function EventRulesDisplay({
     tobi_prize: eventRules.tobi_prize ?? groupRules.tobi_prize ?? 0,
     yakuman_prize: eventRules.yakuman_prize ?? groupRules.yakuman_prize ?? 0,
     yakitori_prize: eventRules.yakitori_prize ?? groupRules.yakitori_prize ?? 0,
+    top_prize: eventRules.top_prize ?? groupRules.top_prize ?? 0,
   };
 
   const settingsUrl = eventId
@@ -122,6 +124,12 @@ export function EventRulesDisplay({
                 <span className="font-medium">
                   {displayRules.yakitori_prize.toLocaleString()}点
                 </span>
+              </div>
+            )}
+            {displayRules.top_prize > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">トップ賞</span>
+                <span className="font-medium">{displayRules.top_prize.toLocaleString()}点</span>
               </div>
             )}
           </div>

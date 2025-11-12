@@ -74,16 +74,19 @@ interface PrizeInputsForEventProps {
   defaultTobiPrize: number;
   defaultYakumanPrize: number;
   defaultYakitoriPrize: number;
+  defaultTopPrize: number;
 }
 
 function PrizeInputsForEvent({
   defaultTobiPrize,
   defaultYakumanPrize,
   defaultYakitoriPrize,
+  defaultTopPrize,
 }: PrizeInputsForEventProps) {
   const [tobiPrize, setTobiPrize] = useState(defaultTobiPrize);
   const [yakumanPrize, setYakumanPrize] = useState(defaultYakumanPrize);
   const [yakitoriPrize, setYakitoriPrize] = useState(defaultYakitoriPrize);
+  const [topPrize, setTopPrize] = useState(defaultTopPrize);
 
   return (
     <div>
@@ -143,6 +146,26 @@ function PrizeInputsForEvent({
               step="1000"
               value={yakitoriPrize}
               onChange={(e) => setYakitoriPrize(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
+            />
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              点
+            </span>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="yakitori_prize" className="block text-xs text-gray-600 mb-1">
+            トップ賞
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              id="top_prize"
+              name="top_prize"
+              min="0"
+              step="1000"
+              value={topPrize}
+              onChange={(e) => setTopPrize(Number(e.target.value))}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 pr-10 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition"
             />
             <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500">
@@ -301,6 +324,7 @@ export function EventRulesForm({ groupRules, initialRules, mode = "create" }: Ev
             defaultTobiPrize={initialRules?.tobi_prize || groupRules.tobi_prize || 0}
             defaultYakumanPrize={initialRules?.yakuman_prize || groupRules.yakuman_prize || 0}
             defaultYakitoriPrize={initialRules?.yakitori_prize || groupRules.yakitori_prize || 0}
+            defaultTopPrize={initialRules?.top_prize || groupRules.top_prize || 0}
           />
         </div>
       )}
